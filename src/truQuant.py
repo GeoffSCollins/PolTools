@@ -18,7 +18,6 @@ from utils.run_bedtools_coverage import run_coverage
 from utils.run_bedtools_subtract import run_subtract
 from utils.remove_files import remove_files
 
-
 search_regions_dict = {}
 gene_tsr_dict = {}
 max_tsrs_dict = {}
@@ -62,7 +61,8 @@ def map_tsrs_to_search_regions(tsr_filename):
         # Loop through the TSR file
         for i, line in enumerate(file):
             if i != 0:
-                tsr_chromosome, tsr_left, tsr_right, tsr_read_sum, tsr_strength, tsr_strand, tss_left, tss_right, max_tss, tss_strength, avgTSS, max_tss_mins_avg_tss, std_dev_avg_tss = line.split()
+                tsr_chromosome, tsr_left, tsr_right, tsr_read_sum, tsr_strength, tsr_strand, tss_left, tss_right, \
+                    max_tss, tss_strength, avgTSS, max_tss_mins_avg_tss, std_dev_avg_tss = line.split()
 
                 has_mapped = False
 
@@ -178,9 +178,11 @@ def map_flow_through_tsrs():
             # If there is a TSR as that base pair, add it to the gene_tsr dict
             if not (int(tsr_right) < int(left) or int(tsr_left) > int(right)):
                 if gene_name not in mapped_flow_through_tsrs_dict:
-                    mapped_flow_through_tsrs_dict[gene_name] = [[tsr_chromosome, tsr_left, tsr_right, gene_name, tsr_counts, tsr_strand]]
+                    mapped_flow_through_tsrs_dict[gene_name] = [
+                        [tsr_chromosome, tsr_left, tsr_right, gene_name, tsr_counts, tsr_strand]]
                 else:
-                    mapped_flow_through_tsrs_dict[gene_name].append([tsr_chromosome, tsr_left, tsr_right, gene_name, tsr_counts, tsr_strand])
+                    mapped_flow_through_tsrs_dict[gene_name].append(
+                        [tsr_chromosome, tsr_left, tsr_right, gene_name, tsr_counts, tsr_strand])
 
 
 def make_blacklisted_regions(blacklist_filename):
@@ -224,7 +226,6 @@ def make_blacklisted_regions(blacklist_filename):
 # ----------------------------------------------     Quantitation     -------------------------------------------------#
 
 def get_counts_in_paused_region(regions_filename, blacklisted_sequencing_file, sequencing_file):
-
     five_bed_filename = make_five_bed_file(blacklisted_sequencing_file)
 
     # Run bedtools coverage on the 5' bed file
@@ -329,10 +330,10 @@ if __name__ == "__main__":
     hg38_chrom_sizes_file = _file_path + "/static/hg38.chrom.sizes.GC"
 
     # Blacklist the file first
-    #run_bedtools_subtract.run_subtract(sequencing_files[0], rna_blacklist_file)
+    run_subtract(sequencing_files[0], rna_blacklist_file)
 
-    #os.system("tsrFinderPARALLEL " + sequencing_files[0].replace(".bed", "-blacklisted.bed") +
-    #            " 150 20 30 600 " + hg38_chrom_sizes_file)
+    os.system("tsrFinderPARALLEL " + sequencing_files[0].replace(".bed", "-blacklisted.bed") +
+              " 150 20 30 600 " + hg38_chrom_sizes_file)
 
     tsr_file = sequencing_files[0].replace(".bed", "-blacklisted_150_20_30_600-TSR.tab")
 
@@ -359,7 +360,8 @@ if __name__ == "__main__":
         # We need to blacklist the data before running the program
         blacklisted_sequencing_filename = generate_random_filename()
 
-        run_subtract(sequencing_file, rna_blacklist_file, blacklist_filename, output_filename=blacklisted_sequencing_filename)
+        run_subtract(sequencing_file, rna_blacklist_file, blacklist_filename,
+                     output_filename=blacklisted_sequencing_filename)
 
         get_counts_in_paused_region(paused_region_filename, blacklisted_sequencing_filename, sequencing_file)
         get_counts_in_gene_bodies(gene_body_region_filename, blacklisted_sequencing_filename, sequencing_file)
@@ -373,11 +375,11 @@ if __name__ == "__main__":
 
         remove_files(blacklisted_sequencing_filename)
 
-
     pause_region_headers = [file.split("/")[-1] + " Pause Region" for file in sequencing_files]
     gene_body_headers = [file.split("/")[-1] + " Gene Body" for file in sequencing_files]
 
-    with open(output_directory + "/" + os.path.basename(sequencing_files[0].replace('.bed', '-truQuant_output.txt')), 'w') as output_file:
+    with open(output_directory + "/" + os.path.basename(sequencing_files[0].replace('.bed', '-truQuant_output.txt')),
+              'w') as output_file:
         output_writer = csv.writer(output_file, delimiter='\t', lineterminator='\n')
 
         output_writer.writerow(["Gene", "Chromosome", "Pause Region Left", "Pause Region Right", "Strand",
