@@ -37,7 +37,7 @@ annotated 5' end. The pause region will be the 150 bp region surrounding the wei
 will be the end of the pause region to the TES. TSRs in the gene with more than 30% of the reads as the max TSR will be
 blacklisted. 5' ends in the pause regions will be quantified and 3' ends in the gene bodies will be quantified.
 
-.. image:: images/truQuant.tif
+.. image:: images/truQuant.png
 
 For example:
 
