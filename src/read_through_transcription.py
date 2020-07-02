@@ -11,6 +11,7 @@ from utils.run_bedtools_subtract import run_subtract
 from utils.make_three_prime_bed_file import make_three_bed_file
 from utils.make_random_filename import generate_random_filename
 from utils.remove_files import remove_files
+from utils.verify_bed_file import verify_bed_files
 
 
 def make_incremented_regions(regions_filename):
@@ -129,14 +130,51 @@ def output_data(combined_dict):
             real_position += 50
 
 
+def print_usage():
+    print("Usage: ")
+    print("python3 read_through_transcription <Regions Filename> <TSR Filename> <Output Filename>" + \
+                                        "<Upstream Distance> <Downstream Distance> <Sequencing Files>")
+    print("\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/read_through_transcription.rst")
+
+
+def parse_input():
+    if len(sys.argv[1:]) == 0:
+        print_usage()
+        sys.exit(1)
+
+    args = sys.argv[1:]
+
+    if len(args) < 6:
+        print("You did not provide all of the necessary arguments. Please try again.")
+        print_usage()
+        sys.exit(1)
+
+    regions_filename, tsr_file, output_filename, upstream_distance, downstream_distance = args[:5]
+    sequencing_files = args[5:]
+
+    verify_bed_files(regions_filename, sequencing_files) # TSR file?
+
+    try:
+        upstream_distance = int(upstream_distance)
+
+    except ValueError as e:
+        # The values are not integers
+        raise ValueError("The upstream distance you provided is not an integer.")
+
+    try:
+        downstream_distance = int(upstream_distance)
+
+    except ValueError as e:
+        # The values are not integers
+        raise ValueError("The downstream distance you provided is not an integer.")
+
+
+    return regions_filename, tsr_file, output_filename, upstream_distance, downstream_distance, sequencing_files
+
 if __name__ == '__main__':
     # The user must give us a bed file with the regions and a list of the sequencing files
-    regions_filename, tsr_file, output_filename, upstream_distance, downstream_distance = sys.argv[1:6]
+    regions_filename, tsr_file, output_filename, upstream_distance, downstream_distance, sequencing_files = parse_input()
 
-    upstream_distance = int(upstream_distance)
-    downstream_distance = int(downstream_distance)
-
-    sequencing_files = sys.argv[6:]
 
     # 1. Make the region intervals file from upstream distance to downstream distance at 50 bp intervals
     incremented_regions_filename = make_incremented_regions(regions_filename)

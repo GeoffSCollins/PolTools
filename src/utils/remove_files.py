@@ -5,7 +5,8 @@ def remove_files(*files):
     """
     Deletes the files from the system.
 
-    :param str or list files: files to be deleted
+    :param files: files to be deleted
+    :type files: str or list
     """
     command = "rm "
     for file in files[:-1]:

@@ -17,6 +17,7 @@ from utils.make_random_filename import generate_random_filename
 from utils.run_bedtools_coverage import run_coverage
 from utils.run_bedtools_subtract import run_subtract
 from utils.remove_files import remove_files
+from utils.verify_bed_file import verify_bed_files
 
 search_regions_dict = {}
 gene_tsr_dict = {}
@@ -314,9 +315,25 @@ def get_region_data(region):
     return [five_prime_sum, max_tss_position, max_tss_counts, weighted_pause_region_center,
             stdev_weighted_pause_region_center]
 
+def print_usage():
+    print("Usage: ")
+    print("python3 truQuant <Sequencing Files>")
+    print("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/truQuant.rst")
+
+
+def parse_input(args):
+    if len(sys.argv) == 1:
+        print_usage()
+        sys.exit(1)
+
+    sequencing_files = sys.argv[1:]
+    verify_bed_files(sequencing_files)
+
+    return sequencing_files
+
 
 if __name__ == "__main__":
-    sequencing_files = sys.argv[1:]
+    sequencing_files = parse_input(sys.argv[1:])
 
     _file_path = str(Path(__file__).parent.absolute())
 
