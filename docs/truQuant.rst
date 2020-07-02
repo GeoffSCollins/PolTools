@@ -1,13 +1,13 @@
 ##############################
-*Read Through Transcription*
+*truQuant*
 ##############################
-The ``read_through_transcription`` tool computes the coverage of 3' ends of sequencing data around the 3' end of
-features provided. This can be used to look at read through or runaway transcription.
-
+The ``truQuant`` tool is used to build an annotation of the transcribed genes from PRO-Seq data. It also quantifies the
+pause regions and gene bodies from the generated annotation while blacklisting enhancers, downstream promoters, and
+non RNA Polymerase II transcripts.
 
 .. note::
 
-    This tool requires bedtools to be installed.
+    This tool requires `bedtools <https://github.com/arq5x/bedtools2>`_ and `tsrFinder <https://github.com/P-TEFb/tsrFinderM1>`_ be installed.
 
 ===============================
 Usage and option summary
@@ -15,29 +15,29 @@ Usage and option summary
 **Usage**:
 ::
 
-  python3 read_through_transcription <Regions Filename> <TSR Filename> <Output Filename> \
-                                          <Upstream Distance> <Downstream Distance> <Sequencing Files>
+  python3 truQuant <Sequencing Files>
 
 
 ===========================    =========================================================================================================================================================
 Option                         Description
 ===========================    =========================================================================================================================================================
-**Regions Filename**           Bed formatted file containing all the genes to quantify (regions will be determined from the 3' end of each region in this file.
-**TSR Filename**               [tsrFinder](https://github.com/P-TEFb/tsrFinderM1) output file which will be blacklisted.
-                               Simply type *no* to not blacklist TSRs.
-**Output Filename**            Name of the output file.
-**Upstream Distance**          The number of base pairs to subtract from the left position.
-**Downstream Distance**        The number of base pairs to add from the left position.
 **Sequencing Files**           Sequencing files to quantify separated by spaces.
 ===========================    =========================================================================================================================================================
 
+.. note::
 
+  The first sequencing file provided will be used to generate the annotation.
 
 ==========================================================================
 Behavior
 ==========================================================================
-``read_through_transcription`` will report the position relative to the 3' end of the regions provided and the sum
-of the 3' reads at that position (50 bp intervals).
+``truQuant`` will generate search regions 1000 bp upstream of the 5' end of protein coding genes from GENCODE v32. Then,
+tsrFinder will be run to determine the max TSR in the search region. Inside this TSR, the max TSS will be chosen as the
+annotated 5' end. The pause region will be the 150 bp region surrounding the weighted average TSS (avgTSS) and gene body
+will be the end of the pause region to the TES. TSRs in the gene with more than 30% of the reads as the max TSR will be
+blacklisted. 5' ends in the pause regions will be quantified and 3' ends in the gene bodies will be quantified.
+
+.. image:: images/truQuant.tif
 
 For example:
 
@@ -57,19 +57,9 @@ For example:
   chr1    10564   10600   K00294:149:H35VNBBXY:6:1205:16407:42724 255     -
   chr1    10565   10597   K00294:149:H35VNBBXY:6:2221:2077:20709  255     -
 
-  $ python3 read_through_transcription.py gene_body_regions.bed no output.txt 100 500 control.bed treated.bed
-  $ cat output.txt
-  Position        control.bed treated.bed
-  -100    19627   14509
-  -50     17838   14471
-  0       20637   16395
-  50      24370   18634
-  100     24902   18578
-  150     25444   18615
-  200     26958   19160
-  250     28065   19877
-  300     29358   20841
-  350     27988   19534
-  400     27068   19176
-  450     26912   19786
+  $ python3 truQuant.py control.bed treated.bed
+  $ head -n 1 control-truQuant_output.txt # Printing the headers
+  Gene    Chromosome      Pause Region Left       Pause Region Right      Strand  Total 5' Reads  MaxTSS  MaxTSS 5' Reads
+  Weighted Pause Region Center    STDEV of TSSs   Gene Body Left  Gene Body Right Gene Body Distance
+  control.bed Pause Region   treated.bed Pause Region   combined.bed Gene Body   treated.bed Gene Body
 

@@ -7,7 +7,7 @@ features provided. This can be used to look at read through or runaway transcrip
 
 .. note::
 
-    This tool requires bedtools to be installed.
+    This tool requires `bedtools <https://github.com/arq5x/bedtools2>`_ to be installed.
 
 ===============================
 Usage and option summary
