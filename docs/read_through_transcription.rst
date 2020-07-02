@@ -23,7 +23,7 @@ Usage and option summary
 Option                         Description
 ===========================    =========================================================================================================================================================
 **Regions Filename**           Bed formatted file containing all the genes to quantify (regions will be determined from the 3' end of each region in this file.
-**TSR Filename**               [tsrFinder](https://github.com/P-TEFb/tsrFinderM1) output file which will be blacklisted.
+**TSR Filename**               tsrFinder (https://github.com/P-TEFb/tsrFinderM1) output file which will be blacklisted.
                                Simply type *no* to not blacklist TSRs.
 **Output Filename**            Name of the output file.
 **Upstream Distance**          The number of base pairs to subtract from the left position.
