@@ -1,16 +1,12 @@
-'''
-Takes in a regions bed file and outputs a csv of the base distribution at each position
-'''
-
-# Todo: Test this program
-
 import sys
 import os
 import csv
 
 from pathlib import Path
 
-from utils import fasta_reader, make_random_filename
+from utils.fasta_reader import read_fasta
+from utils.make_random_filename import generate_random_filename
+from utils.verify_bed_file import verify_bed_files
 
 
 def calculate_averages(sequences):
@@ -64,8 +60,24 @@ def output_to_file(filename, a_avgs, t_avgs, g_avgs, c_avgs):
             position += 1
 
 
-if __name__ == '__main__':
+def print_usage():
+    print("Usage: ")
+    print("python3 base_distribution.py <Regions Filename>")
+    print("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/base_distribution.rst")
+
+def parse_input():
+    if len(sys.argv) == 1 or len(sys.argv) > 2:
+        print_usage()
+        sys.exit(1)
+
     regions_file = sys.argv[1]
+    verify_bed_files(regions_file)
+
+    return regions_file
+
+
+if __name__ == '__main__':
+    regions_file = parse_input()
 
     if regions_file == "":
         print("No region file was given. Exiting...")
@@ -75,15 +87,15 @@ if __name__ == '__main__':
     hg38_fasta_file = _file_path + "/static/hg38.fa"
 
     # 1. Make a fasta file
-    random_filename = make_random_filename.generate_random_filename()
+    random_filename = generate_random_filename()
     os.system("bedtools getfasta -s -fi " + hg38_fasta_file + " -bed " + regions_file + " > " + random_filename)
-    sequences = fasta_reader.read_fasta(random_filename)
+    sequences = read_fasta(random_filename)
     os.system("rm " + random_filename)
 
     # 2. Get the percentages at each position
     a_avgs, t_avgs, g_avgs, c_avgs = calculate_averages(sequences)
 
-    output_filename = regions_file.replace(".bed", "base_distribution_plot.tsv")
+    output_filename = regions_file.replace(".bed", "-base_distribution_plot.tsv")
 
     # 3. Output into a file
     output_to_file(output_filename, a_avgs, t_avgs, g_avgs, c_avgs)
