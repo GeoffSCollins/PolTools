@@ -32,6 +32,8 @@ Behavior
 ==========================================================================
 ``base_distribution`` will report the position relative to the middle of the region and the percent occupancy of each base.
 
+.. image:: images/base_distribution.png
+
 For example:
 
 .. code-block:: bash
