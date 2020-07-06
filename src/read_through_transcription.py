@@ -5,6 +5,7 @@ We will output for every 50 bp
 
 import csv
 import sys
+import threading
 
 from utils.run_bedtools_coverage import run_coverage
 from utils.run_bedtools_subtract import run_subtract
@@ -12,9 +13,10 @@ from utils.make_three_prime_bed_file import make_three_bed_file
 from utils.make_random_filename import generate_random_filename
 from utils.remove_files import remove_files
 from utils.verify_bed_file import verify_bed_files
+from utils.check_dependencies import check_dependencies
 
 
-def make_incremented_regions(regions_filename):
+def make_incremented_regions(regions_filename, upstream_distance, downstream_distance):
     # Using the regions provided, make 50 bp incremented regions
     with open(regions_filename) as file:
         regions = []
@@ -61,34 +63,56 @@ def make_incremented_regions(regions_filename):
     return region_intervals_filename
 
 
-def blacklist_tsrs(sequencing_files):
+def blacklist_tsrs(sequencing_files, tsr_file):
     # Go through all of the sequencing files and blacklist TSRs
     blacklisted_filenames = []
+    threads = []
     for seq_filename in sequencing_files:
         curr_filename = generate_random_filename()
         blacklisted_filenames.append(curr_filename)
-        run_subtract(seq_filename, tsr_file, output_filename=curr_filename)
+        t = threading.Thread(target=run_subtract, args=[seq_filename, tsr_file],
+                             kwargs={'output_filename': curr_filename})
+        threads.append(t)
+        t.start()
+
+    for thread in threads:
+        thread.join()
+
+    return blacklisted_filenames
+
+
+def get_coverage_files_helper(filename, region_intervals_file, index):
+    # First makes the three bed file
+    three_prime_end_file = make_three_bed_file(filename)
+
+    # Run coverage on the three bed file
+    coverage_file = generate_random_filename()
+    run_coverage(region_intervals_file, three_prime_end_file, output_filename=coverage_file)
+
+    coverage_files[index] = coverage_file
+
+    remove_files(three_prime_end_file)
+    return coverage_file
 
 
 def get_coverage_files(blacklisted_filenames, region_intervals_file):
     # Go through all of the blacklisted sequencing files and make 3' end files
-    three_end_files = []
-    for filename in blacklisted_filenames:
-        three_end_files.append(make_three_bed_file(filename))
+    global coverage_files
+    coverage_files = [''] * len(blacklisted_filenames)
+    threads = []
 
-    # Now run bedtools coverage on each 3' end file
-    coverage_files = []
-    for i, seq_filename in enumerate(three_end_files):
-        curr_filename = generate_random_filename()
-        coverage_files.append(curr_filename)
-        run_coverage(region_intervals_file, three_end_files[i], output_filename=curr_filename)
+    for i, filename in enumerate(blacklisted_filenames):
+        t = threading.Thread(target=get_coverage_files_helper, args=[filename, region_intervals_file, i])
+        threads.append(t)
+        t.start()
 
-    remove_files(three_end_files)
+    for thread in threads:
+        thread.join()
 
     return coverage_files
 
 
-def coverage_files_to_dictionary(coverage_files):
+def coverage_files_to_dictionary(coverage_files, sequencing_files):
     # Has keys of the region number and values of a list containing the counts for each file
     combined_dict = {}
 
@@ -115,7 +139,7 @@ def coverage_files_to_dictionary(coverage_files):
     return combined_dict
 
 
-def output_data(combined_dict):
+def output_data(combined_dict, output_filename, sequencing_files, upstream_distance):
     # Now the data is in the combined_dict, we need to reduce it back down to positions again
     with open(output_filename, 'w') as output_file:
         output_writer = csv.writer(output_file, delimiter='\t', lineterminator='\n')
@@ -132,9 +156,10 @@ def output_data(combined_dict):
 
 def print_usage():
     print("Usage: ")
-    print("python3 read_through_transcription <Regions Filename> <TSR Filename> <Output Filename>" + \
-                                        "<Upstream Distance> <Downstream Distance> <Sequencing Files>")
-    print("\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/read_through_transcription.rst")
+    print("python3 read_through_transcription <Regions Filename> <TSR Filename> <Output Filename> " +
+          "<Upstream Distance> <Downstream Distance> <Sequencing Files>")
+    print(
+        "\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/read_through_transcription.rst")
 
 
 def parse_input():
@@ -152,44 +177,48 @@ def parse_input():
     regions_filename, tsr_file, output_filename, upstream_distance, downstream_distance = args[:5]
     sequencing_files = args[5:]
 
-    verify_bed_files(regions_filename, sequencing_files) # TSR file?
+    verify_bed_files(regions_filename, sequencing_files)
 
     try:
         upstream_distance = int(upstream_distance)
 
-    except ValueError as e:
+    except ValueError as _:
         # The values are not integers
         raise ValueError("The upstream distance you provided is not an integer.")
 
     try:
-        downstream_distance = int(upstream_distance)
+        downstream_distance = int(downstream_distance)
 
-    except ValueError as e:
+    except ValueError as _:
         # The values are not integers
         raise ValueError("The downstream distance you provided is not an integer.")
 
-
     return regions_filename, tsr_file, output_filename, upstream_distance, downstream_distance, sequencing_files
 
-if __name__ == '__main__':
+
+def run_read_through_transcription():
     # The user must give us a bed file with the regions and a list of the sequencing files
     regions_filename, tsr_file, output_filename, upstream_distance, downstream_distance, sequencing_files = parse_input()
 
-
     # 1. Make the region intervals file from upstream distance to downstream distance at 50 bp intervals
-    incremented_regions_filename = make_incremented_regions(regions_filename)
+    incremented_regions_filename = make_incremented_regions(regions_filename, upstream_distance, downstream_distance)
 
     # Blacklist the TSRs
     if tsr_file != 'no':
-        blacklisted_filenames = blacklist_tsrs(sequencing_files)
+        blacklisted_filenames = blacklist_tsrs(sequencing_files, tsr_file)
         coverage_files = get_coverage_files(blacklisted_filenames, incremented_regions_filename)
         remove_files(blacklisted_filenames)
     else:
         coverage_files = get_coverage_files(sequencing_files, incremented_regions_filename)
 
-    combined_dict = coverage_files_to_dictionary(coverage_files)
+    combined_dict = coverage_files_to_dictionary(coverage_files, sequencing_files)
 
-    output_data(combined_dict)
+    output_data(combined_dict, output_filename, sequencing_files, upstream_distance)
 
     # Remove all of the temporary files
     remove_files(incremented_regions_filename, coverage_files)
+
+
+if __name__ == '__main__':
+    check_dependencies("bedtools")
+    run_read_through_transcription()
