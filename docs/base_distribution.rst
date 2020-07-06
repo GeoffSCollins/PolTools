@@ -7,8 +7,8 @@ The ``base_distribution`` tool computes the average base composition at each pos
 .. note::
 
     This tool requires `bedtools <https://github.com/arq5x/bedtools2>`_ to be installed.
-    This tool requires hg38.fa to be downloaded to ~/GC_bioinfo/src/static. This can be done by running the following
-    commands in the static directory
+    This tool requires hg38.fa to be downloaded to ~/GC_bioinfo/src/static. This can be done by running the commands
+    at the bottom of this page.
 
 
 ===============================
@@ -160,7 +160,7 @@ For example:
 Download hg38.fa
 ===============================
 **Download hg38.fa**:
-To download the hg38.fa (fasta file for the whole genome), run the following commands:
+To download the hg38.fa (fasta file for the whole genome), run the following commands in the static directory:
 
 .. code-block:: bash
 

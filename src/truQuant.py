@@ -61,7 +61,7 @@ def map_tsrs_to_search_regions(tsr_filename, search_regions_dict):
         for i, line in enumerate(file):
             if i != 0:
                 tsr_chromosome, tsr_left, tsr_right, tsr_read_sum, tsr_strength, tsr_strand, tss_left, tss_right, \
-                max_tss, tss_strength, avg_tss, max_tss_mins_avg_tss, std_dev_avg_tss = line.split()
+                    max_tss, tss_strength, avg_tss, max_tss_mins_avg_tss, std_dev_avg_tss = line.split()
 
                 has_mapped = False
 

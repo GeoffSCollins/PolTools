@@ -15,7 +15,7 @@ def run_getfasta(regions_file, output_filename=''):
     :return: filename of the resultant bedtools fasta output
     :rtype: str
     """
-    _file_path = str(Path(__file__).parent.absolute())
+    _file_path = str(Path(__file__).parent.parent.absolute())
     hg38_fasta_file = _file_path + "/static/hg38.fa"
 
     if output_filename == '':

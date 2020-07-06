@@ -1,61 +1,61 @@
 import sys
-import os
 import csv
 
-from pathlib import Path
-
 from utils.fasta_reader import read_fasta
-from utils.make_random_filename import generate_random_filename
 from utils.verify_bed_file import verify_bed_files
+from utils.check_dependencies import check_dependencies
+from utils.run_bedtools_getfasta import run_getfasta
+from utils.remove_files import remove_files
+from utils.get_region_length import determine_region_length
 
 
 def calculate_averages(sequences):
-    a_sums = [0] * len(sequences[0])
-    t_sums = [0] * len(sequences[0])
-    g_sums = [0] * len(sequences[0])
-    c_sums = [0] * len(sequences[0])
+    sums_dict = {
+        "A": [0] * len(sequences[0]),
+        "T": [0] * len(sequences[0]),
+        "G": [0] * len(sequences[0]),
+        "C": [0] * len(sequences[0])
+    }
 
     for sequence in sequences:
         for i, char in enumerate(sequence):
-            if char.upper() == "A":
-                a_sums[i] += 1
-            elif char.upper() == "T":
-                t_sums[i] += 1
-            elif char.upper() == "G":
-                g_sums[i] += 1
-            elif char.upper() == "C":
-                c_sums[i] += 1
+            if char.upper() in sums_dict:
+                sums_dict[char.upper()][i] += 1
 
-    a_avgs = [0] * len(sequences[0])
-    g_avgs = [0] * len(sequences[0])
-    c_avgs = [0] * len(sequences[0])
-    t_avgs = [0] * len(sequences[0])
+    averages_dict = {
+        "A": [0] * len(sequences[0]),
+        "T": [0] * len(sequences[0]),
+        "G": [0] * len(sequences[0]),
+        "C": [0] * len(sequences[0])
+    }
 
-    # Loop through all of the values in the sums and compute the average
-    for i in range(len(a_sums)):
-        # The averages are equal to the sum / the number of sequences
-        a_avgs[i] = a_sums[i] / len(sequences)
-        g_avgs[i] = g_sums[i] / len(sequences)
-        c_avgs[i] = c_sums[i] / len(sequences)
-        t_avgs[i] = t_sums[i] / len(sequences)
+    # We loop through each position in the list
+    # Loop through each base in the dictionary
+    # Do the division
 
-    return a_avgs, t_avgs, g_avgs, c_avgs
+    for i in range(len(sequences[0])):
+        # Looping through each position in the region
+        for nt in averages_dict:
+            # Looping through nucleotides (A, T, G, C)
+            averages_dict[nt][i] = sums_dict[nt][i] / len(sequences)
+
+    return averages_dict
 
 
-def output_to_file(filename, a_avgs, t_avgs, g_avgs, c_avgs):
+def output_to_file(filename, avgs_dict):
     with open(filename, 'w') as output_file:
         tsv_writer = csv.writer(output_file, delimiter='\t', lineterminator='\n')
         # Write a header
-        tsv_writer.writerow(["Position", "A", "T", "G", "C"])
+        tsv_writer.writerow(["Position"] + list(avgs_dict.keys()))
 
-        position = len(a_avgs) / 2 * -1
+        position = region_length / 2 * -1
 
         # We go through each position and output the averages
-        for i in range(len(a_avgs)):
+        for i in range(region_length):
             if position == 0:
                 position += 1
 
-            tsv_writer.writerow([position, a_avgs[i], t_avgs[i], g_avgs[i], c_avgs[i]])
+            tsv_writer.writerow([position] + [avgs_dict[nt][i] for nt in avgs_dict.keys()])
 
             position += 1
 
@@ -63,7 +63,9 @@ def output_to_file(filename, a_avgs, t_avgs, g_avgs, c_avgs):
 def print_usage():
     print("Usage: ")
     print("python3 base_distribution.py <Regions Filename>")
-    print("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/base_distribution.rst")
+    print(
+        "More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/base_distribution.rst")
+
 
 def parse_input():
     if len(sys.argv) == 1 or len(sys.argv) > 2:
@@ -73,29 +75,33 @@ def parse_input():
     regions_file = sys.argv[1]
     verify_bed_files(regions_file)
 
+    global region_length
+    region_length = determine_region_length(regions_file)
+
+    if region_length % 2 != 0:
+        print("The region length is not even, so the +1 nt position cannot be determined. Exiting ...")
+        sys.exit(1)
+
     return regions_file
 
 
-if __name__ == '__main__':
+def run_base_distribution():
     regions_file = parse_input()
 
-    if regions_file == "":
-        print("No region file was given. Exiting...")
-        exit(1)
-
-    _file_path = str(Path(__file__).parent.absolute())
-    hg38_fasta_file = _file_path + "/static/hg38.fa"
-
-    # 1. Make a fasta file
-    random_filename = generate_random_filename()
-    os.system("bedtools getfasta -s -fi " + hg38_fasta_file + " -bed " + regions_file + " > " + random_filename)
-    sequences = read_fasta(random_filename)
-    os.system("rm " + random_filename)
+    # 1. Get the sequences of the region
+    fasta_file = run_getfasta(regions_file)
+    sequences = read_fasta(fasta_file)
+    remove_files(fasta_file)
 
     # 2. Get the percentages at each position
-    a_avgs, t_avgs, g_avgs, c_avgs = calculate_averages(sequences)
+    avgs_dict = calculate_averages(sequences)
 
     output_filename = regions_file.replace(".bed", "-base_distribution_plot.tsv")
 
     # 3. Output into a file
-    output_to_file(output_filename, a_avgs, t_avgs, g_avgs, c_avgs)
+    output_to_file(output_filename, avgs_dict)
+
+
+if __name__ == '__main__':
+    check_dependencies("bedtools")
+    run_base_distribution()

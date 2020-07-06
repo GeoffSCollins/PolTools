@@ -37,7 +37,7 @@ def _python_module_exits(module):
     try:
         dist = pkg_resources.get_distribution(module)
     except pkg_resources.DistributionNotFound:
-        install_module_response = input(module + " is not installed. Do you want to install it? y or n")
+        install_module_response = input(module + " is not installed. Do you want to install it? y or n\n")
         if install_module_response == "y":
             # Install it
             print("Installing " + module)
