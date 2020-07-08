@@ -7,6 +7,7 @@ from utils.check_dependencies import check_dependencies
 from utils.run_bedtools_getfasta import run_getfasta
 from utils.remove_files import remove_files
 from utils.get_region_length import determine_region_length
+from utils.print_tab_delimited import print_tab_delimited
 
 
 def calculate_averages(sequences):
@@ -42,37 +43,34 @@ def calculate_averages(sequences):
     return averages_dict
 
 
-def output_to_file(filename, avgs_dict):
-    with open(filename, 'w') as output_file:
-        tsv_writer = csv.writer(output_file, delimiter='\t', lineterminator='\n')
-        # Write a header
-        tsv_writer.writerow(["Position"] + list(avgs_dict.keys()))
+def output_data(avgs_dict):
+    # Write the header
+    print_tab_delimited(["Position"] + list(avgs_dict.keys()))
 
-        position = region_length / 2 * -1
+    position = region_length / 2 * -1
 
-        # We go through each position and output the averages
-        for i in range(region_length):
-            if position == 0:
-                position += 1
-
-            tsv_writer.writerow([position] + [avgs_dict[nt][i] for nt in avgs_dict.keys()])
-
+    # We go through each position and output the averages
+    for i in range(region_length):
+        if position == 0:
             position += 1
+
+        print_tab_delimited([position] + [avgs_dict[nt][i] for nt in avgs_dict.keys()])
+
+        position += 1
 
 
 def print_usage():
     print("Usage: ")
     print("python3 base_distribution.py <Regions Filename>")
-    print(
-        "More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/base_distribution.rst")
+    print("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/base_distribution.rst")
 
 
-def parse_input():
-    if len(sys.argv) == 1 or len(sys.argv) > 2:
+def parse_input(args):
+    if len(args) != 1:
         print_usage()
         sys.exit(1)
 
-    regions_file = sys.argv[1]
+    regions_file = args[0]
     verify_bed_files(regions_file)
 
     global region_length
@@ -85,9 +83,7 @@ def parse_input():
     return regions_file
 
 
-def run_base_distribution():
-    regions_file = parse_input()
-
+def run_base_distribution(regions_file):
     # 1. Get the sequences of the region
     fasta_file = run_getfasta(regions_file)
     sequences = read_fasta(fasta_file)
@@ -96,12 +92,23 @@ def run_base_distribution():
     # 2. Get the percentages at each position
     avgs_dict = calculate_averages(sequences)
 
-    output_filename = regions_file.replace(".bed", "-base_distribution_plot.tsv")
-
     # 3. Output into a file
-    output_to_file(output_filename, avgs_dict)
+    output_data(avgs_dict)
+
+
+def main(args):
+    """
+    base_distribution.py <Regions Filename>
+    More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/base_distribution.rst
+
+    :param args: list of the sequencing files
+    :type args: list
+    :return:
+    """
+    check_dependencies("bedtools")
+    regions_file = parse_input(args)
+    run_base_distribution(regions_file)
 
 
 if __name__ == '__main__':
-    check_dependencies("bedtools")
-    run_base_distribution()
+    main(sys.argv[1:])
