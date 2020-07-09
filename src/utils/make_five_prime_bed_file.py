@@ -27,8 +27,8 @@ def make_five_bed_file(sequencing_filename):
                     left = int(left)
                     right = int(left) + 1
                 else:
-                    right = int(right) + 1
-                    left = int(right)
+                    right = int(right)
+                    left = int(right) - 1
 
                 # Output the 5' end to the file
                 output_writer.writerow([chromosome, left, right, gene_name, score, strand])

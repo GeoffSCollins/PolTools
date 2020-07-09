@@ -24,8 +24,8 @@ def make_three_bed_file(sequencing_filename):
 
                 # Now get the 3' end
                 if strand == "+":
-                    left = int(right)
-                    right = int(right) + 1
+                    left = int(right) - 1
+                    right = int(right)
                 else:
                     left = int(left)
                     right = int(left) + 1

@@ -26,10 +26,10 @@ def build_counts_dict(sequencing_filename):
 
             if strand == "+":
                 five_prime_position = left
-                three_prime_position = right
+                three_prime_position = right - 1
 
             else:
-                five_prime_position = right
+                five_prime_position = right - 1
                 three_prime_position = left
 
             if five_prime_position not in five_prime_counts_dict[chromosome][strand]:
