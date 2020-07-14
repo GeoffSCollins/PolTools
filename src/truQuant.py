@@ -8,7 +8,7 @@ import csv
 import sys
 import os
 import math
-import threading
+import multiprocessing
 from pathlib import Path
 
 from utils.make_five_prime_bed_file import make_five_bed_file
@@ -61,7 +61,7 @@ def map_tsrs_to_search_regions(tsr_filename, search_regions_dict):
         for i, line in enumerate(file):
             if i != 0:
                 tsr_chromosome, tsr_left, tsr_right, tsr_read_sum, tsr_strength, tsr_strand, tss_left, tss_right, \
-                    max_tss, tss_strength, avg_tss, max_tss_mins_avg_tss, std_dev_avg_tss = line.split()
+                max_tss, tss_strength, avg_tss, max_tss_mins_avg_tss, std_dev_avg_tss = line.split()
 
                 has_mapped = False
 
@@ -234,31 +234,30 @@ def make_blacklisted_regions(blacklist_filename, annotations_dict, max_tsrs_dict
 
 # ----------------------------------------------     Quantitation     -------------------------------------------------#
 
-def get_counts_in_paused_region(regions_filename, blacklisted_sequencing_file, sequencing_file):
+def get_counts_in_paused_region(regions_filename, blacklisted_sequencing_file):
     five_bed_filename = make_five_bed_file(blacklisted_sequencing_file)
 
     # Run bedtools coverage on the 5' bed file
     random_filename = run_coverage(regions_filename, five_bed_filename)
+
+    indv_gene_counts_dict = {}
 
     with open(random_filename) as file:
         for line in file:
             counts = int(line.split()[-4])
             gene_name = line.split()[3]
 
-            if gene_name not in gene_counts_dict:
-                gene_counts_dict[gene_name] = {"Pause": [-1] * len(sequencing_files),
-                                               "Body": [-1] * len(sequencing_files)}
+            if gene_name not in indv_gene_counts_dict:
+                indv_gene_counts_dict[gene_name] = {"Pause": -1,
+                                               "Body": -1}
 
-            # We are going to place the current data in the position that it is found in the sequencing_files list
-            for i, seq_file in enumerate(sequencing_files):
-                if sequencing_file == seq_file:
-                    gene_counts_dict[gene_name]["Pause"][i] = counts
-                    break
+            indv_gene_counts_dict[gene_name]["Pause"] = counts
 
     remove_files(five_bed_filename, random_filename)
+    return indv_gene_counts_dict
 
 
-def get_counts_in_gene_bodies(regions_filename, blacklisted_sequencing_file, sequencing_file):
+def get_counts_in_gene_bodies(regions_filename, blacklisted_sequencing_file, indv_gene_counts_dict):
     three_bed_filename = make_three_bed_file(blacklisted_sequencing_file)
 
     # Generate a random filename
@@ -269,13 +268,10 @@ def get_counts_in_gene_bodies(regions_filename, blacklisted_sequencing_file, seq
             counts = line.split()[-4]
             gene_name = line.split()[3]
 
-            # We are going to place the current data in the position that it is found in the sequencing_files list
-            for i, seq_file in enumerate(sequencing_files):
-                if sequencing_file == seq_file:
-                    gene_counts_dict[gene_name]["Body"][i] = counts
-                    break
+            indv_gene_counts_dict[gene_name]["Body"] = counts
 
     remove_files(three_bed_filename, random_filename)
+    return indv_gene_counts_dict
 
 
 def get_region_data(region, five_prime_counts_dict):
@@ -326,14 +322,16 @@ def get_region_data(region, five_prime_counts_dict):
 
 def gather_data(sequencing_file, blacklist_filename, annotated_dataset, paused_region_filename,
                 gene_body_region_filename):
+
+    region_data_dict = {}
     # We need to blacklist the data before running the program
     blacklisted_sequencing_filename = generate_random_filename()
 
     run_subtract(sequencing_file, rna_blacklist_file, blacklist_filename,
                  output_filename=blacklisted_sequencing_filename)
 
-    get_counts_in_paused_region(paused_region_filename, blacklisted_sequencing_filename, sequencing_file)
-    get_counts_in_gene_bodies(gene_body_region_filename, blacklisted_sequencing_filename, sequencing_file)
+    indv_gene_counts_dict = get_counts_in_paused_region(paused_region_filename, blacklisted_sequencing_filename)
+    get_counts_in_gene_bodies(gene_body_region_filename, blacklisted_sequencing_filename, indv_gene_counts_dict)
 
     # Only get the region data from the dataset which was annotated
     if annotated_dataset:
@@ -344,8 +342,33 @@ def gather_data(sequencing_file, blacklist_filename, annotated_dataset, paused_r
 
     remove_files(blacklisted_sequencing_filename)
 
+    return sequencing_file, indv_gene_counts_dict, region_data_dict
 
-def output_data(output_filename):
+
+def combine_indv_gene_counts_dict(count_information_list):
+    # Need to combine the dictionaries to fit the gene_counts dict format
+    ret_region_data_dict = {}
+    gene_counts_dict = {}
+
+    for i, tup in enumerate(count_information_list):
+        # Tup has the sequencing_file, indv_gene_counts_dict, and region_data_dict
+        sequencing_file, indv_gene_counts_dict, region_data_dict = tup
+
+        for gene_name in indv_gene_counts_dict:
+            if gene_name not in gene_counts_dict:
+                gene_counts_dict[gene_name] = {"Pause": [-1] * len(sequencing_files),
+                                               "Body": [-1] * len(sequencing_files)}
+
+            gene_counts_dict[gene_name]["Pause"][i] = indv_gene_counts_dict[gene_name]["Pause"]
+            gene_counts_dict[gene_name]["Body"][i] = indv_gene_counts_dict[gene_name]["Body"]
+
+        if region_data_dict != {}:
+            ret_region_data_dict = region_data_dict
+
+    return ret_region_data_dict, gene_counts_dict
+
+
+def output_data(output_filename, region_data_dict, gene_counts_dict):
     pause_region_headers = [file.split("/")[-1] + " Pause Region" for file in sequencing_files]
     gene_body_headers = [file.split("/")[-1] + " Gene Body" for file in sequencing_files]
 
@@ -379,12 +402,12 @@ def print_usage():
     print("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/truQuant.rst")
 
 
-def parse_input():
-    if len(sys.argv) == 1:
+def parse_input(args):
+    if len(args) == 0:
         print_usage()
         sys.exit(1)
 
-    seq_files = sys.argv[1:]
+    seq_files = args
     verify_bed_files(seq_files)
 
     return seq_files
@@ -396,7 +419,7 @@ def run_truQuant():
     run_subtract(sequencing_files[0], rna_blacklist_file, output_filename=blacklisted_first_sequencing_file)
 
     # Run tsrFinder on the first file
-    os.system("tsrFinderPARALLEL " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file)
+    #os.system("tsrFinderPARALLEL " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file)
 
     tsr_file = blacklisted_first_sequencing_file.replace(".bed", "_150_20_30_600-TSR.tab")
 
@@ -417,31 +440,44 @@ def run_truQuant():
     make_blacklisted_regions(blacklist_filename, annotations_dict, max_tsrs_dict, non_max_tsrs_dict, flow_through_tsrs)
 
     # 3. Get the number of counts (multithreaded)
-    threads_list = []
-    for i, sequencing_file in enumerate(sequencing_files):
-        annotated_dataset = i == 0
-        t = threading.Thread(target=gather_data, args=[sequencing_file, blacklist_filename, annotated_dataset,
-                                                       paused_region_filename, gene_body_region_filename])
-        t.start()
-        threads_list.append(t)
 
-    for thread in threads_list:
-        thread.join()
+    pool = multiprocessing.Pool(processes=len(sequencing_files))
+
+    count_information_list = pool.starmap(gather_data,
+                                 [(sequencing_file, blacklist_filename, i == 0, paused_region_filename,
+                                    gene_body_region_filename) for i, sequencing_file in enumerate(sequencing_files)])
+
+    region_data_dict, gene_counts_dict = combine_indv_gene_counts_dict(count_information_list)
 
     # Output the data
-    output_data(output_filename)
+    output_data(output_filename, region_data_dict, gene_counts_dict)
 
 
-if __name__ == "__main__":
+def main(args):
+    """
+    truQuant <Sequencing Files>
+    More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/truQuant.rst
+
+    :param args: list of the sequencing files
+    :type args: list
+    :return:
+    """
     check_dependencies("bedtools", "tsrFinderPARALLEL")
-    sequencing_files = parse_input()
+
+    # Declare all of the global variables
+    global annotation_extension, blacklist_extension, percent_for_blacklisting, output_directory, gene_counts_dict, \
+        truQuant_regions_dict, region_data_dict, sequencing_files
+
+    sequencing_files = parse_input(args)
 
     annotation_extension = 1000
     blacklist_extension = 0
     percent_for_blacklisting = 0.3
     output_directory = str(Path(sequencing_files[0]).parent) + "/"
 
-    gene_counts_dict = {}
     truQuant_regions_dict = {}
-    region_data_dict = {}
     run_truQuant()
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
