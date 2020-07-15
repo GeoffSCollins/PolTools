@@ -1,11 +1,6 @@
-'''
-We are going to look at the TES and go to 10 kb past that and get all of the 3' ends
-We will output for every 50 bp
-'''
-
 import csv
 import sys
-import threading
+import multiprocessing
 
 from utils.run_bedtools_coverage import run_coverage
 from utils.run_bedtools_subtract import run_subtract
@@ -14,10 +9,11 @@ from utils.make_random_filename import generate_random_filename
 from utils.remove_files import remove_files
 from utils.verify_bed_file import verify_bed_files
 from utils.check_dependencies import check_dependencies
+from utils.print_tab_delimited import print_tab_delimited
 
 
-def make_incremented_regions(regions_filename, upstream_distance, downstream_distance):
-    # Using the regions provided, make 50 bp incremented regions
+def make_incremented_regions(regions_filename, upstream_distance, downstream_distance, interval_size):
+    # Using the regions provided, make incremented regions
     with open(regions_filename) as file:
         regions = []
         for line in file:
@@ -42,16 +38,16 @@ def make_incremented_regions(regions_filename, upstream_distance, downstream_dis
 
         if strand == "+":
             # We work from left to right
-            for i in range(left + 50, right + 1, 50):
-                # Looping through each 50 bp region
-                incremented_regions.append([chromosome, i - 50, i, gene_name, score, strand])
+            for i in range(left + interval_size, right + 1, interval_size):
+                # Looping through each interval region
+                incremented_regions.append([chromosome, i - interval_size, i, gene_name, score, strand])
 
         else:
             # We work from right to left
-            if left + 49 > 0:
-                for i in range(right, left + 49, -50):
-                    # Looping through each 50 bp region
-                    incremented_regions.append([chromosome, i - 50, i, gene_name, score, strand])
+            if left + (interval_size - 1) > 0:
+                for i in range(right, left + (interval_size - 1), (-1* interval_size)):
+                    # Looping through each interval region
+                    incremented_regions.append([chromosome, i - interval_size, i, gene_name, score, strand])
 
     region_intervals_filename = generate_random_filename()
 
@@ -66,22 +62,22 @@ def make_incremented_regions(regions_filename, upstream_distance, downstream_dis
 def blacklist_tsrs(sequencing_files, tsr_file):
     # Go through all of the sequencing files and blacklist TSRs
     blacklisted_filenames = []
-    threads = []
+    jobs = []
     for seq_filename in sequencing_files:
         curr_filename = generate_random_filename()
         blacklisted_filenames.append(curr_filename)
-        t = threading.Thread(target=run_subtract, args=[seq_filename, tsr_file],
+        p = multiprocessing.Process(target=run_subtract, args=[seq_filename, tsr_file],
                              kwargs={'output_filename': curr_filename})
-        threads.append(t)
-        t.start()
+        jobs.append(p)
+        p.start()
 
-    for thread in threads:
-        thread.join()
+    for job in jobs:
+        job.join()
 
     return blacklisted_filenames
 
 
-def get_coverage_files_helper(filename, region_intervals_file, index):
+def get_coverage_files_helper(filename, region_intervals_file):
     # First makes the three bed file
     three_prime_end_file = make_three_bed_file(filename)
 
@@ -89,25 +85,14 @@ def get_coverage_files_helper(filename, region_intervals_file, index):
     coverage_file = generate_random_filename()
     run_coverage(region_intervals_file, three_prime_end_file, output_filename=coverage_file)
 
-    coverage_files[index] = coverage_file
-
     remove_files(three_prime_end_file)
     return coverage_file
 
 
 def get_coverage_files(blacklisted_filenames, region_intervals_file):
     # Go through all of the blacklisted sequencing files and make 3' end files
-    global coverage_files
-    coverage_files = [''] * len(blacklisted_filenames)
-    threads = []
-
-    for i, filename in enumerate(blacklisted_filenames):
-        t = threading.Thread(target=get_coverage_files_helper, args=[filename, region_intervals_file, i])
-        threads.append(t)
-        t.start()
-
-    for thread in threads:
-        thread.join()
+    pool = multiprocessing.Pool(processes=len(blacklisted_filenames))
+    coverage_files = pool.starmap(get_coverage_files_helper, [(filename, region_intervals_file) for filename in blacklisted_filenames])
 
     return coverage_files
 
@@ -139,42 +124,37 @@ def coverage_files_to_dictionary(coverage_files, sequencing_files):
     return combined_dict
 
 
-def output_data(combined_dict, output_filename, sequencing_files, upstream_distance):
+def output_data(combined_dict, sequencing_files, upstream_distance, interval_size):
     # Now the data is in the combined_dict, we need to reduce it back down to positions again
-    with open(output_filename, 'w') as output_file:
-        output_writer = csv.writer(output_file, delimiter='\t', lineterminator='\n')
 
-        # First write the headers
-        output_writer.writerow(["Position"] + [seq_file.split("/")[-1] for seq_file in sequencing_files])
+    # First print out the headers
+    print_tab_delimited(["Position"] + [seq_file.split("/")[-1] for seq_file in sequencing_files])
 
-        real_position = upstream_distance * -1
-        # Now output all of the data
-        for position in combined_dict:
-            output_writer.writerow([real_position] + combined_dict[position])
-            real_position += 50
+    real_position = upstream_distance * -1
+    # Now output all of the data
+    for position in combined_dict:
+        print_tab_delimited([real_position] + combined_dict[position])
+        real_position += interval_size
 
 
 def print_usage():
     print("Usage: ")
-    print("python3 read_through_transcription <Regions Filename> <TSR Filename> <Output Filename> " +
-          "<Upstream Distance> <Downstream Distance> <Sequencing Files>")
-    print(
-        "\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/read_through_transcription.rst")
+    print("python3 read_through_transcription.py <Regions Filename> <TSR Filename> " +
+          "<Upstream Distance> <Downstream Distance> <Interval Distance> <Sequencing Files>")
+    print("\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/read_through_transcription.rst")
 
 
-def parse_input():
-    if len(sys.argv[1:]) == 0:
+def parse_input(args):
+    if len(args) == 0:
         print_usage()
         sys.exit(1)
-
-    args = sys.argv[1:]
 
     if len(args) < 6:
         print("You did not provide all of the necessary arguments. Please try again.")
         print_usage()
         sys.exit(1)
 
-    regions_filename, tsr_file, output_filename, upstream_distance, downstream_distance = args[:5]
+    regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size = args[:5]
     sequencing_files = args[5:]
 
     verify_bed_files(regions_filename, sequencing_files)
@@ -193,15 +173,24 @@ def parse_input():
         # The values are not integers
         raise ValueError("The downstream distance you provided is not an integer.")
 
-    return regions_filename, tsr_file, output_filename, upstream_distance, downstream_distance, sequencing_files
+    try:
+        interval_size = int(interval_size)
+
+    except ValueError as _:
+        # The values are not integers
+        raise ValueError("The downstream distance you provided is not an integer.")
 
 
-def run_read_through_transcription():
-    # The user must give us a bed file with the regions and a list of the sequencing files
-    regions_filename, tsr_file, output_filename, upstream_distance, downstream_distance, sequencing_files = parse_input()
+    if upstream_distance < 0 or downstream_distance < 0 or interval_size < 0:
+        print("Distances cannot be negative. Please enter a positive number.")
+        sys.exit(1)
 
-    # 1. Make the region intervals file from upstream distance to downstream distance at 50 bp intervals
-    incremented_regions_filename = make_incremented_regions(regions_filename, upstream_distance, downstream_distance)
+    return regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size, sequencing_files
+
+
+def run_read_through_transcription(regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size, sequencing_files):
+    # 1. Make the region intervals file from upstream distance to downstream distance in intervals
+    incremented_regions_filename = make_incremented_regions(regions_filename, upstream_distance, downstream_distance, interval_size)
 
     # Blacklist the TSRs
     if tsr_file != 'no':
@@ -213,12 +202,29 @@ def run_read_through_transcription():
 
     combined_dict = coverage_files_to_dictionary(coverage_files, sequencing_files)
 
-    output_data(combined_dict, output_filename, sequencing_files, upstream_distance)
+    output_data(combined_dict, sequencing_files, upstream_distance, interval_size)
 
     # Remove all of the temporary files
     remove_files(incremented_regions_filename, coverage_files)
 
 
-if __name__ == '__main__':
+def main(args):
+    """
+    read_through_transcription <Regions Filename> <TSR Filename> <Upstream Distance> <Downstream Distance> <Interval Size>
+    <Sequencing Files>
+    More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/read_through_transcription.rst
+
+    :param args: arguments provided to the program
+    :type args: list
+    :return:
+    """
     check_dependencies("bedtools")
-    run_read_through_transcription()
+    # The user must give us a bed file with the regions and a list of the sequencing files
+    regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size, sequencing_files = parse_input(args)
+
+    run_read_through_transcription(regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size,
+                                   sequencing_files)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])

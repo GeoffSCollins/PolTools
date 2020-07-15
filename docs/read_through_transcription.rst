@@ -15,8 +15,8 @@ Usage and option summary
 **Usage**:
 ::
 
-  python3 read_through_transcription <Regions Filename> <TSR Filename> <Output Filename> \
-                                          <Upstream Distance> <Downstream Distance> <Sequencing Files>
+  python3 read_through_transcription.py <Regions Filename> <TSR Filename> \
+          <Upstream Distance> <Downstream Distance> <Interval Distance> <Sequencing Files>
 
 
 ===========================    =========================================================================================================================================================
@@ -25,9 +25,9 @@ Option                         Description
 **Regions Filename**           Bed formatted file containing all the genes to quantify (regions will be determined from the 3' end of each region in this file.
 **TSR Filename**               `tsrFinder <https://github.com/P-TEFb/tsrFinderM1>`_ output file which will be blacklisted.
                                Simply type *no* to not blacklist TSRs.
-**Output Filename**            Name of the output file.
 **Upstream Distance**          The number of base pairs to subtract from the left position.
 **Downstream Distance**        The number of base pairs to add from the left position.
+**Interval Distance**          The size of sub-regions to split the regions into.
 **Sequencing Files**           Sequencing files to quantify separated by spaces.
 ===========================    =========================================================================================================================================================
 
@@ -35,7 +35,7 @@ Option                         Description
 Behavior
 ==========================================================================
 ``read_through_transcription`` will report the position relative to the 3' end of the regions provided and the sum
-of the 3' reads at that position (50 bp intervals).
+of the 3' reads at that interval.
 
 For example:
 
@@ -55,7 +55,7 @@ For example:
   chr1    10564   10600   K00294:149:H35VNBBXY:6:1205:16407:42724 255     -
   chr1    10565   10597   K00294:149:H35VNBBXY:6:2221:2077:20709  255     -
 
-  $ python3 read_through_transcription.py gene_body_regions.bed no output.txt 100 500 control.bed treated.bed
+  $ python3 read_through_transcription.py gene_body_regions.bed no output.txt 100 500 50 control.bed treated.bed
   $ cat output.txt
   Position        control.bed treated.bed
   -100    19627   14509
