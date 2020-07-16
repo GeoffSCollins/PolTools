@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 def build_counts_dict(sequencing_filename):
     """
     Builds two dictionaries for the 5' ends and 3' ends of transcripts. Dictionaries can be accessed like so:
@@ -19,10 +21,10 @@ def build_counts_dict(sequencing_filename):
             right = int(right)
 
             if chromosome not in five_prime_counts_dict:
-                five_prime_counts_dict[chromosome] = {"+": {}, "-": {}}
+                five_prime_counts_dict[chromosome] = {"+": defaultdict(lambda: 0), "-": defaultdict(lambda: 0)}
 
             if chromosome not in three_prime_counts_dict:
-                three_prime_counts_dict[chromosome] = {"+": {}, "-": {}}
+                three_prime_counts_dict[chromosome] = {"+": defaultdict(lambda: 0), "-": defaultdict(lambda: 0)}
 
             if strand == "+":
                 five_prime_position = left

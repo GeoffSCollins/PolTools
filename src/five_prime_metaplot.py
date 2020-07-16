@@ -1,14 +1,13 @@
 import sys
-
-from itertools import chain
+import multiprocessing
 
 from utils.make_five_and_three_dict import build_counts_dict
 from utils.get_region_length import determine_region_length
 from utils.verify_bed_file import verify_bed_files
-from utils.print_tab_delimited import print_tab_delimited
+from utils.output_metaplot_data import output_metaplot_data
 
 
-def get_primes_data(regions_filename, five_prime_counts_dict):
+def get_primes_data_helper(regions_filename, five_prime_counts_dict):
     with open(regions_filename) as file:
         five_output_list = []
         five_rev_output_list = []
@@ -16,27 +15,22 @@ def get_primes_data(regions_filename, five_prime_counts_dict):
         for line in file:
             chromosome, left, right, gene_name, _, strand = line.split()
 
-            five_current_list = [0] * region_length
-            five_rev_current_list = [0] * region_length
+            five_current_list = [-1] * region_length
+            five_rev_current_list = [-1] * region_length
 
             if strand == "+":
-                current_position = -1 * region_length
+                current_position = 0
                 add_next = 1
                 opp_strand = "-"
             else:
-                current_position = region_length
+                current_position = region_length - 1
                 add_next = -1
                 opp_strand = "+"
 
             # Now we loop through the region left to right
-            for i in range(int(left), int(right) + 1):  # right+1 to include right
-                # If the position is in the dictionary, add it to the 2D list
-
-                if i in five_prime_counts_dict[chromosome][strand]:
-                    five_current_list[current_position] = five_prime_counts_dict[chromosome][strand][i]
-
-                if i in five_prime_counts_dict[chromosome][opp_strand]:
-                    five_rev_current_list[current_position] = five_prime_counts_dict[chromosome][opp_strand][i]
+            for i in range(int(left), int(right)):
+                five_current_list[current_position] = five_prime_counts_dict[chromosome][strand][i]
+                five_rev_current_list[current_position] = five_prime_counts_dict[chromosome][opp_strand][i]
 
                 current_position += add_next
 
@@ -44,6 +38,20 @@ def get_primes_data(regions_filename, five_prime_counts_dict):
             five_rev_output_list.append(five_rev_current_list)
 
     return five_output_list, five_rev_output_list
+
+
+def get_primes_data(regions_filename, sequencing_file):
+    # 1. Load the five_prime_dict
+    five_prime_counts_dict, _ = build_counts_dict(sequencing_file)
+
+    # 2. Load 2D list containing the data to be outputted
+    five_same_regions_data, five_rev_regions_data = get_primes_data_helper(regions_filename, five_prime_counts_dict)
+
+    # 3. Get averages data
+    five_same_averages = get_averages(five_same_regions_data)
+    five_rev_averages = get_averages(five_rev_regions_data)
+
+    return list(zip(five_same_averages, five_rev_averages)), sequencing_file
 
 
 def get_averages(input_2d_list):
@@ -68,25 +76,6 @@ def get_averages(input_2d_list):
     return averages_list
 
 
-def output_data(files, merged_list):
-    header = ["Position"]
-    # Write the header first
-    for file in files:
-        header.append(file + " 5' same strand")
-        header.append(file + " 5' reverse strand")
-
-    print_tab_delimited(header)
-
-    for i, base_list in enumerate(merged_list):
-        position = i - region_length / 2
-
-        if position >= 0:
-            position += 1
-
-        print_tab_delimited([position] + base_list)
-
-
-
 def parse_input(args):
     if len(args) < 2:
         print("You did not provide any sequencing files! Exiting ...")
@@ -97,6 +86,10 @@ def parse_input(args):
 
     global region_length
     region_length = determine_region_length(regions_filename)
+
+    if region_length % 2 != 0:
+        print("The region length is not even, so the +1 nt position cannot be determined. Exiting ...")
+        sys.exit(1)
 
     verify_bed_files([regions_filename] + sequencing_files_list)
 
@@ -110,33 +103,10 @@ def print_usage():
 
 
 def run_five_prime_metaplot(regions_filename, sequencing_files_list):
-    # Output dictionary has keys of sequencing files and values of a list containing average lists
-    # The order of the list goes as follows: 5'same, 5'rev
-    output_dictionary = {}
+    pool = multiprocessing.Pool(processes=len(sequencing_files_list))
+    averages = pool.starmap(get_primes_data, [(regions_filename, sequencing_file) for sequencing_file in sequencing_files_list])
+    output_metaplot_data(averages, region_length)
 
-    for sequencing_file in sequencing_files_list:
-        # 1. Load the five_prime_dict
-        five_prime_counts_dict, _ = build_counts_dict(sequencing_file)
-
-        # 2. Load 2D list containing the data to be outputted
-        five_same_regions_data, five_rev_regions_data = get_primes_data(regions_filename, five_prime_counts_dict)
-
-        # 3. Get averages data
-        five_same_averages = get_averages(five_same_regions_data)
-        five_rev_averages = get_averages(five_rev_regions_data)
-
-        # The transposed_l looks like [ [], [] ] where the brackets contain an individual nt
-        output_dictionary[sequencing_file] = list(zip(five_same_averages, five_rev_averages))
-
-    files = []
-    all_data = []
-    for file in output_dictionary:
-        all_data.append(output_dictionary[file])
-        files.append(file.split("/")[-1])
-
-    # Merge all of the lists together
-    merged_list = [list(chain.from_iterable(x)) for x in zip(*all_data)]
-    output_data(files, merged_list)
 
 def main(args):
     """

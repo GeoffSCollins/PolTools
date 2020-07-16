@@ -1,0 +1,33 @@
+from itertools import chain
+
+from utils.print_tab_delimited import print_tab_delimited
+
+def output_metaplot_data(averages, region_length):
+    """
+
+    :param averages: averages list from the metaplots programs
+    :type averages: list
+    :param region_length: length of the region
+    :type region_length: int
+    :return:
+    """
+    avgs_data, files = [x for x in zip(*averages)]
+
+    # Merge all of the lists together
+    merged_list = [list(chain.from_iterable(x)) for x in zip(*avgs_data)]
+
+    # 5. Put the data into a file
+    header = ["Position"]
+    # Write the header first
+    for file in files:
+        header.append(file.split("/")[-1] + " pileup same strand")
+        header.append(file.split("/")[-1] + " pileup reverse strand")
+
+    print_tab_delimited(header)
+
+    for i, base_list in enumerate(merged_list):
+        position = i - (region_length / 2)
+        if position >= 0:
+            position += 1
+
+        print_tab_delimited([position] + base_list)
