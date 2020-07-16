@@ -1,9 +1,3 @@
-'''
-This file will run truQuant annotation and quantitation together and make the huge output file
-June 20, 2020
-Geoff Collins
-'''
-
 import csv
 import sys
 import os
@@ -286,10 +280,7 @@ def get_region_data(region, five_prime_counts_dict):
 
     # Loop through each base in the region
     for i in range(int(left), int(right) + 1):
-        if i in five_prime_counts_dict[chromosome][strand]:
-            height = five_prime_counts_dict[chromosome][strand][i]
-        else:
-            height = 0
+        height = five_prime_counts_dict[chromosome][strand][i]
 
         position = i - int(left)
 
@@ -306,10 +297,7 @@ def get_region_data(region, five_prime_counts_dict):
     weighted_pause_region_center = int(round(weighted_pause_region_center))
 
     for i in range(int(left), int(right)):
-        if i in five_prime_counts_dict[chromosome][strand]:
-            height = five_prime_counts_dict[chromosome][strand][i]
-        else:
-            height = 0
+        height = five_prime_counts_dict[chromosome][strand][i]
         position = i - int(left)
 
         stdev_weighted_pause_region_center += ((position - (weighted_pause_region_center - int(left))) ** 2) * height
@@ -419,7 +407,7 @@ def run_truQuant():
     run_subtract(sequencing_files[0], rna_blacklist_file, output_filename=blacklisted_first_sequencing_file)
 
     # Run tsrFinder on the first file
-    #os.system("tsrFinderPARALLEL " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file)
+    os.system("tsrFinderPARALLEL " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file)
 
     tsr_file = blacklisted_first_sequencing_file.replace(".bed", "_150_20_30_600-TSR.tab")
 
