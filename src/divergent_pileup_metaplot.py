@@ -37,10 +37,8 @@ def get_pileups_helper(region_filename, sequencing_file, opposite_strand):
 
     # Combine the two files together
     combined_file = generate_random_filename()
-    # os.system("cat " + fw_output + " " + rv_output + " > " + combined_file)
-    os.system("cat " + rv_output + " > " + combined_file)
+    os.system("cat " + fw_output + " " + rv_output + " > " + combined_file)
 
-    # Counts list will start with the -500 nt and go to +500 nt
     counts_list = [0] * region_length
 
     with open(combined_file) as file:
@@ -49,7 +47,6 @@ def get_pileups_helper(region_filename, sequencing_file, opposite_strand):
                 if "+" in line:
                     position = int(line.split()[-2]) - 1  # Subtract 1 because position starts at 1
                 else:
-                    # position = (region_length - 1) - int(line.split()[-2])  # Subtract 1 because position starts at 1
                     position = region_length - int(line.split()[-2])
 
                 counts_list[position] += int(line.split()[-1])
@@ -58,7 +55,6 @@ def get_pileups_helper(region_filename, sequencing_file, opposite_strand):
                 if "-" in line:
                     position = int(line.split()[-2]) - 1  # Subtract 1 because position starts at 1
                 else:
-                    # position = (region_length - 1) - int(line.split()[-2])  # Subtract 1 because position starts at 1
                     position = region_length - int(line.split()[-2])
 
                 counts_list[position] -= int(line.split()[-1])
@@ -69,10 +65,8 @@ def get_pileups_helper(region_filename, sequencing_file, opposite_strand):
 
 
 def make_rev_region_file(region_filename):
-    # We are wanting to get the opposite strand as well
     rev_region_filename = region_filename.replace(".bed", "rev_strands.bed")
 
-    # Make a new version of the regions file
     with open(region_filename) as file:
         with open(rev_region_filename, 'w') as outfile:
             for line in file:
@@ -84,36 +78,17 @@ def make_rev_region_file(region_filename):
     return rev_region_filename
 
 
-def get_averages(input_2d_list):
-    # This will take in a 2d list containing the regions and counts at that specific base
-    # and output a list of the averages at each base
-    averages_list = [0] * region_length
-
-    # We loop through each base in the region
-    for current_base_position, counts in enumerate(input_2d_list[0]):
-        current_sum = 0
-
-        # The total is the number of regions
-        total = len(input_2d_list)
-
-        # Loop through all of the regions
-        for region in input_2d_list:
-            current_sum += region[current_base_position]
-
-        avg = current_sum / total
-        averages_list[current_base_position] = avg
-
-    return averages_list
-
-
 def get_pileups(region_filename, sequencing_file, rev_region_filename):
     pileups = get_pileups_helper(region_filename, sequencing_file, False)
     rev_pileups = get_pileups_helper(rev_region_filename, sequencing_file, True)
 
-    same_averages = []
-    rev_averages = []
+    with open(region_filename) as reg_file:
+        number_of_regions = sum(1 for _ in reg_file)
 
-    return list(zip(pileups, rev_pileups)), sequencing_file
+    same_averages = [x / number_of_regions for x in pileups]
+    rev_averages = [x / number_of_regions for x in rev_pileups]
+
+    return list(zip(same_averages, rev_averages)), sequencing_file
 
 
 def parse_args(args):

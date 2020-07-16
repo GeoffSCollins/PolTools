@@ -5,6 +5,7 @@ from utils.make_five_and_three_dict import build_counts_dict
 from utils.get_region_length import determine_region_length
 from utils.verify_bed_file import verify_bed_files
 from utils.output_metaplot_data import output_metaplot_data
+from utils.get_metaplot_averages import get_averages
 
 
 def get_primes_data_helper(regions_filename, five_prime_counts_dict):
@@ -48,32 +49,10 @@ def get_primes_data(regions_filename, sequencing_file):
     five_same_regions_data, five_rev_regions_data = get_primes_data_helper(regions_filename, five_prime_counts_dict)
 
     # 3. Get averages data
-    five_same_averages = get_averages(five_same_regions_data)
-    five_rev_averages = get_averages(five_rev_regions_data)
+    five_same_averages = get_averages(five_same_regions_data, region_length)
+    five_rev_averages = get_averages(five_rev_regions_data, region_length)
 
     return list(zip(five_same_averages, five_rev_averages)), sequencing_file
-
-
-def get_averages(input_2d_list):
-    # This will take in a 2d list containing the regions and counts at that specific base
-    # and output a list of the averages at each base
-    averages_list = [0] * region_length
-
-    # We loop through each base in the region
-    for current_base_position, counts in enumerate(input_2d_list[0]):
-        current_sum = 0
-
-        # The total is the number of regions
-        total = len(input_2d_list)
-
-        # Loop through all of the regions
-        for region in input_2d_list:
-            current_sum += region[current_base_position]
-
-        avg = current_sum / total
-        averages_list[current_base_position] = avg
-
-    return averages_list
 
 
 def parse_input(args):

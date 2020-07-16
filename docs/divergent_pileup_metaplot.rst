@@ -1,7 +1,7 @@
 ##############################
 *Divergent Pileup Metaplot*
 ##############################
-The ``divergent_pileup_metaplot`` tool computes the coverage of 5' ends of sequencing data around the center of features provided.
+The ``divergent_pileup_metaplot`` tool computes the coverage of reads data around the center of features provided.
 
 
 ===============================
@@ -16,14 +16,14 @@ Usage and option summary
 ===========================    =========================================================================================================================================================
 Option                         Description
 ===========================    =========================================================================================================================================================
-**Regions Filename**           Bed formatted file containing all the genes to quantify (regions will be determined from the 3' end of each region in this file.
+**Regions Filename**           Bed formatted file containing all the genes to quantify (+1 nucleotide centered)
 **Sequencing Files**           Sequencing files to quantify separated by spaces.
 ===========================    =========================================================================================================================================================
 
 ==========================================================================
 Behavior
 ==========================================================================
-``divergent_pileup_metaplot`` will report the position relative to the center of the regions provided and the sum
+``divergent_pileup_metaplot`` will report the position relative to the center of the regions provided and the average
 of the reads at that position.
 
 For example:

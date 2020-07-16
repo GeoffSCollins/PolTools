@@ -16,7 +16,7 @@ Usage and option summary
 ===========================    =========================================================================================================================================================
 Option                         Description
 ===========================    =========================================================================================================================================================
-**Regions Filename**           Bed formatted file containing all the genes to quantify (regions will be determined from the 3' end of each region in this file.
+**Regions Filename**           Bed formatted file containing all the genes to quantify (+1 nucleotide centered)
 **Sequencing Files**           Sequencing files to quantify separated by spaces.
 ===========================    =========================================================================================================================================================
 
