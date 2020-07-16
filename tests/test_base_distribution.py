@@ -16,7 +16,7 @@ class TestBaseDistribution(unittest.TestCase):
     # Has the sequence "CGAGTTCGCT GCTCAGAAGC" (+1 on right side of space)
 
     ccnt1_region_file = str(Path(__file__).parent) + "/test_files/CCNT1_inr.bed"
-    # Has the sequence "AGTGCCTGCA GCCTTCGCCG" (+1 on right side of space)
+    # Has the sequence "AAGTGCCTGC AGCCTTCGCC" (+1 on right side of space)
 
     def get_sequence(self, std_output):
         sequence = ""
@@ -60,7 +60,7 @@ class TestBaseDistribution(unittest.TestCase):
         base_distribution.main([self.ccnt1_region_file])
 
         result = self.get_sequence(mock_stdout.getvalue())
-        self.assertEqual(result, "AGTGCCTGCAGCCTTCGCCG")
+        self.assertEqual(result, "AAGTGCCTGCAGCCTTCGCC")
 
     def test_two_files(self):
         with self.assertRaises(SystemExit):

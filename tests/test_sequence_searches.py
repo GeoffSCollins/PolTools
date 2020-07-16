@@ -17,7 +17,7 @@ class TestSequenceSearches(unittest.TestCase):
     # Has the sequence "CGAGTTCGCT GCTCAGAAGC" (+1 on right side of space)
 
     ccnt1_region_file = str(Path(__file__).parent) + "/test_files/CCNT1_inr.bed"
-    # Has the sequence "AGTGCCTGCA GCCTTCGCCG" (+1 on right side of space)
+    # Has the sequence "AAGTGCCTGC AGCCTTCGCC" (+1 on right side of space)
 
     def _parse_stdoutput(self, output):
         # Returns the True or False value of the test
@@ -63,7 +63,7 @@ class TestSequenceSearches(unittest.TestCase):
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_negative_strand_one_upstream_sequence_found(self, mock_stdout):
-        sequence_searches.main([self.ccnt1_region_file, 'AGTGC,-10:-5'])
+        sequence_searches.main([self.ccnt1_region_file, 'AAGTG,-10:-5'])
         output = self._parse_stdoutput(mock_stdout.getvalue())
         self.assertEqual(output, "True")
 
@@ -87,7 +87,7 @@ class TestSequenceSearches(unittest.TestCase):
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_negative_strand_one_downstream_sequence_found(self, mock_stdout):
-        sequence_searches.main([self.ccnt1_region_file, 'CGCCG,5:10'])
+        sequence_searches.main([self.ccnt1_region_file, 'TCGCC,5:10'])
         output = self._parse_stdoutput(mock_stdout.getvalue())
         self.assertEqual(output, "True")
 
@@ -111,7 +111,7 @@ class TestSequenceSearches(unittest.TestCase):
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_negative_strand_inr_sequence_not_found(self, mock_stdout):
-        sequence_searches.main([self.ccnt1_region_file, 'GCAGCC,-3:3'])
+        sequence_searches.main([self.ccnt1_region_file, 'TGCAGC,-3:3'])
         output = self._parse_stdoutput(mock_stdout.getvalue())
         self.assertEqual(output, "True")
 
