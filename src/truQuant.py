@@ -292,10 +292,6 @@ def get_region_data(region, five_prime_counts_dict):
             max_tss_position = i
             max_tss_counts = height
 
-    # Because the minus strand is flipped, we subtract one to the position
-    if strand == "-":
-        max_tss_position -= 1
-
     weighted_pause_region_center = int(left) + (tsr_position_sum / five_prime_sum)
 
     # Round it and make it an integer
