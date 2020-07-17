@@ -1,138 +1,94 @@
-'''
-This will take in a a region file and a sequencing file to output the average pausing distance for each gene
-'''
-
-# Todo
-
 import sys
-import csv
+import multiprocessing
 
-# Has keys of chromosomes and values of a dictionary with keys of strand and values of a list of counts
-counts_dict = {}
-
-
-def build_counts_dict(sequencing_filename):
-    with open(sequencing_filename, 'r') as file:
-        for i, line in enumerate(file):
-            chromosome, left, right, _, _, strand = line.split()
-
-            if strand == "+":
-                five_prime_position = int(left)
-            else:
-                five_prime_position = int(right)
-
-            if chromosome not in counts_dict:
-                counts_dict[chromosome] = {}
-
-            if strand not in counts_dict[chromosome]:
-                counts_dict[chromosome][strand] = {}
-
-            if five_prime_position not in counts_dict[chromosome][strand]:
-                counts_dict[chromosome][strand][five_prime_position] = 0
-
-            counts_dict[chromosome][strand][five_prime_position] += 1
+from utils.print_tab_delimited import print_tab_delimited
+from utils.make_five_and_three_dict import build_counts_dict
+from utils.get_region_length import determine_region_length
+from utils.verify_region_length_is_even import verify_region_length_is_even
+from utils.verify_bed_file import verify_bed_files
 
 
-def get_counts(counts_dict, regions_filename):
-    # This will return a list of the number of counts
-
-    counts_list = []
+def get_counts_helper(five_prime_counts_dict, region_length, regions_filename):
+    # Counts_dict has keys of gene_names and values of the number of inr_counts
+    counts_dict = {}
 
     # Loop through each region
     with open(regions_filename) as file:
         for line in file:
             chromosome, left, right, gene_name, _, strand = line.split()
 
-            # Only getting counts from -5 to +5, so we
-            loop_left = int(left) + 95
-            loop_right = int(right) - 95
+            inr_position = int(left) + int(region_length / 2)
 
-            max_counts = 0
-            for i in range(loop_left, loop_right + 1):
-                if i in counts_dict[chromosome][strand]:
-                    if counts_dict[chromosome][strand][i] > max_counts:
-                        max_counts = counts_dict[chromosome][strand][i]
+            if strand == "-":
+                # Subtract one if the strand is negative because the +1 is on the left side
+                inr_position -= 1
 
-            # We have the counts, so just append it
-            counts_list.append((gene_name, max_counts))
+            inr_counts = five_prime_counts_dict[chromosome][strand][inr_position]
 
-    return counts_list
+            counts_dict[gene_name] = inr_counts
+
+    return counts_dict
+
+
+def get_counts(region_length, regions_filename, sequencing_filename):
+    five_prime_counts_dict, _ = build_counts_dict(sequencing_filename)
+    counts_dict = get_counts_helper(five_prime_counts_dict, region_length, regions_filename)
+
+    return counts_dict
+
+
+def output_data(output_list, sequencing_filenames):
+
+    # First print out the header
+    print_tab_delimited(["Gene"] + sequencing_filenames)
+
+    # We will loop through every gene using the first dictionary in the list
+    for gene_name in output_list[0]:
+        # Print the counts for each of the datasets
+        print_tab_delimited([gene_name] + [output_dict[gene_name] for output_dict in output_list])
+
+
+def print_usage():
+    print("Usage: ")
+    print("python3 inr_reads.py <regions file> <sequencing files>")
+    print("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/inr_reads.rst")
+
+
+def parse_args(args):
+    if len(args) < 2:
+        print_usage()
+        sys.exit(1)
+
+    regions_filename = args[0]
+    sequencing_files_list = args[1:]
+
+    verify_bed_files(regions_filename, sequencing_files_list)
+
+    region_length = determine_region_length(regions_filename)
+    verify_region_length_is_even(region_length)
+
+    return regions_filename, region_length, sequencing_files_list
+
+
+
+def run_inr_reads(regions_filename, region_length, sequencing_files_list):
+    pool = multiprocessing.Pool(processes=len(sequencing_files_list))
+    output_list = pool.starmap(get_counts, [(region_length, regions_filename, seq_file) for seq_file in sequencing_files_list])
+
+    output_data(output_list, [seq_file.split("/")[-1] for seq_file in sequencing_files_list])
+
+
+def main(args):
+    """
+    python3 inr_reads.py <regions file> <sequencing files>
+    More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/inr_reads.rst
+
+    :param args:
+    :return:
+    """
+    regions_filename, region_length, sequencing_files_list = parse_args(args)
+    run_inr_reads(regions_filename, region_length, sequencing_files_list)
 
 
 if __name__ == '__main__':
-    regions_filename = sys.argv[1]
-
-    tfiib_files = [
-        "/media/projects/FKBP_DATASETS/2019-03-14-0149_Price_JSantana/DEDUPED/TFIIB_DMSO_2hrs_20190314-dedup_hg38-blacklisted-150.bed",
-        "/media/projects/FKBP_DATASETS/2019-03-14-0149_Price_JSantana/DEDUPED/TFIIB_dTAG7_2hrs_20190314-dedup_hg38-blacklisted-150.bed",
-        "/media/projects/FKBP_DATASETS/2019-03-14-0149_Price_JSantana/DEDUPED/TFIIB_dTAG7_Flavo_2hrs_20190314-dedup_hg38-blacklisted-150.bed",
-        "/media/projects/FKBP_DATASETS/2020-01-17-PriceSantana/DEDUPED/hg38/blacklisted_files/TFIIB_DMSO_20200117-dedup_hg38blacklisted.bed",
-        "/media/projects/FKBP_DATASETS/2020-01-17-PriceSantana/DEDUPED/hg38/blacklisted_files/TFIIB_VHL_2hrs_20200117-dedup_hg38blacklisted.bed",
-        "/media/projects/FKBP_DATASETS/2020-01-17-PriceSantana/DEDUPED/hg38/blacklisted_files/TFIIB_VHL_Flavo_2hrs_20200117-dedup_hg38blacklisted.bed"
-    ]
-
-    taf1_files = [
-        "/media/projects/FKBP_DATASETS/2019-12-10-PriceSantana/TAF1_DMSO_2hrs_20191210-dedup-hg38-blacklisted-150.bed",
-        "/media/projects/FKBP_DATASETS/2019-12-10-PriceSantana/TAF1_VHL_2hrs_20191210-dedup-hg38-blacklisted-150.bed",
-        "/media/projects/FKBP_DATASETS/2019-12-10-PriceSantana/TAF1_VHL_Flavo_2hrs_20191210-dedup-hg38-blacklisted-150.bed",
-        "/media/projects/FKBP_DATASETS/2019-10-28-PriceSantana/BED/TAF1/TAF1_DMSO_2hrs_20191027-hg38-dedup-blacklisted.bed",
-        "/media/projects/FKBP_DATASETS/2019-10-28-PriceSantana/BED/TAF1/TAF1_VHL_2hrs_20191027-hg38-dedup-blacklisted.bed",
-        "/media/projects/FKBP_DATASETS/2019-10-28-PriceSantana/BED/TAF1/TAF1_VHL_Flavo_2hrs_20191027-hg38-dedup-blacklisted.bed"
-    ]
-
-    taf4_files = [
-        "/media/projects/FKBP_DATASETS/2019-10-28-PriceSantana/BED/TAF4/TAF4_DMSO_2hrs_20191027-hg38-dedup-blacklisted.bed",
-        "/media/projects/FKBP_DATASETS/2019-10-28-PriceSantana/BED/TAF4/TAF4_VHL_0.5hrs_20191027-hg38-dedup-blacklisted.bed",
-        "/media/projects/FKBP_DATASETS/2019-10-28-PriceSantana/BED/TAF4/TAF4_VHL_2hrs_20191027-hg38-dedup-blacklisted.bed",
-        "/media/projects/FKBP_DATASETS/2020-01-17-PriceSantana/DEDUPED/hg38/blacklisted_files/TAF4_DMSO_20200117-dedup_hg38blacklisted.bed",
-        "/media/projects/FKBP_DATASETS/2020-01-17-PriceSantana/DEDUPED/hg38/blacklisted_files/TAF4_VHL_0.5hrs-dedup_hg38blacklisted.bed",
-        "/media/projects/FKBP_DATASETS/2020-01-17-PriceSantana/DEDUPED/hg38/blacklisted_files/TAF4_VHL_2hrs_20200117-dedup_hg38blacklisted.bed"
-    ]
-
-    sequencing_files_list = []
-
-    # Will have keys of gene names and values of another dictionary with keys of dataset and values of counts
-    genes_dict = {}
-
-    if "taf1" in regions_filename.lower():
-        sequencing_files_list.extend(taf1_files)
-    if "taf4" in regions_filename.lower():
-        sequencing_files_list.extend(taf4_files)
-    if "tfiib" in regions_filename.lower():
-        sequencing_files_list.extend(tfiib_files)
-
-    data = []
-
-    for i, sequencing_filename in enumerate(sequencing_files_list):
-        counts_dict = {}
-        build_counts_dict(sequencing_filename)
-
-        tmp_list = get_counts(counts_dict, regions_filename)
-
-        # Looks like [ (x, x) ]
-
-        # Now we want to get the counts into the genes dict
-        for tup in tmp_list:
-            gene_name, counts = tup
-
-            if gene_name not in genes_dict:
-                genes_dict[gene_name] = {}
-
-            if sequencing_filename not in genes_dict[gene_name]:
-                genes_dict[gene_name][sequencing_filename] = 0
-
-            genes_dict[gene_name][sequencing_filename] = counts
-
-
-    with open(regions_filename.replace(".bed", "_inr_reads.txt"), 'w') as output_file:
-        output_writer = csv.writer(output_file, delimiter='\t', lineterminator='\n')
-
-        for i, gene in enumerate(genes_dict):
-            if i == 0:
-                # Write all of the headers
-                output_writer.writerow(genes_dict[gene].keys())
-                output_writer.writerow([gene] + [genes_dict[gene][dataset] for dataset in genes_dict[gene]])
-
-            else:
-                # We write the counts
-                output_writer.writerow([gene] + [genes_dict[gene][dataset] for dataset in genes_dict[gene]])
+    main(sys.argv[1:])

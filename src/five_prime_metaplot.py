@@ -6,6 +6,7 @@ from utils.get_region_length import determine_region_length
 from utils.verify_bed_file import verify_bed_files
 from utils.output_metaplot_data import output_metaplot_data
 from utils.get_metaplot_averages import get_averages
+from utils.verify_region_length_is_even import verify_region_length_is_even
 
 
 def get_primes_data_helper(regions_filename, five_prime_counts_dict):
@@ -66,9 +67,7 @@ def parse_input(args):
     global region_length
     region_length = determine_region_length(regions_filename)
 
-    if region_length % 2 != 0:
-        print("The region length is not even, so the +1 nt position cannot be determined. Exiting ...")
-        sys.exit(1)
+    verify_region_length_is_even(region_length)
 
     verify_bed_files([regions_filename] + sequencing_files_list)
 
