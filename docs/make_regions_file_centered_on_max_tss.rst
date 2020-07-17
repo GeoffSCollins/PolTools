@@ -27,6 +27,10 @@ Behavior
 ``make_regions_file_centered_on_max_tss`` will report the generated regions centered on the max TSS from truQuant in bed format.
 For example:
 
+.. image:: images/make_regions_file_centered_on_max_tss.png
+
+\
+
 .. code-block:: bash
 
   $ grep "POLR2A" truQuant_output.bed
