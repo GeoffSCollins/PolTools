@@ -17,7 +17,7 @@ from utils.check_dependencies import check_dependencies
 from utils.constants import rna_blacklist_file, hg38_chrom_sizes_file, annotation_file
 
 
-def make_search_regions_list(regions_filename):
+def make_search_regions_list(regions_filename, annotation_extension):
     search_regions_dict = {}
     annotations_dict = {}
     # This makes the search regions
@@ -111,7 +111,7 @@ def find_max_tsr_in_search_region(gene_tsr_dict):
 
 
 def define_pause_regions_and_gene_bodies(paused_region_filename, gene_body_region_filename, max_tsrs_dict,
-                                         annotations_dict):
+                                         annotations_dict, truQuant_regions_dict):
     # This function will define the pause region as the max TSR for each gene and gene bodies as the end of
     # the pause region to the TES of the annotation
 
@@ -188,7 +188,8 @@ def map_flow_through_tsrs(annotations_dict, flow_through_tsrs):
     return mapped_flow_through_tsrs_dict
 
 
-def make_blacklisted_regions(blacklist_filename, annotations_dict, max_tsrs_dict, non_max_tsrs_dict, flow_through_tsrs):
+def make_blacklisted_regions(blacklist_filename, annotations_dict, max_tsrs_dict, non_max_tsrs_dict, flow_through_tsrs,
+                             percent_for_blacklisting):
     # We are blacklisting all non max TSRs that are not inside ANY paused region
 
     blacklisted_tsrs = []
@@ -204,7 +205,7 @@ def make_blacklisted_regions(blacklist_filename, annotations_dict, max_tsrs_dict
             if gene_name in max_tsrs_dict:
                 max_tsr_counts = int(max_tsrs_dict[gene_name][-3])
 
-                if int(tsr_counts) >= 0.3 * max_tsr_counts:
+                if int(tsr_counts) >= percent_for_blacklisting * max_tsr_counts:
                     # It should be blacklisted
                     blacklisted_tsrs.append(tsr)
 
@@ -216,7 +217,7 @@ def make_blacklisted_regions(blacklist_filename, annotations_dict, max_tsrs_dict
             if gene_name in max_tsrs_dict:
                 max_tsr_counts = int(max_tsrs_dict[gene_name][-3])
 
-                if int(tsr_counts) >= 0.3 * max_tsr_counts:
+                if int(tsr_counts) >= percent_for_blacklisting * max_tsr_counts:
                     blacklisted_tsrs.append(tsr[:-1])
 
     with open(blacklist_filename, 'w') as output_file:
@@ -243,7 +244,7 @@ def get_counts_in_paused_region(regions_filename, blacklisted_sequencing_file):
 
             if gene_name not in indv_gene_counts_dict:
                 indv_gene_counts_dict[gene_name] = {"Pause": -1,
-                                               "Body": -1}
+                                                    "Body": -1}
 
             indv_gene_counts_dict[gene_name]["Pause"] = counts
 
@@ -291,6 +292,10 @@ def get_region_data(region, five_prime_counts_dict):
             max_tss_position = i
             max_tss_counts = height
 
+    # Because the minus strand is flipped, we subtract one to the position
+    if strand == "-":
+        max_tss_position -= 1
+
     weighted_pause_region_center = int(left) + (tsr_position_sum / five_prime_sum)
 
     # Round it and make it an integer
@@ -309,8 +314,7 @@ def get_region_data(region, five_prime_counts_dict):
 
 
 def gather_data(sequencing_file, blacklist_filename, annotated_dataset, paused_region_filename,
-                gene_body_region_filename):
-
+                gene_body_region_filename, truQuant_regions_dict):
     region_data_dict = {}
     # We need to blacklist the data before running the program
     blacklisted_sequencing_filename = generate_random_filename()
@@ -333,7 +337,7 @@ def gather_data(sequencing_file, blacklist_filename, annotated_dataset, paused_r
     return sequencing_file, indv_gene_counts_dict, region_data_dict
 
 
-def combine_indv_gene_counts_dict(count_information_list):
+def combine_indv_gene_counts_dict(count_information_list, sequencing_files):
     # Need to combine the dictionaries to fit the gene_counts dict format
     ret_region_data_dict = {}
     gene_counts_dict = {}
@@ -356,7 +360,7 @@ def combine_indv_gene_counts_dict(count_information_list):
     return ret_region_data_dict, gene_counts_dict
 
 
-def output_data(output_filename, region_data_dict, gene_counts_dict):
+def output_data(output_filename, region_data_dict, gene_counts_dict, truQuant_regions_dict, sequencing_files):
     pause_region_headers = [file.split("/")[-1] + " Pause Region" for file in sequencing_files]
     gene_body_headers = [file.split("/")[-1] + " Gene Body" for file in sequencing_files]
 
@@ -401,7 +405,8 @@ def parse_input(args):
     return seq_files
 
 
-def run_truQuant():
+def run_truQuant(annotation_extension, percent_for_blacklisting, truQuant_regions_dict, output_directory,
+                 sequencing_files):
     # Blacklist the file first
     blacklisted_first_sequencing_file = sequencing_files[0].replace(".bed", "-blacklisted.bed")
     run_subtract(sequencing_files[0], rna_blacklist_file, output_filename=blacklisted_first_sequencing_file)
@@ -418,27 +423,29 @@ def run_truQuant():
     output_filename = output_directory + os.path.basename(sequencing_files[0].replace('.bed', '-truQuant_output.txt'))
 
     # 1: Make the regions we are going to be searching for max TSSs in max TSRs
-    search_regions_dict, annotations_dict = make_search_regions_list(annotation_file)
+    search_regions_dict, annotations_dict = make_search_regions_list(annotation_file, annotation_extension)
 
     # 2: Make the pause regions and gene bodies
     gene_tsr_dict, flow_through_tsrs = map_tsrs_to_search_regions(tsr_file, search_regions_dict)
     max_tsrs_dict, non_max_tsrs_dict = find_max_tsr_in_search_region(gene_tsr_dict)
     define_pause_regions_and_gene_bodies(paused_region_filename, gene_body_region_filename,
-                                         max_tsrs_dict, annotations_dict)
-    make_blacklisted_regions(blacklist_filename, annotations_dict, max_tsrs_dict, non_max_tsrs_dict, flow_through_tsrs)
+                                         max_tsrs_dict, annotations_dict, truQuant_regions_dict)
+    make_blacklisted_regions(blacklist_filename, annotations_dict, max_tsrs_dict, non_max_tsrs_dict, flow_through_tsrs,
+                             percent_for_blacklisting)
 
     # 3. Get the number of counts (multithreaded)
 
     pool = multiprocessing.Pool(processes=len(sequencing_files))
 
     count_information_list = pool.starmap(gather_data,
-                                 [(sequencing_file, blacklist_filename, i == 0, paused_region_filename,
-                                    gene_body_region_filename) for i, sequencing_file in enumerate(sequencing_files)])
+                                          [(sequencing_file, blacklist_filename, i == 0, paused_region_filename,
+                                            gene_body_region_filename, truQuant_regions_dict) for i, sequencing_file in
+                                           enumerate(sequencing_files)])
 
-    region_data_dict, gene_counts_dict = combine_indv_gene_counts_dict(count_information_list)
+    region_data_dict, gene_counts_dict = combine_indv_gene_counts_dict(count_information_list, sequencing_files)
 
     # Output the data
-    output_data(output_filename, region_data_dict, gene_counts_dict)
+    output_data(output_filename, region_data_dict, gene_counts_dict, truQuant_regions_dict, sequencing_files)
 
 
 def main(args):
@@ -452,19 +459,16 @@ def main(args):
     """
     check_dependencies("bedtools", "tsrFinderPARALLEL")
 
-    # Declare all of the global variables
-    global annotation_extension, blacklist_extension, percent_for_blacklisting, output_directory, gene_counts_dict, \
-        truQuant_regions_dict, region_data_dict, sequencing_files
-
     sequencing_files = parse_input(args)
 
     annotation_extension = 1000
-    blacklist_extension = 0
     percent_for_blacklisting = 0.3
     output_directory = str(Path(sequencing_files[0]).parent) + "/"
 
     truQuant_regions_dict = {}
-    run_truQuant()
+
+    run_truQuant(annotation_extension, percent_for_blacklisting, truQuant_regions_dict, output_directory,
+                 sequencing_files)
 
 
 if __name__ == "__main__":
