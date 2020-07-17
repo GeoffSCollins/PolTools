@@ -2,13 +2,15 @@ from itertools import chain
 
 from utils.print_tab_delimited import print_tab_delimited
 
-def output_metaplot_data(averages, region_length):
+def output_metaplot_data(averages, region_length, prime_name):
     """
 
     :param averages: averages list from the metaplots programs
     :type averages: list
     :param region_length: length of the region
     :type region_length: int
+    :param prime_name: either "five prime" or "three prime"
+    :type prime_name: str
     :return:
     """
     avgs_data, files = [x for x in zip(*averages)]
@@ -20,8 +22,8 @@ def output_metaplot_data(averages, region_length):
     header = ["Position"]
     # Write the header first
     for file in files:
-        header.append(file.split("/")[-1] + " pileup same strand")
-        header.append(file.split("/")[-1] + " pileup reverse strand")
+        header.append(file.split("/")[-1] + " " + prime_name + " pileup same strand")
+        header.append(file.split("/")[-1] + " " + prime_name + " pileup reverse strand")
 
     print_tab_delimited(header)
 

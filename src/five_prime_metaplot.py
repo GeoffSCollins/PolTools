@@ -57,7 +57,7 @@ def get_primes_data(regions_filename, sequencing_file):
 
 def parse_input(args):
     if len(args) < 2:
-        print("You did not provide any sequencing files! Exiting ...")
+        print_usage()
         sys.exit(1)
 
     regions_filename = args[0]
@@ -84,7 +84,7 @@ def print_usage():
 def run_five_prime_metaplot(regions_filename, sequencing_files_list):
     pool = multiprocessing.Pool(processes=len(sequencing_files_list))
     averages = pool.starmap(get_primes_data, [(regions_filename, sequencing_file) for sequencing_file in sequencing_files_list])
-    output_metaplot_data(averages, region_length)
+    output_metaplot_data(averages, region_length, "five prime")
 
 
 def main(args):

@@ -28,6 +28,10 @@ of the 5' reads at that position.
 
 For example:
 
+.. image:: images/five_prime_metaplot.png
+
+\
+
 .. code-block:: bash
 
   $ cat CCNT1_inr.bed
