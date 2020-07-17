@@ -16,7 +16,7 @@ Usage and option summary
 ===========================    =========================================================================================================================================================
 Option                         Description
 ===========================    =========================================================================================================================================================
-**Regions Filename**           Bed formatted file containing all the genes to quantify (+1 nucleotide centered)
+**Regions Filename**           Bed formatted file containing all the genes to quantify (this will typically be the truQuant gene_body_regions file
 **Sequencing Files**           Sequencing files to quantify separated by spaces.
 ===========================    =========================================================================================================================================================
 

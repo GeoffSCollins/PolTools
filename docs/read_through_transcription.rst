@@ -39,6 +39,11 @@ of the 3' reads at that interval.
 
 For example:
 
+
+.. image:: images/read_through_transcription.png
+
+\
+
 .. code-block:: bash
 
   $ head -n 5 control.bed
