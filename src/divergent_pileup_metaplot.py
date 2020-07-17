@@ -131,7 +131,7 @@ def run_divergent_pileup_plots(regions_filename, sequencing_files_list):
     remove_files(regions_filename.replace(".bed", "-FW.bed"), regions_filename.replace(".bed", "-RV.bed"))
     remove_files(rev_region_filename.replace(".bed", "-FW.bed"), rev_region_filename.replace(".bed", "-RV.bed"), rev_region_filename)
 
-    output_metaplot_data(averages, region_length)
+    output_metaplot_data(averages, region_length, "")
 
 
 def main(args):

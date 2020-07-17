@@ -28,6 +28,11 @@ of the reads at that position.
 
 For example:
 
+.. image:: images/divergent_pileup_metaplot.png
+
+\
+
+
 .. code-block:: bash
 
   $ cat CCNT1_inr.bed
