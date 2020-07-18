@@ -15,7 +15,7 @@ Usage and option summary
 **Usage**:
 ::
 
-  python3 truQuant <Sequencing Files>
+  GC_bioinfo truQuant <Sequencing Files>
 
 
 ===========================    =========================================================================================================================================================
@@ -57,7 +57,7 @@ For example:
   chr1    10564   10600   K00294:149:H35VNBBXY:6:1205:16407:42724 255     -
   chr1    10565   10597   K00294:149:H35VNBBXY:6:2221:2077:20709  255     -
 
-  $ python3 truQuant.py control.bed treated.bed
+  $ GC_bioinfo truQuant.py control.bed treated.bed
   $ head -n 1 control-truQuant_output.txt # Printing the headers
   Gene    Chromosome      Pause Region Left       Pause Region Right      Strand  Total 5' Reads  MaxTSS  MaxTSS 5' Reads
   Weighted Pause Region Center    STDEV of TSSs   Gene Body Left  Gene Body Right Gene Body Distance

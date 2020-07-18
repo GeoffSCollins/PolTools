@@ -41,7 +41,7 @@ def get_pausing_distances(sequencing_filename, region_filename):
 
 def print_usage():
     sys.stderr.write("Usage: \n")
-    sys.stderr.write("python3 tps_distance_per_gene.py <Regions Filename> <Sequencing Files>\n")
+    sys.stderr.write("GC_bioinfo tps_distance_per_gene.py <Regions Filename> <Sequencing Files>\n")
     sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/tps_distance_per_gene.rst\n")
 
 
@@ -90,7 +90,7 @@ def run_tps_distance_per_gene(regions_filename, sequencing_files_list):
 
 def main(args):
     """
-    python3 tps_distance_per_gene.py <Regions Filename> <Sequencing Files>
+    GC_bioinfo tps_distance_per_gene.py <Regions Filename> <Sequencing Files>
     More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/tps_distance_per_gene.rst
 
     :param args:

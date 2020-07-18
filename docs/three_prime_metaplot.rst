@@ -10,7 +10,7 @@ Usage and option summary
 **Usage**:
 ::
 
-  python3 three_prime_metaplot.py <Regions Filename> <Sequencing Files>
+  GC_bioinfo three_prime_metaplot.py <Regions Filename> <Sequencing Files>
 
 
 ===========================    =========================================================================================================================================================
@@ -44,7 +44,7 @@ For example:
   chr1    10564   10620   K00294:149:H35VNBBXY:6:1212:19441:27971 255     -
   chr1    10564   10611   K00294:149:H35VNBBXY:6:1211:31121:35022 255     -
 
-  $ python3 three_prime_metaplot.py CCNT1_inr.bed control.bed
+  $ GC_bioinfo three_prime_metaplot.py CCNT1_inr.bed control.bed
   Position        control.bed 5' same strand  control.bed 5' reverse strand
   -10.0   0.0     0.0
   -9.0    3.0     0.0

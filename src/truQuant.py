@@ -386,7 +386,7 @@ def output_data(output_filename, region_data_dict, gene_counts_dict, truQuant_re
 
 def print_usage():
     sys.stderr.write("Usage: \n")
-    sys.stderr.write("python3 truQuant <Sequencing Files>\n")
+    sys.stderr.write("GC_bioinfo truQuant <Sequencing Files>\n")
     sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/truQuant.rst\n")
 
 

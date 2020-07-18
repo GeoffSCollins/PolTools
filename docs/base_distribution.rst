@@ -16,7 +16,7 @@ Usage
 **Usage**:
 ::
 
-  python3 base_distribution.py <Regions Filename>
+  GC_bioinfo base_distribution.py <Regions Filename>
 
 
 ===========================    =========================================================================================================================================================
@@ -49,7 +49,7 @@ For example:
   chr11   827195  827395  CRACR2B -7.368074425    +
   chr1    180229938       180230138       LHX4    -7.356983285    +
 
-  $ python3 base_distribution.py promoter.bed
+  $ GC_bioinfo base_distribution.py promoter.bed
   $ head -n 1 promoter-base_distribution_plot.tsv # Print out the headers
   Position        A       T       G       C
   $ head -n 151 promoter-base_distribution_plot.tsv | tail -n 100 # Print out the middle 100 bp

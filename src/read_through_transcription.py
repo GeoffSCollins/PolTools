@@ -139,7 +139,7 @@ def output_data(combined_dict, sequencing_files, upstream_distance, interval_siz
 
 def print_usage():
     sys.stderr.write("Usage: \n")
-    sys.stderr.write("python3 read_through_transcription.py <Regions Filename> <TSR Filename> " +
+    sys.stderr.write("GC_bioinfo read_through_transcription.py <Regions Filename> <TSR Filename> " +
           "<Upstream Distance> <Downstream Distance> <Interval Distance> <Sequencing Files>\n")
     sys.stderr.write("\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/read_through_transcription.rst\n")
 

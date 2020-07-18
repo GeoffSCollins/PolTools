@@ -43,7 +43,7 @@ def get_pausing_distances(regions_filename, sequencing_filename):
 
 def print_usage():
     sys.stderr.write("Usage: \n")
-    sys.stderr.write("python3 pausing_distance_distribution_from_maxTSS.py <regions file> <sequencing files>\n")
+    sys.stderr.write("GC_bioinfo pausing_distance_distribution_from_maxTSS.py <regions file> <sequencing files>\n")
     sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/pausing_distance_distribution_from_maxTSS.rst\n")
 
 

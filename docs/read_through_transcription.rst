@@ -15,7 +15,7 @@ Usage and option summary
 **Usage**:
 ::
 
-  python3 read_through_transcription.py <Regions Filename> <TSR Filename> \
+  GC_bioinfo read_through_transcription.py <Regions Filename> <TSR Filename> \
           <Upstream Distance> <Downstream Distance> <Interval Distance> <Sequencing Files>
 
 
@@ -60,7 +60,7 @@ For example:
   chr1    10564   10600   K00294:149:H35VNBBXY:6:1205:16407:42724 255     -
   chr1    10565   10597   K00294:149:H35VNBBXY:6:2221:2077:20709  255     -
 
-  $ python3 read_through_transcription.py gene_body_regions.bed no output.txt 100 500 50 control.bed treated.bed
+  $ GC_bioinfo read_through_transcription.py gene_body_regions.bed no output.txt 100 500 50 control.bed treated.bed
   $ cat output.txt
   Position        control.bed treated.bed
   -100    19627   14509
