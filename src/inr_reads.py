@@ -49,9 +49,9 @@ def output_data(output_list, sequencing_filenames):
 
 
 def print_usage():
-    print("Usage: ")
-    print("python3 inr_reads.py <regions file> <sequencing files>")
-    print("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/inr_reads.rst")
+    sys.stderr.write("Usage: \n")
+    sys.stderr.write("python3 inr_reads.py <regions file> <sequencing files>\n")
+    sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/inr_reads.rst\n")
 
 
 def parse_args(args):

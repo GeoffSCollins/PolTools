@@ -75,9 +75,9 @@ def parse_input(args):
 
 
 def print_usage():
-    print("Usage: ")
-    print("python3 five_prime_metaplot.py <Regions Filename> <Sequencing Files>")
-    print("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/five_prime_metaplot.rst")
+    sys.stderr.write("Usage: \n")
+    sys.stderr.write("python3 five_prime_metaplot.py <Regions Filename> <Sequencing Files>\n")
+    sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/five_prime_metaplot.rst\n")
 
 
 def run_five_prime_metaplot(regions_filename, sequencing_files_list):

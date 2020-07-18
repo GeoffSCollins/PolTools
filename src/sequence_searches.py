@@ -52,10 +52,10 @@ def clean_sequence_searches(sequence_searches):
 
 
 def print_usage():
-    print("Usage: ")
-    print("python3 sequence_searches.py <regions file> <Sequence,startPosition:endPosition>")
-    print("Ex. python3 sequence_searches.py genes.bed TATA,-34:-28")
-    print("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/sequence_searches.rst")
+    sys.stderr.write("Usage: \n")
+    sys.stderr.write("python3 sequence_searches.py <regions file> <Sequence,startPosition:endPosition>\n")
+    sys.stderr.write("Ex. python3 sequence_searches.py genes.bed TATA,-34:-28\n")
+    sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/sequence_searches.rst\n")
 
 
 def parse_input(args):

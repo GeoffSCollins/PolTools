@@ -138,10 +138,10 @@ def output_data(combined_dict, sequencing_files, upstream_distance, interval_siz
 
 
 def print_usage():
-    print("Usage: ")
-    print("python3 read_through_transcription.py <Regions Filename> <TSR Filename> " +
-          "<Upstream Distance> <Downstream Distance> <Interval Distance> <Sequencing Files>")
-    print("\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/read_through_transcription.rst")
+    sys.stderr.write("Usage: \n")
+    sys.stderr.write("python3 read_through_transcription.py <Regions Filename> <TSR Filename> " +
+          "<Upstream Distance> <Downstream Distance> <Interval Distance> <Sequencing Files>\n")
+    sys.stderr.write("\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/read_through_transcription.rst\n")
 
 
 def parse_input(args):
@@ -150,7 +150,7 @@ def parse_input(args):
         sys.exit(1)
 
     if len(args) < 6:
-        print("You did not provide all of the necessary arguments. Please try again.")
+        sys.stderr.write("You did not provide all of the necessary arguments. Please try again.\n")
         print_usage()
         sys.exit(1)
 
@@ -182,7 +182,7 @@ def parse_input(args):
 
 
     if upstream_distance < 0 or downstream_distance < 0 or interval_size < 0:
-        print("Distances cannot be negative. Please enter a positive number.")
+        sys.stderr.write("Distances cannot be negative. Please enter a positive number.\n")
         sys.exit(1)
 
     return regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size, sequencing_files

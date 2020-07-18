@@ -56,9 +56,9 @@ def parse_args(args):
 
 
 def print_usage():
-    print("Usage: ")
-    print("python3 make_regions_file_centered_on_max_tss.py <truQuant output file> <region size>")
-    print("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/make_regions_file_centered_on_max_tss.rst")
+    sys.stderr.write("Usage: \n")
+    sys.stderr.write("python3 make_regions_file_centered_on_max_tss.py <truQuant output file> <region size>\n")
+    sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/make_regions_file_centered_on_max_tss.rst\n")
 
 
 def main(args):
