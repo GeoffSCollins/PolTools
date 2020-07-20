@@ -15,7 +15,7 @@ Usage and option summary
 **Usage**:
 ::
 
-  GC_bioinfo sequence_searches.py <regions file> <Sequence,startPosition:endPosition>
+  GC_bioinfo sequence_searches <regions file> <Sequence,startPosition:endPosition>
 
 
 ======================================   =========================================================================================================================================================
@@ -42,7 +42,7 @@ For example:
   $ cat CCNT1_inr.bed
   chr12   48716696        48716716        CCNT1   0       -
 
-  $ GC_bioinfo sequence_searches.py POLR2A_inr.bed GCTGCT,-3:3
+  $ GC_bioinfo sequence_searches POLR2A_inr.bed GCTGCT,-3:3
   Chromosome      Left    Right   Gene    Score   Strand  GCTGCT
   chr17   7484355 7484375 POLR2A  0       +       True
 

@@ -9,7 +9,7 @@ Usage
 **Usage**:
 ::
 
-  GC_bioinfo tps_distance_per_gene.py <regions file> <sequencing files>
+  GC_bioinfo tps_distance_per_gene <regions file> <sequencing files>
 
 
 ===========================    =========================================================================================================================================================
@@ -52,7 +52,7 @@ For example:
   chr1    12310   12348   A00876:65:HLHG7DRXX:1:2273:11478:4492   255     -
   chr1    12381   12401   A00876:65:HLHG7DRXX:1:2219:8829:14434   255     +
 
-  $ GC_bioinfo tps_distance_per_gene.py promoters.bed control.bed > output.tmp
+  $ GC_bioinfo tps_distance_per_gene promoters.bed control.bed > output.tmp
   $ head output.tmp
   Gene    control.bed
   PIGG    25.0

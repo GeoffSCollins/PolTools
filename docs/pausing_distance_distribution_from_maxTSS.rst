@@ -9,7 +9,7 @@ Usage
 **Usage**:
 ::
 
-  GC_bioinfo pausing_distance_distribution_from_maxTSS.py <regions file> <sequencing files>
+  GC_bioinfo pausing_distance_distribution_from_maxTSS <regions file> <sequencing files>
 
 
 ===========================    =========================================================================================================================================================
@@ -56,7 +56,7 @@ For example:
   chr1    12310   12348   A00876:65:HLHG7DRXX:1:2273:11478:4492   255     -
   chr1    12381   12401   A00876:65:HLHG7DRXX:1:2219:8829:14434   255     +
 
-  $ GC_bioinfo pausing_distance_distribution_from_maxTSS.py regions.bed control.bed > output.tmp
+  $ GC_bioinfo pausing_distance_distribution_from_maxTSS regions.bed control.bed > output.tmp
   $ head -n 30 output.tmp
   1-dedup.bed     2-dedup.bed
   0       0
