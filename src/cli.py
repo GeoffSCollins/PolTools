@@ -43,5 +43,5 @@ if __name__ == '__main__':
     programs_list = ["base_distribution", "divergent_pileup_metaplot", "five_prime_metaplot", "inr_reads",
                      "make_regions_file_centered_on_max_tss", "pausing_distance_distribution_from_maxTSS",
                      "read_through_transcription", "sequence_searches", "three_prime_metaplot", "tps_distance_per_gene",
-                     "truQuant"]
+                     "truQuant", "multicoverage"]
     main(sys.argv[1:])
