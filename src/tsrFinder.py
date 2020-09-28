@@ -7,6 +7,7 @@ import sys
 from multiprocessing import Process
 from collections import defaultdict
 
+from utils.constants import tsr_finder_location
 from utils.tsr_finder_step_four_from_rocky import run_step_four
 
 
@@ -98,7 +99,7 @@ for chromosome in chromosome_file_writers:
 
 # Step 2: Run tsrFinder on both files concurrently
 def run_tsrFinderGC(filename):
-    os.system("utils/tsrFinder " + filename + " " + " ".join(args[1:]))
+    os.system(tsr_finder_location + " " + filename + " " + " ".join(args[1:]))
 
     step_three_filename = filename.replace(".bed", "-3-output.txt")
     step_four_filename = filename.replace(".bed", "-4-output.txt")
