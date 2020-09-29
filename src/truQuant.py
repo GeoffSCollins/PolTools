@@ -394,18 +394,18 @@ def run_truQuant(annotation_extension, percent_for_blacklisting, truQuant_region
 
 
     # Run tsrFinder on the first file
-    #os.system("GC_bioinfo tsrFinder " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file)
+    os.system("GC_bioinfo tsrFinder " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file)
 
     # 1: Make the regions we are going to be searching for max TSSs in max TSRs
-    # search_regions_dict, annotations_dict = make_search_regions_list(annotation_file, annotation_extension)
+    search_regions_dict, annotations_dict = make_search_regions_list(annotation_file, annotation_extension)
 
     # 2: Make the pause regions and gene bodies
-    # gene_tsr_dict, flow_through_tsrs = map_tsrs_to_search_regions(tsr_file, search_regions_dict)
-    # max_tsrs_dict, non_max_tsrs_dict = find_max_tsr_in_search_region(gene_tsr_dict)
-    # define_pause_regions_and_gene_bodies(paused_region_filename, gene_body_region_filename,
-    #                                      max_tsrs_dict, annotations_dict, truQuant_regions_dict)
-    # make_blacklisted_regions(blacklist_filename, annotations_dict, max_tsrs_dict, non_max_tsrs_dict, flow_through_tsrs,
-    #                          percent_for_blacklisting)
+    gene_tsr_dict, flow_through_tsrs = map_tsrs_to_search_regions(tsr_file, search_regions_dict)
+    max_tsrs_dict, non_max_tsrs_dict = find_max_tsr_in_search_region(gene_tsr_dict)
+    define_pause_regions_and_gene_bodies(paused_region_filename, gene_body_region_filename,
+                                         max_tsrs_dict, annotations_dict, truQuant_regions_dict)
+    make_blacklisted_regions(blacklist_filename, annotations_dict, max_tsrs_dict, non_max_tsrs_dict, flow_through_tsrs,
+                             percent_for_blacklisting)
 
     # 3. Get the number of counts (multithreaded)
 
