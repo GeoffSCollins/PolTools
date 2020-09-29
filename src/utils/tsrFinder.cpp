@@ -5,6 +5,7 @@
 #include <fstream>
 #include <math.h>
 #include <unordered_map>
+#include <stdint.h>
 
 using namespace std;
 
@@ -114,16 +115,16 @@ map<string, vector<string>> readStepTwoFile(string fileName, string &strand) {
 }
 
 
-void buildMap(unordered_map<string, vector<int>> &tsrMap, vector<string> regions, int stepSize) {
+void buildMap(unordered_map<string, vector<__int128>> &tsrMap, vector<string> regions, int stepSize) {
     // For each region in the map values (given from step 2 file)
     for (string region: regions) {
         vector<string> splitRegion = splitString(region, "\t");
         // Split the string by tabs to grab the entries
 
-        int tss = stoi(splitRegion[0]);
-        int tssPlusOne = stoi(splitRegion[1]);
-        int readLenSum = stoi(splitRegion[2]);
-        int readCount = stoi(splitRegion[3]);
+        __int128 tss = stoi(splitRegion[0]);
+        __int128 tssPlusOne = stoi(splitRegion[1]);
+        __int128 readLenSum = stoi(splitRegion[2]);
+        __int128 readCount = stoi(splitRegion[3]);
 
          // For each sub region of length stepsize starting at the tss + 1 - the stepSize to the tss + 1
          // This is the window loop?
@@ -140,7 +141,7 @@ void buildMap(unordered_map<string, vector<int>> &tsrMap, vector<string> regions
 
             if (tsrMap.find(mapKey) == tsrMap.end()) {
                 // This means the TSR was not added to the map
-                vector<int> mapData = {0, 0, 0, 0, 0, 0};
+                vector<__int128> mapData = {0, 0, 0, 0, 0};
                 tsrMap[mapKey] = mapData;
             }
 
@@ -154,9 +155,6 @@ void buildMap(unordered_map<string, vector<int>> &tsrMap, vector<string> regions
 
             // This is a helper for the avgTSS
             tsrMap[mapKey][4] += tssPlusOne * readCount;
-
-            // This is a helper for the stdev
-            tsrMap[mapKey][5] += tssPlusOne * readCount;
          }
     }
 }
@@ -173,7 +171,7 @@ string stepThree(string stepTwoFilename, int stepSize, int minSeqDepth, int minA
     for(auto const& key: dataByChromosome) {
         string chrom = key.first;
         vector<string> regions = key.second;
-        unordered_map<string, vector<int>> tsrMap;
+        unordered_map<string, vector<__int128>> tsrMap;
 
         buildMap(tsrMap, regions, stepSize);
 
@@ -188,12 +186,12 @@ string stepThree(string stepTwoFilename, int stepSize, int minSeqDepth, int minA
 
             int maxTSS = tsrMap[subMapKey][2];
             int maxReadCount = tsrMap[subMapKey][3];
-            double avgTSSHelper = tsrMap[subMapKey][4];
+            __int128 avgTSSHelper = tsrMap[subMapKey][4];
 
             // Only keep the ones with RCOVSUM >= MINSEQDEPTH and (RLSUM / RCOVSUM) >= AVGTRANSLEN
             if (readCount >= minSeqDepth && (readLenSum / readCount) >= minAvgTranscriptLength) {
                 // We need to get the other values and then print it out
-                double averageTSS = avgTSSHelper / readCount;
+                long double averageTSS = avgTSSHelper / readCount;
 
                 string data = chrom + "\t" + to_string(windowStart) + "\t" + to_string(windowEnd) + "\t" + to_string(readLenSum) + "\t" + to_string(readCount);
                 data += "\t" + strand + "\t" + to_string(maxTSS) + "\t" + to_string(maxTSS + 1) + "\t" + to_string(maxReadCount) + "\t";

@@ -60,7 +60,9 @@ with open(chrom_size_file) as file:
 fw_filename = bed_file.replace(".bed", "-FW.bed")
 rv_filename = bed_file.replace(".bed", "-RV.bed")
 
-output_filename = bed_file.replace(".bed", "-TSR.txt")
+parameters_string = "_".join([str(window_size), str(min_seq_depth), str(min_avg_transcript_length), str(max_fragment_size)])
+
+output_filename = bed_file.replace(".bed", "_" + parameters_string + "-TSR.tab")
 
 chromosome_file_writers = defaultdict(lambda : {"+": None, "-": None})
 

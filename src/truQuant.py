@@ -4,6 +4,7 @@ import os
 import math
 import multiprocessing
 from pathlib import Path
+from collections import defaultdict
 
 from utils.make_five_prime_bed_file import make_five_bed_file
 from utils.make_three_prime_bed_file import make_three_bed_file
@@ -17,8 +18,9 @@ from utils.check_dependencies import check_dependencies
 from utils.constants import rna_blacklist_file, hg38_chrom_sizes_file, annotation_file
 
 
+
 def make_search_regions_list(regions_filename, annotation_extension):
-    search_regions_dict = {}
+    search_regions_dict = defaultdict(list)
     annotations_dict = {}
     # This makes the search regions
     with open(regions_filename, 'r') as file:
@@ -27,19 +29,9 @@ def make_search_regions_list(regions_filename, annotation_extension):
 
             if strand == "+":
                 # We want to go from the left position to the met_left position
-                if chromosome in search_regions_dict:
-                    search_regions_dict[chromosome].append(
-                        [chromosome, int(left) - annotation_extension, met_left, gene_name, 0, strand])
-                else:
-                    search_regions_dict[chromosome] = [
-                        [chromosome, int(left) - annotation_extension, met_left, gene_name, 0, strand]]
+                search_regions_dict[chromosome].append([chromosome, int(left) - annotation_extension, met_left, gene_name, 0, strand])
             else:
-                if chromosome in search_regions_dict:
-                    search_regions_dict[chromosome].append(
-                        [chromosome, met_right, int(right) + annotation_extension, gene_name, 0, strand])
-                else:
-                    search_regions_dict[chromosome] = [
-                        [chromosome, met_right, int(right) + annotation_extension, gene_name, 0, strand]]
+                search_regions_dict[chromosome].append([chromosome, met_right, int(right) + annotation_extension, gene_name, 0, strand])
 
             annotations_dict[gene_name] = [chromosome, left, right, gene_name, 0, strand]
 
@@ -47,44 +39,39 @@ def make_search_regions_list(regions_filename, annotation_extension):
 
 
 def map_tsrs_to_search_regions(tsr_filename, search_regions_dict):
-    gene_tsr_dict = {}
+    gene_tsr_dict = defaultdict(list)
     flow_through_tsrs = []
 
     with open(tsr_filename, 'r') as file:
         # Loop through the TSR file
-        for i, line in enumerate(file):
-            if i != 0:
-                tsr_chromosome, tsr_left, tsr_right, tsr_read_sum, tsr_strength, tsr_strand, tss_left, tss_right, \
-                max_tss, tss_strength, avg_tss, max_tss_mins_avg_tss, std_dev_avg_tss = line.split()
+        for line in file:
+            tsr_chromosome, tsr_left, tsr_right, tsr_read_sum, tsr_strength, tsr_strand, tss_left, tss_right, \
+            tss_strength, avg_tss, max_tss_mins_avg_tss = line.split()
 
-                has_mapped = False
+            has_mapped = False
 
-                if tsr_chromosome in search_regions_dict:
-                    for region in search_regions_dict[tsr_chromosome]:
-                        chromosome, left, right, gene_name, _, strand = region
+            for region in search_regions_dict[tsr_chromosome]:
+                chromosome, left, right, gene_name, _, strand = region
 
-                        # If there is a TSR as that base pair, add it to the gene_tsr dict
-                        if tsr_strand == strand and not (int(tsr_right) < int(left) or int(tsr_left) > int(right)):
-                            has_mapped = True
-                            if gene_name not in gene_tsr_dict:
-                                gene_tsr_dict[gene_name] = [line.split()[0:6] + [avg_tss]]
-                            else:
-                                gene_tsr_dict[gene_name].append(line.split()[0:6] + [avg_tss])
+                # If there is a TSR as that base pair, add it to the gene_tsr dict
+                if tsr_strand == strand and not (int(tsr_right) < int(left) or int(tsr_left) > int(right)):
+                    has_mapped = True
+                    gene_tsr_dict[gene_name].append(line.split()[0:6] + [avg_tss])
 
-                        # If the left of the region is past the right side of the TSR,
-                        # we don't need to search the rest of the file
-                        if int(left) > int(tsr_right):
-                            break
+                # If the left of the region is past the right side of the TSR,
+                # we don't need to search the rest of the file
+                if int(left) > int(tsr_right):
+                    break
 
-                if not has_mapped:
-                    flow_through_tsrs.append(line.split()[0:6] + [avg_tss])
+            if not has_mapped:
+                flow_through_tsrs.append(line.split()[0:6] + [avg_tss])
 
     return gene_tsr_dict, flow_through_tsrs
 
 
 def find_max_tsr_in_search_region(gene_tsr_dict):
     max_tsrs_dict = {}
-    non_max_tsrs_dict = {}
+    non_max_tsrs_dict = defaultdict(list)
 
     for gene_name in gene_tsr_dict:
         for tsr in gene_tsr_dict[gene_name]:
@@ -94,18 +81,12 @@ def find_max_tsr_in_search_region(gene_tsr_dict):
                 max_tsrs_dict[gene_name] = tsr
             elif int(tsr_counts) > int(max_tsrs_dict[gene_name][4]):
                 # If the current max is larger than the previous max, add the old tsr to the non_max
-                if gene_name not in non_max_tsrs_dict:
-                    non_max_tsrs_dict[gene_name] = [max_tsrs_dict[gene_name]]
-                else:
-                    non_max_tsrs_dict[gene_name].append(max_tsrs_dict[gene_name])
+                non_max_tsrs_dict[gene_name].append(max_tsrs_dict[gene_name])
 
                 # Put in the new one
                 max_tsrs_dict[gene_name] = tsr
             else:
-                if gene_name not in non_max_tsrs_dict:
-                    non_max_tsrs_dict[gene_name] = [tsr]
-                else:
-                    non_max_tsrs_dict[gene_name].append(tsr)
+                non_max_tsrs_dict[gene_name].append(tsr)
 
     return max_tsrs_dict, non_max_tsrs_dict
 
@@ -159,14 +140,11 @@ def define_pause_regions_and_gene_bodies(paused_region_filename, gene_body_regio
 
 def map_flow_through_tsrs(annotations_dict, flow_through_tsrs):
     # To make this function faster, we split the annotations dict by chromosome and strand
-    temp_annotations_dict = {}
+    temp_annotations_dict = defaultdict(lambda: {"+": [], "-": []})
     mapped_flow_through_tsrs_dict = {}
 
     for gene_name in annotations_dict:
         chromosome, left, right, gene_name, _, strand = annotations_dict[gene_name]
-
-        if chromosome not in temp_annotations_dict:
-            temp_annotations_dict[chromosome] = {"+": [], "-": []}
 
         temp_annotations_dict[chromosome][strand].append([left, right, gene_name])
 
@@ -235,6 +213,7 @@ def get_counts_in_paused_region(regions_filename, blacklisted_sequencing_file):
     # Run bedtools coverage on the 5' bed file
     random_filename = run_coverage(regions_filename, five_bed_filename)
 
+    # Not using a defaultdict because multiprocessing does not like it
     indv_gene_counts_dict = {}
 
     with open(random_filename) as file:
@@ -243,8 +222,7 @@ def get_counts_in_paused_region(regions_filename, blacklisted_sequencing_file):
             gene_name = line.split()[3]
 
             if gene_name not in indv_gene_counts_dict:
-                indv_gene_counts_dict[gene_name] = {"Pause": -1,
-                                                    "Body": -1}
+                indv_gene_counts_dict[gene_name] = {"Pause": -1, "Body": -1}
 
             indv_gene_counts_dict[gene_name]["Pause"] = counts
 
@@ -336,17 +314,13 @@ def gather_data(sequencing_file, blacklist_filename, annotated_dataset, paused_r
 def combine_indv_gene_counts_dict(count_information_list, sequencing_files):
     # Need to combine the dictionaries to fit the gene_counts dict format
     ret_region_data_dict = {}
-    gene_counts_dict = {}
+    gene_counts_dict = defaultdict(lambda: {"Pause": [-1] * len(sequencing_files), "Body": [-1] * len(sequencing_files)})
 
     for i, tup in enumerate(count_information_list):
         # Tup has the sequencing_file, indv_gene_counts_dict, and region_data_dict
         sequencing_file, indv_gene_counts_dict, region_data_dict = tup
 
         for gene_name in indv_gene_counts_dict:
-            if gene_name not in gene_counts_dict:
-                gene_counts_dict[gene_name] = {"Pause": [-1] * len(sequencing_files),
-                                               "Body": [-1] * len(sequencing_files)}
-
             gene_counts_dict[gene_name]["Pause"][i] = indv_gene_counts_dict[gene_name]["Pause"]
             gene_counts_dict[gene_name]["Body"][i] = indv_gene_counts_dict[gene_name]["Body"]
 
@@ -403,13 +377,13 @@ def parse_input(args):
 
 def run_truQuant(annotation_extension, percent_for_blacklisting, truQuant_regions_dict, output_directory,
                  sequencing_files):
+
     # Blacklist the file first
     blacklisted_first_sequencing_file = sequencing_files[0].replace(".bed", "-blacklisted.bed")
     run_subtract(sequencing_files[0], rna_blacklist_file, output_filename=blacklisted_first_sequencing_file)
 
-    # Run tsrFinder on the first file
-    os.system("tsrFinderPARALLEL " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file)
 
+    # Define necessary files
     tsr_file = blacklisted_first_sequencing_file.replace(".bed", "_150_20_30_600-TSR.tab")
 
     paused_region_filename = output_directory + os.path.basename(tsr_file).replace('-TSR.tab', '-paused_regions.bed')
@@ -418,16 +392,20 @@ def run_truQuant(annotation_extension, percent_for_blacklisting, truQuant_region
     blacklist_filename = output_directory + os.path.basename(tsr_file).replace('-TSR.tab', '-blacklisted_regions.bed')
     output_filename = output_directory + os.path.basename(sequencing_files[0].replace('.bed', '-truQuant_output.txt'))
 
+
+    # Run tsrFinder on the first file
+    #os.system("GC_bioinfo tsrFinder " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file)
+
     # 1: Make the regions we are going to be searching for max TSSs in max TSRs
-    search_regions_dict, annotations_dict = make_search_regions_list(annotation_file, annotation_extension)
+    # search_regions_dict, annotations_dict = make_search_regions_list(annotation_file, annotation_extension)
 
     # 2: Make the pause regions and gene bodies
-    gene_tsr_dict, flow_through_tsrs = map_tsrs_to_search_regions(tsr_file, search_regions_dict)
-    max_tsrs_dict, non_max_tsrs_dict = find_max_tsr_in_search_region(gene_tsr_dict)
-    define_pause_regions_and_gene_bodies(paused_region_filename, gene_body_region_filename,
-                                         max_tsrs_dict, annotations_dict, truQuant_regions_dict)
-    make_blacklisted_regions(blacklist_filename, annotations_dict, max_tsrs_dict, non_max_tsrs_dict, flow_through_tsrs,
-                             percent_for_blacklisting)
+    # gene_tsr_dict, flow_through_tsrs = map_tsrs_to_search_regions(tsr_file, search_regions_dict)
+    # max_tsrs_dict, non_max_tsrs_dict = find_max_tsr_in_search_region(gene_tsr_dict)
+    # define_pause_regions_and_gene_bodies(paused_region_filename, gene_body_region_filename,
+    #                                      max_tsrs_dict, annotations_dict, truQuant_regions_dict)
+    # make_blacklisted_regions(blacklist_filename, annotations_dict, max_tsrs_dict, non_max_tsrs_dict, flow_through_tsrs,
+    #                          percent_for_blacklisting)
 
     # 3. Get the number of counts (multithreaded)
 
@@ -435,8 +413,7 @@ def run_truQuant(annotation_extension, percent_for_blacklisting, truQuant_region
 
     count_information_list = pool.starmap(gather_data,
                                           [(sequencing_file, blacklist_filename, i == 0, paused_region_filename,
-                                            gene_body_region_filename, truQuant_regions_dict) for i, sequencing_file in
-                                           enumerate(sequencing_files)])
+                                            gene_body_region_filename, truQuant_regions_dict) for i, sequencing_file in enumerate(sequencing_files)])
 
     region_data_dict, gene_counts_dict = combine_indv_gene_counts_dict(count_information_list, sequencing_files)
 
@@ -453,7 +430,7 @@ def main(args):
     :type args: list
     :return:
     """
-    check_dependencies("bedtools", "tsrFinderPARALLEL")
+    check_dependencies("bedtools")
 
     sequencing_files = parse_input(args)
 
