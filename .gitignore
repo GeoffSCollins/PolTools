@@ -1,3 +1,3 @@
-src/static/hg38.fa
-src/truQuant_mapping_pipeline.py
+GC_bioinfo/static/hg38.fa
+GC_bioinfo/main_programs/truQuant_mapping_pipeline.py
 **/pyc

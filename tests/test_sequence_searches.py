@@ -2,14 +2,15 @@ import unittest.mock
 from pathlib import Path
 
 import sys
-import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+sys.path.append("../GC_bioinfo")
 
-import sequence_searches
-from sequence_searches import InvalidSearchException
+from main_programs import sequence_searches
+from main_programs.sequence_searches import InvalidSearchException
 
 import io
+
+from quiet_stderr import Quieter
 
 
 class TestSequenceSearches(unittest.TestCase):
@@ -26,22 +27,26 @@ class TestSequenceSearches(unittest.TestCase):
     def test_no_arguments(self):
         # Should print the usage
         with self.assertRaises(SystemExit):
-            sequence_searches.main([])
+            with Quieter():
+                sequence_searches.main([])
 
     def test_only_regions_file(self):
         # Should print the usage
         with self.assertRaises(SystemExit):
-            sequence_searches.main([self.polr2a_region_file])
+            with Quieter():
+                sequence_searches.main([self.polr2a_region_file])
 
     def test_incorrect_search(self):
         # Should raise an InvalidSearch error because of the underscore
         with self.assertRaises(InvalidSearchException):
-            sequence_searches.main([self.polr2a_region_file, 'TATA,-5_7'])
+            with Quieter():
+                sequence_searches.main([self.polr2a_region_file, 'TATA,-5_7'])
 
     def test_search_not_in_region(self):
         # Should raise an InvalidSearch error because polr2a file is -10 to +10
         with self.assertRaises(InvalidSearchException):
-            sequence_searches.main([self.polr2a_region_file, 'TATA,-20:-10'])
+            with Quieter():
+                sequence_searches.main([self.polr2a_region_file, 'TATA,-20:-10'])
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_positive_strand_one_upstream_sequence_not_found(self, mock_stdout):
