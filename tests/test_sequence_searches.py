@@ -3,14 +3,12 @@ from pathlib import Path
 
 import sys
 
-sys.path.append("../GC_bioinfo")
-
-from main_programs import sequence_searches
-from main_programs.sequence_searches import InvalidSearchException
+from GC_bioinfo.main_programs import sequence_searches
+from GC_bioinfo.main_programs.sequence_searches import InvalidSearchException
 
 import io
 
-from quiet_stderr import Quieter
+from quiter import Quieter
 
 
 class TestSequenceSearches(unittest.TestCase):

@@ -1,15 +1,27 @@
-import sys
 import glob
-import os
 import multiprocessing
+import os
+import sys
 
-from main_programs import gene_body_heatmap
-
-from GC_bioinfo.utils.remove_files import remove_files
+from GC_bioinfo.main_programs import gene_body_heatmap
 from GC_bioinfo.utils.add_matrices import add_matrices
-from GC_bioinfo.utils.generate_heatmap import generate_heatmap, Ticks
-from GC_bioinfo.utils.average_matrix import average_matrix
-from GC_bioinfo.utils.scale_matrix import scale_matrix
+from GC_bioinfo.utils.remove_files import remove_files
+
+
+def get_combined_matrix(seq_files_data, matrix_params, filenames):
+    args = []
+    for seq_data in seq_files_data:
+        args.append( (seq_data, matrix_params, filenames) )
+
+    pool = multiprocessing.Pool(processes=2)
+    matrix_filenames = pool.starmap(gene_body_heatmap.build_matrix, args)
+
+    # Add the matricies together
+    combined_matrix = add_matrices(matrix_filenames)
+
+    remove_files(matrix_filenames)
+
+    return combined_matrix
 
 
 def print_usage():
@@ -97,82 +109,23 @@ def get_args(args):
 
     interval_size = try_to_convert_to_int(interval_size, "interval size")
 
-    return truQuant_output_file, tsr_file, upstream_distance, distance_past_tes, bp_width, width, height, gamma, max_black_value, \
-           interval_size, spike_in_one, sequencing_filename_one, spike_in_two, sequencing_filename_two, output_filename_prefix
+    seq_files_data = [(sequencing_filename_one, spike_in_one), (sequencing_filename_two, spike_in_two)]
+    matrix_params = (upstream_distance, distance_past_tes, width, height, interval_size)
+    heatmap_params = (bp_width, width, height, gamma, max_black_value, interval_size)
+    filenames = (truQuant_output_file, tsr_file, output_filename_prefix)
 
-
-def get_individual_matrices(truQuant_output_file, distance_past_tes, interval_size, five_prime_buffer_distance,
-                            sequencing_filename, blacklist_regions_file, width, height, spike_in):
-
-    # Step 1. Make regions to quantify
-    intervals_filename = gene_body_heatmap.make_incremented_regions(truQuant_output_file, distance_past_tes, interval_size,
-                                                                    five_prime_buffer_distance)
-
-    # Step 2. Quantify them
-    quantified_regions_filename = gene_body_heatmap.quantify_intervals(sequencing_filename, blacklist_regions_file,
-                                                                       intervals_filename)
-
-    # Step 3. Read the coverage data and add them to a 2d list
-    sorted_matrix_filename, num_lines = gene_body_heatmap.read_coverage_file(quantified_regions_filename, width)
-
-    remove_files(intervals_filename, quantified_regions_filename)
-
-    # Make the dimensions correct
-    num_lines_to_average = int(num_lines / height)
-    averaged_matrix_filename = average_matrix(sorted_matrix_filename, num_lines_to_average)
-
-    remove_files(sorted_matrix_filename)
-
-    finalized_matrix_filename = scale_matrix(averaged_matrix_filename, spike_in)
-
-    remove_files(averaged_matrix_filename)
-
-    return finalized_matrix_filename
-
-
-def get_combined_matrix(truQuant_output_file, tsr_file, distance_past_tes, sequencing_filename_one, spike_in_one, sequencing_filename_two, spike_in_two,
-                        interval_size, upstream_distance, width, height):
-
-    blacklist_regions_file = gene_body_heatmap.blacklist_extended_gene_bodies(tsr_file, distance_past_tes)
-
-    get_individual_matrices_args = []
-    for data_tuple in [(sequencing_filename_one, spike_in_one), (sequencing_filename_two, spike_in_two)]:
-        sequencing_filename, spike_in = data_tuple
-
-        get_individual_matrices_args.append(
-            [truQuant_output_file, distance_past_tes, interval_size, upstream_distance,
-             sequencing_filename, blacklist_regions_file, width, height, spike_in])
-
-    pool = multiprocessing.Pool(processes=2)
-
-    matrix_filenames = pool.starmap(get_individual_matrices, get_individual_matrices_args)
-
-    # Add the matricies together
-    combined_matrix = add_matrices(matrix_filenames)
-
-    remove_files(matrix_filenames, blacklist_regions_file)
-
-    return combined_matrix
+    return seq_files_data, matrix_params, heatmap_params, filenames
 
 
 def main(args):
-    truQuant_output_file, tsr_file, upstream_distance, distance_past_tes, bp_width, width, height, gamma, max_black_value, \
-        interval_size, spike_in_one, sequencing_filename_one, spike_in_two, sequencing_filename_two, \
-        output_filename_prefix = get_args(args)
+    seq_files_data, matrix_params, heatmap_params, filenames = get_args(args)
 
-    combined_matrix = get_combined_matrix(truQuant_output_file, tsr_file, distance_past_tes, sequencing_filename_one, spike_in_one,
-                                          sequencing_filename_two, spike_in_two, interval_size,
-                                          upstream_distance, width, height)
+    combined_matrix = get_combined_matrix(seq_files_data, matrix_params, filenames)
 
-    # Step 4. Make the heatmap using the resulting file
+    output_filename_prefix = filenames[-1]
 
-    # Minor tick marks every 10 kb and major tick marks every 50 kb
-    t = Ticks(minor_tick_mark_interval_size=(10_000 / interval_size), major_tick_mark_interval_size=(50_000 / interval_size))
-
-    output_filename = output_filename_prefix + "_gamma_" + str(gamma) + "_max_" + str (max_black_value) + \
-                      "_width_" + str(bp_width) + "bp_gene_body_combined_heatmap.tiff"
-
-    generate_heatmap(combined_matrix, 'gray', output_filename, gamma, 0, max_black_value, ticks=t)
+    # Make the heatmap of the combined matrix
+    gene_body_heatmap.make_heatmap(combined_matrix, heatmap_params, output_filename_prefix)
 
     # Step 5. Remove the averaged_matrix file
     remove_files(combined_matrix)

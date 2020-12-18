@@ -1,30 +1,27 @@
 import unittest.mock
-import sys
 
-sys.path.append("../GC_bioinfo")
+from GC_bioinfo.utils.add_matrices import add_matrices
+from GC_bioinfo.utils.average_matrix import average_matrix
+from GC_bioinfo.utils.fasta_reader import read_fasta, NotFastaFileError
+from GC_bioinfo.utils.generate_blacklist_regions_for_gene_body_heatmap import blacklist_extended_gene_bodies
+from GC_bioinfo.utils.get_metaplot_averages import average_vertically
+from GC_bioinfo.utils.get_region_length import determine_region_length
+from GC_bioinfo.utils.make_five_and_three_dict import build_counts_dict
+from GC_bioinfo.utils.make_five_prime_bed_file import make_five_bed_file
+from GC_bioinfo.utils.make_random_filename import generate_random_filename
+from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
+from GC_bioinfo.utils.make_transcripts_dict import build_transcripts_dict
+from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
+from GC_bioinfo.utils.run_bedtools_getfasta import run_getfasta
+from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
+from GC_bioinfo.utils.scale_matrix import scale_matrix
+from GC_bioinfo.utils.set_matrix_bounds import set_matrix_bounds
+from GC_bioinfo.utils.verify_bed_file import verify_bed_files
+from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
 
-from utils.add_matrices import add_matrices
-from utils.average_matrix import average_matrix
-from utils.fasta_reader import read_fasta, NotFastaFileError
-from utils.generate_blacklist_regions_for_gene_body_heatmap import blacklist_extended_gene_bodies
-from utils.get_metaplot_averages import average_vertically
-from utils.get_region_length import determine_region_length
-from utils.make_five_and_three_dict import build_counts_dict
-from utils.make_five_prime_bed_file import make_five_bed_file
-from utils.make_random_filename import generate_random_filename
-from utils.make_three_prime_bed_file import make_three_bed_file
-from utils.make_transcripts_dict import build_transcripts_dict
-from utils.run_bedtools_coverage import run_coverage
-from utils.run_bedtools_getfasta import run_getfasta
-from utils.run_bedtools_subtract import run_subtract
-from utils.scale_matrix import scale_matrix
-from utils.set_matrix_bounds import set_matrix_bounds
-from utils.verify_bed_file import verify_bed_files
-from utils.verify_region_length_is_even import verify_region_length_is_even
+from GC_bioinfo.utils.remove_files import remove_files
 
-from utils.remove_files import remove_files
-
-from quiet_stderr import Quieter
+from quiter import Quieter
 
 
 class TestAddMatrices(unittest.TestCase):
@@ -130,10 +127,6 @@ class TestAverageMatrix(unittest.TestCase):
         self.assertEqual(r, [[2.5, 1], [6.5, 1.75], [9.5, 2]])
 
         remove_files(test_mat, result_mat)
-
-    def test_different_sized_matrices(self):
-        # TODO
-        pass
 
 
 class TestReadFasta(unittest.TestCase):

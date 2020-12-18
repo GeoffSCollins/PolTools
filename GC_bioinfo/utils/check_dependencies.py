@@ -1,6 +1,7 @@
-from shutil import which
-import sys
 import subprocess
+import sys
+from shutil import which
+
 import pkg_resources
 
 

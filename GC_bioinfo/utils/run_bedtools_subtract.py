@@ -24,13 +24,13 @@ def run_subtract(sequencing_file, *subtracted_regions, output_filename=''):
 
     if len(subtracted_regions) == 1:
         os.system(
-            "bedtools subtract -s -A -a " + sequencing_file + " -b " + subtracted_regions[0] + " > " + output_filename)
+            "bedtools subtract -nonamecheck -s -A -a " + sequencing_file + " -b " + subtracted_regions[0] + " > " + output_filename)
 
     else:
-        command = "bedtools subtract -s -A -a " + sequencing_file
+        command = "bedtools subtract -nonamecheck -s -A -a " + sequencing_file
 
         for region_filename in subtracted_regions[:-1]:
-            command += " -b " + region_filename + " | bedtools subtract -s -A -a stdin -b "
+            command += " -b " + region_filename + " | bedtools subtract -nonamecheck -s -A -a stdin -b "
 
         command += subtracted_regions[-1] + " > " + output_filename
 

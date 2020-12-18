@@ -1,17 +1,16 @@
-import math
-import sys
 import glob
 import os
+import sys
 
-from main_programs.combine_TES_heatmap import get_combined_matrix
-from main_programs.gene_body_fold_change_heatmap import combine_images
-
-from GC_bioinfo.utils.set_matrix_bounds import set_matrix_bounds
+from GC_bioinfo.utils.constants import generate_heatmap_location
 from GC_bioinfo.utils.generate_heatmap import generate_heatmap, Ticks, make_ticks_matrix
-from GC_bioinfo.utils.remove_files import remove_files
+from GC_bioinfo.utils.make_fold_change_matrix import make_fold_change_matrix
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.nested_multiprocessing_pool import NestedPool
-from GC_bioinfo.utils.constants import generate_heatmap_location
+from GC_bioinfo.utils.remove_files import remove_files
+from GC_bioinfo.utils.set_matrix_bounds import set_matrix_bounds
+from main_programs.combine_TES_heatmap import get_combined_matrix
+from main_programs.gene_body_fold_change_heatmap import combine_images
 
 
 def get_fold_change_matrix(tsr_file, downstream_distance, upstream_distance, distance_upstream_of_gene_body_start, gene_body_file, interval_size, width, height, numerator_sequencing_filename_one,
@@ -36,63 +35,6 @@ def get_fold_change_matrix(tsr_file, downstream_distance, upstream_distance, dis
     remove_files(numerator_matrix, denominator_matrix)
 
     return fold_change_matrix
-
-
-
-def make_fold_change_matrix(numerator_filename, denominator_filename):
-    # Going to divide the first by the second
-    first_matrix = []
-    with open(numerator_filename) as file:
-        for line in file:
-            first_matrix.append([float(val) for val in line.rstrip().split()])
-
-    second_matrix = []
-    with open(denominator_filename) as file:
-        for line in file:
-            second_matrix.append([float(val) for val in line.rstrip().split()])
-
-    # Verify the matricies are the same size
-    first_matrix_width = len(first_matrix[0])
-    first_matrix_height = len(first_matrix)
-
-    second_matrix_width = len(second_matrix[0])
-    second_matrix_height = len(second_matrix)
-
-    if not (first_matrix_width == second_matrix_width) and not (first_matrix_height == second_matrix_height):
-        sys.stderr.write("The matricies are not the same size. Exiting ...")
-        sys.exit(1)
-
-    # Now divide the first by the second
-    fold_change_matrix = []
-    for i in range(first_matrix_height):
-        fold_change_matrix.append([0 for _ in range(first_matrix_width)])
-
-    for row in range(first_matrix_height):
-        for col in range(first_matrix_width):
-            numerator = first_matrix[row][col]
-            denominator = second_matrix[row][col]
-
-            if numerator == 0:
-                numerator = 1
-
-            if denominator == 0:
-                denominator = 1
-
-            value = numerator / denominator
-
-            # Get the log 2 fold change
-            log_two_fold_change = math.log2(value)
-
-            fold_change_matrix[row][col] = log_two_fold_change
-
-    # Write to a file
-    fold_change_matrix_filename = generate_random_filename()
-    with open(fold_change_matrix_filename, 'w') as file:
-        for row in fold_change_matrix:
-            str_row = [str(val) for val in row]
-            file.write("\t".join(str_row) + "\n")
-
-    return fold_change_matrix_filename
 
 
 def set_max_fold_change(fold_change_matrix_filename, max_fold_change):

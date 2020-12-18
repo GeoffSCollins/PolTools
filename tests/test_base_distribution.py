@@ -1,17 +1,14 @@
 import unittest.mock
 from pathlib import Path
 
-import sys
 import io
 
-sys.path.append("../GC_bioinfo")
+from GC_bioinfo.utils.make_random_filename import generate_random_filename
+from GC_bioinfo.utils.remove_files import remove_files
 
-from utils.make_random_filename import generate_random_filename
-from utils.remove_files import remove_files
+from GC_bioinfo.main_programs import base_distribution
 
-from main_programs import base_distribution
-
-from quiet_stderr import Quieter
+from quiter import Quieter
 
 
 class TestBaseDistribution(unittest.TestCase):

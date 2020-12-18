@@ -5,12 +5,12 @@ import io
 
 sys.path.append("../GC_bioinfo")
 
-from main_programs import divergent_pileup_metaplot
+from GC_bioinfo.main_programs import divergent_pileup_metaplot
 
-from utils.make_random_filename import generate_random_filename
-from utils.remove_files import remove_files
+from GC_bioinfo.utils.make_random_filename import generate_random_filename
+from GC_bioinfo.utils.remove_files import remove_files
 
-from quiet_stderr import Quieter
+from quiter import Quieter
 
 
 class TestDivergentPileup(unittest.TestCase):
@@ -85,7 +85,7 @@ class TestDivergentPileup(unittest.TestCase):
         with open(regions_filename, 'w') as file:
             file.write("chr1\t0\t20\tregion\t0\t+")
 
-        from utils.get_region_length import determine_region_length
+        from GC_bioinfo.utils.get_region_length import determine_region_length
         region_length = determine_region_length(regions_filename)
 
         region_files = divergent_pileup_metaplot.split_bed_file(regions_filename)
@@ -107,7 +107,7 @@ class TestDivergentPileup(unittest.TestCase):
         with open(regions_filename, 'w') as file:
             file.write("chr1\t0\t20\tregion\t0\t+")
 
-        from utils.get_region_length import determine_region_length
+        from GC_bioinfo.utils.get_region_length import determine_region_length
         region_length = determine_region_length(regions_filename)
 
         region_files = divergent_pileup_metaplot.split_bed_file(regions_filename)

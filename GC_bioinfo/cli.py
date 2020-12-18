@@ -1,6 +1,5 @@
-import sys
 import os
-
+import sys
 from pathlib import Path
 
 
@@ -43,7 +42,7 @@ if __name__ == '__main__':
     programs_list = ["base_distribution", "divergent_pileup_metaplot", "five_prime_metaplot", "inr_reads",
                      "make_regions_file_centered_on_max_tss", "pausing_distance_distribution_from_maxTSS",
                      "read_through_transcription", "sequence_searches", "three_prime_metaplot", "tps_distance_per_gene",
-                     "truQuant", "multicoverage", "polyAToPolyN", "tsrFinder", "combine_gene_body_heatmap",
+                     "truQuant", "multicoverage", "tsrFinder", "combine_gene_body_heatmap",
                      "gene_body_fold_change_heatmap", "gene_body_heatmap", "quantify_gene_body_fold_change_heatmap",
                      "TES_heatmap", "combine_TES_heatmap", "TES_fold_change_heatmap"]
 

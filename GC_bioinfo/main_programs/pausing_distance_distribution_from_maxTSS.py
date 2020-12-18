@@ -1,8 +1,8 @@
-import sys
 import multiprocessing
+import sys
 
-from GC_bioinfo.utils.make_transcripts_dict import build_transcripts_dict
 from GC_bioinfo.utils.get_region_length import determine_region_length
+from GC_bioinfo.utils.make_transcripts_dict import build_transcripts_dict
 from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
 from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
 

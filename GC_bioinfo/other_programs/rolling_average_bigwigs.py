@@ -1,8 +1,9 @@
 import os
 import sys
 
-from GC_bioinfo.utils.remove_files import remove_files
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
+from GC_bioinfo.utils.remove_files import remove_files
+
 
 def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100):
     """

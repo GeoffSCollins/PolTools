@@ -6,10 +6,10 @@ import csv
 import glob
 import os
 import sys
-
 from collections import defaultdict
 
-from GC_bioinfo.utils.constants import  rna_blacklist_file
+from GC_bioinfo.utils.constants import hg38_chrom_sizes_file
+from GC_bioinfo.utils.constants import rna_blacklist_file
 from GC_bioinfo.utils.generate_blacklist_regions_for_gene_body_heatmap import blacklist_extended_gene_bodies
 from GC_bioinfo.utils.generate_heatmap import generate_heatmap, Ticks
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
@@ -22,6 +22,13 @@ from GC_bioinfo.utils.scale_matrix import scale_matrix
 
 
 def make_incremented_regions(regions_filename, downstream_distance, interval_size, upstream_distance, min_gene_length):
+    # Get the chrom sizes
+    chrom_sizes_dict = defaultdict(int)
+    with open(hg38_chrom_sizes_file) as file:
+        for line in file:
+            chromosome, size = line.split()
+            chrom_sizes_dict[chromosome] = int(size)
+
     # Using the regions provided, make incremented regions
     with open(regions_filename) as file:
         regions = []
@@ -38,8 +45,9 @@ def make_incremented_regions(regions_filename, downstream_distance, interval_siz
                     region_right = int(max_tss) + upstream_distance
 
                 # Add the region to regions
-                if region_right - region_left > min_gene_length:
-                    regions.append([chromosome, region_left, region_right, gene_name, max_tss_five_prime_reads, strand])
+                if (int(gene_body_right) - int(gene_body_left)) > min_gene_length:
+                    if int(region_left) > 0 and int(region_right) <= chrom_sizes_dict[chromosome]:
+                        regions.append([chromosome, region_left, region_right, gene_name, max_tss_five_prime_reads, strand])
 
     # Go through all the regions and make the incremented ones
     incremented_regions = []
@@ -50,13 +58,14 @@ def make_incremented_regions(regions_filename, downstream_distance, interval_siz
             # We work from left to right
             for i in range(left + interval_size, right + 1, interval_size):
                 # Looping through each interval region
-                incremented_regions.append([chromosome, i - interval_size, i, gene_name, score, strand])
+                if i-interval_size > 0:
+                    incremented_regions.append([chromosome, i - interval_size, i, gene_name, score, strand])
 
         else:
             # We work from right to left
-            if left + (interval_size - 1) > 0:
-                for i in range(right, left + (interval_size - 1), (-1 * interval_size)):
-                    # Looping through each interval region
+            for i in range(right, left + (interval_size - 1), (-1 * interval_size)):
+                # Looping through each interval region
+                if i - interval_size > 0:
                     incremented_regions.append([chromosome, i - interval_size, i, gene_name, score, strand])
 
     region_intervals_filename = generate_random_filename()
@@ -87,8 +96,7 @@ def quantify_intervals(sequencing_filename, blacklist_filename, intervals_file):
 
 
 def read_coverage_file(coverage_file, width):
-    # Goal is to make a table with the gene name and then all of the values.
-    # TODO: The last value will be the nt content
+    # Goal is to make a table with the gene name and then all of the values
     data = defaultdict(list)
 
     with open(coverage_file) as file:
@@ -97,7 +105,7 @@ def read_coverage_file(coverage_file, width):
             data[gene_name].append(counts)
 
     # Write the dictionary to a file
-    lines = ["\t".join(data[gene_name]) for gene_name in data]
+    lines = [gene_name + "\t" + "\t".join(data[gene_name]) for gene_name in data]
     lines.sort(key=lambda x: len(x.split()))
     num_lines = len(lines)
 
@@ -122,6 +130,13 @@ def read_coverage_file(coverage_file, width):
 def get_nt_content_dict(nt, truQuant_output_file, content_distance):
     # Need to make a dictionary with the keys of the gene names and values of the nt content for the first distance nts
 
+    # Get the chrom sizes
+    chrom_sizes_dict = defaultdict(int)
+    with open(hg38_chrom_sizes_file) as file:
+        for line in file:
+            chromosome, size = line.split()
+            chrom_sizes_dict[chromosome] = int(size)
+
     # Read the genes and make the positions
     positions = defaultdict(list)
 
@@ -132,10 +147,12 @@ def get_nt_content_dict(nt, truQuant_output_file, content_distance):
                 std_tss, gene_body_left, gene_body_right, *_ = line.split()
 
                 if strand == "+":
-                    positions[gene_name] = [chromosome, max_tss, str(int(max_tss) + content_distance), gene_name, "0", strand]
+                    if int(max_tss) + content_distance <= chrom_sizes_dict[chromosome] and int(max_tss) >= 0:
+                        positions[gene_name] = [chromosome, max_tss, str(int(max_tss) + content_distance), gene_name, "0", strand]
                 else:
                     # If the strand is negative, we shift the right 1
-                    positions[gene_name] = [chromosome, str(int(max_tss) - content_distance + 1), str(int(max_tss) + 1), gene_name, "0", strand]
+                    if int(max_tss) - content_distance >= 0 and int(max_tss) + 1 <= chrom_sizes_dict[chromosome]:
+                        positions[gene_name] = [chromosome, str(int(max_tss) - content_distance + 1), str(int(max_tss) + 1), gene_name, "0", strand]
 
     # Now we get the sequences
     sequences = defaultdict(str)
@@ -155,11 +172,10 @@ def get_nt_content_dict(nt, truQuant_output_file, content_distance):
         for i, line in enumerate(file):
             if i % 2 == 1:
                 sequence = line.rstrip().upper()
-                percent_content = sequence.count(nt) / len(sequence)
 
                 curr_gene = gene_names[int(i / 2)]
 
-                sequences[curr_gene] = percent_content
+                sequences[curr_gene] = sequence.count(nt)
 
     remove_files(regions_file, fasta_file)
 
@@ -179,7 +195,8 @@ def add_nt_content_column(sorted_matrix_filename, nt_content_dict):
         gene_name = line.split()[0]
 
         # Now add the content at the end of the line
-        output_lines.append(line.rstrip() + "\t" + str(nt_content_dict[gene_name]) + "\n")
+        if gene_name in nt_content_dict:
+            output_lines.append(line.rstrip() + "\t" + str(nt_content_dict[gene_name]) + "\n")
 
     output_lines.sort(key=lambda x: float(x.split()[-1]))
 
@@ -190,11 +207,66 @@ def add_nt_content_column(sorted_matrix_filename, nt_content_dict):
     return output_file
 
 
+def tmp_fun(mat):
+    output_filename = generate_random_filename()
+    with open(mat) as file:
+        with open(output_filename, 'w') as output_file:
+            for line in file:
+                output_file.write("\t".join(line.split()[1:-1]) + "\n")
+
+    return output_filename
+
+
+def build_matrix(seq_file_data, matrix_params, filenames, nt, nt_content_distance, min_gene_length):
+    sequencing_filename, spike_in = seq_file_data
+    truQuant_output_file, tsr_file, output_filename_prefix = filenames
+    upstream_distance, distance_past_tes, width, height, interval_size = matrix_params
+
+    blacklist_regions_file = blacklist_extended_gene_bodies(tsr_file, distance_past_tes)
+
+    # Step 1. Make regions to quantify
+    intervals_filename = make_incremented_regions(truQuant_output_file, distance_past_tes, interval_size,
+                                                  upstream_distance, min_gene_length)
+
+    # Step 2. Quantify them
+    quantified_regions_filename = quantify_intervals(sequencing_filename, blacklist_regions_file,
+                                                     intervals_filename)
+
+    # Step 3. Read the coverage data and add them to a 2d list
+    sorted_matrix_filename, num_lines = read_coverage_file(quantified_regions_filename, width)
+
+    # Add the final column with the nt data
+    nt_content_dict = get_nt_content_dict(nt, truQuant_output_file, nt_content_distance)
+    matrix_with_gene_and_nt_content = add_nt_content_column(sorted_matrix_filename, nt_content_dict)
+
+    matrix = tmp_fun(matrix_with_gene_and_nt_content)
+
+    remove_files(intervals_filename, quantified_regions_filename, blacklist_regions_file)
+
+    spike_in_normalized_matrix = scale_matrix(matrix, spike_in)
+
+    remove_files(sorted_matrix_filename, matrix, matrix_with_gene_and_nt_content)
+
+    return spike_in_normalized_matrix
+
+
+def make_heatmap(matrix, heatmap_params, output_filename_prefix):
+    bp_width, width, height, gamma, max_black_value, interval_size = heatmap_params
+
+    # Minor tick marks every 10 kb and major tick marks every 50 kb
+    t = Ticks(minor_tick_mark_interval_size=(10_000 / interval_size),
+              major_tick_mark_interval_size=(50_000 / interval_size))
+
+    output_filename = output_filename_prefix + "_gamma_" + str(gamma) + "_max_" + str(
+        max_black_value) + "_width_" + str(bp_width) + "bp_gene_body_heatmap.tiff"
+
+    generate_heatmap(matrix, 'gray', output_filename, gamma, 0, max_black_value, ticks=t)
+
+
 def print_usage():
     sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo nt_sort_gene_body_heatmap <truQuant output file> <Upstream Distance>" +
-                     " <Distance Past TES> <Width (bp)> <Width (px)> <Height> <Gamma> <Max black value> <Spike in Correction> <Sequencing Filename> <Output Filename>" +
-                     " <Nucleotide A, T, G, or C> <Distance to quantify the nucleotides>\n")
+    sys.stderr.write("GC_bioinfo gene_body_heatmap <truQuant output file> <Upstream Distance>" +
+                     " <Distance Past TES> <Width (bp)> <Width (px)> <Height> <Gamma> <Max black value> <Spike in Correction> <Sequencing Filename> <Output Filename> \n")
     sys.stderr.write(
         "\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/gene_body_heatmap.rst\n")
 
@@ -202,11 +274,10 @@ def print_usage():
 def get_args(args):
     if len(args) != 14:
         print_usage()
-        sys.stderr.write(str(len(args)))
         sys.exit(1)
 
     truQuant_output_file, upstream_distance, distance_past_tes, bp_width, width, height, gamma, max_black_value, spike_in, \
-    sequencing_filename, output_filename_prefix, nt, nt_distance, min_gene_length = args
+    sequencing_filename, output_filename_prefix, nt, nt_content_distance, min_gene_length = args
 
     tsr_file = glob.glob(truQuant_output_file.replace("-truQuant_output.txt", "") + "*TSR.tab")
 
@@ -265,61 +336,26 @@ def get_args(args):
     except ValueError:
         sys.stderr.write("The spike in correction factor could not be converted to a float")
 
-    return truQuant_output_file, tsr_file, upstream_distance, distance_past_tes, bp_width, width, height, gamma, \
-           max_black_value, interval_size, spike_in, sequencing_filename, output_filename_prefix, nt, nt_distance, min_gene_length
+    seq_file_data = (sequencing_filename, spike_in)
+    matrix_params = (upstream_distance, distance_past_tes, width, height, interval_size)
+    heatmap_params = (bp_width, width, height, gamma, max_black_value, interval_size)
+    filenames = (truQuant_output_file, tsr_file, output_filename_prefix)
 
-
-def get_matrix(tsr_file, distance_past_tes, nt, truQuant_output_file, nt_distance, interval_size, upstream_distance,
-               sequencing_filename, width, spike_in, min_gene_length):
-    blacklist_regions_file = blacklist_extended_gene_bodies(tsr_file, distance_past_tes)
-
-    nt_content_dict = get_nt_content_dict(nt, truQuant_output_file, nt_distance)
-
-    # Step 1. Make regions to quantify
-    intervals_filename = make_incremented_regions(truQuant_output_file, distance_past_tes, interval_size,
-                                                  upstream_distance, min_gene_length)
-
-    # Step 2. Quantify them
-    quantified_regions_filename = quantify_intervals(sequencing_filename, blacklist_regions_file, intervals_filename)
-
-    # Step 3. Read the coverage data and add them to a 2d list
-    sorted_matrix_filename, num_lines = read_coverage_file(quantified_regions_filename, width)
-
-    matrix_with_nt_content = add_nt_content_column(sorted_matrix_filename, nt_content_dict)
-
-    remove_files(intervals_filename, quantified_regions_filename, blacklist_regions_file)
-
-    remove_files(sorted_matrix_filename)
-
-    spike_in_normalized_matrix = scale_matrix(matrix_with_nt_content, spike_in)
-
-    remove_files(matrix_with_nt_content)
-
-    return spike_in_normalized_matrix
-
+    return seq_file_data, matrix_params, heatmap_params, filenames, nt, nt_content_distance, min_gene_length
 
 
 def main(args):
-    truQuant_output_file, tsr_file, upstream_distance, distance_past_tes, bp_width, width, height, gamma, max_black_value, \
-    interval_size, spike_in, sequencing_filename, output_filename_prefix, nt, nt_distance, min_gene_length = get_args(
-        args)
+    seq_file_data, matrix_params, heatmap_params, filenames, nt, nt_content_distance, min_gene_length = get_args(args)
 
-    # Step 4. Make the heatmap using the resulting file
+    output_filename_prefix = filenames[-1]
 
-    spike_in_normalized_matrix = get_matrix(tsr_file, distance_past_tes, nt, truQuant_output_file, nt_distance, interval_size, upstream_distance,
-               sequencing_filename, width, spike_in, min_gene_length)
+    matrix = build_matrix(seq_file_data, matrix_params, filenames, nt, nt_content_distance, min_gene_length)
 
-    # Minor tick marks every 10 kb and major tick marks every 50 kb
-    t = Ticks(minor_tick_mark_interval_size=(10_000 / interval_size),
-              major_tick_mark_interval_size=(50_000 / interval_size))
+    make_heatmap(matrix, heatmap_params, output_filename_prefix)
 
-    output_filename = output_filename_prefix + "_gamma_" + str(gamma) + "_max_" + str(
-        max_black_value) + "_width_" + str(bp_width) + "bp_gene_body_heatmap.tiff"
-
-    generate_heatmap(spike_in_normalized_matrix, 'gray', output_filename, gamma, 0, max_black_value, ticks=t)
-
-    remove_files(spike_in_normalized_matrix)
+    remove_files(matrix)
 
 
 if __name__ == '__main__':
     main(sys.argv[1:])
+

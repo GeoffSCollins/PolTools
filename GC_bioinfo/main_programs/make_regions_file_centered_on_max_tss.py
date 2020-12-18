@@ -4,6 +4,7 @@ import sys
 from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
 from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
 
+
 def get_max_tsss(truQuant_filename):
     max_tsss = []
 

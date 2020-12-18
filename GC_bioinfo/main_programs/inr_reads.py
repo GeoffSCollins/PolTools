@@ -1,11 +1,11 @@
-import sys
 import multiprocessing
+import sys
 
-from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
-from GC_bioinfo.utils.make_five_and_three_dict import build_counts_dict
 from GC_bioinfo.utils.get_region_length import determine_region_length
-from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
+from GC_bioinfo.utils.make_five_and_three_dict import build_counts_dict
+from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
 from GC_bioinfo.utils.verify_bed_file import verify_bed_files
+from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
 
 
 def get_counts_helper(five_prime_counts_dict, region_length, regions_filename):

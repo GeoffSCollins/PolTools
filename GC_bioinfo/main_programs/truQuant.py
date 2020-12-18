@@ -1,22 +1,21 @@
 import csv
-import sys
-import os
 import math
 import multiprocessing
-from pathlib import Path
+import os
+import sys
 from collections import defaultdict
+from pathlib import Path
 
-from GC_bioinfo.utils.make_five_prime_bed_file import make_five_bed_file
-from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
-from GC_bioinfo.utils.make_five_and_three_dict import build_counts_dict
-from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
-from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
-from GC_bioinfo.utils.remove_files import remove_files
-from GC_bioinfo.utils.verify_bed_file import verify_bed_files
 from GC_bioinfo.utils.check_dependencies import check_dependencies
 from GC_bioinfo.utils.constants import rna_blacklist_file, hg38_chrom_sizes_file, annotation_file
-
+from GC_bioinfo.utils.make_five_and_three_dict import build_counts_dict
+from GC_bioinfo.utils.make_five_prime_bed_file import make_five_bed_file
+from GC_bioinfo.utils.make_random_filename import generate_random_filename
+from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
+from GC_bioinfo.utils.remove_files import remove_files
+from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
+from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
+from GC_bioinfo.utils.verify_bed_file import verify_bed_files
 
 
 def make_search_regions_list(regions_filename, annotation_extension):

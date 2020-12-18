@@ -30,6 +30,6 @@ def run_coverage(regions_filename, sequencing_filename, output_filename='', flag
 
     verify_bed_files(regions_filename, sequencing_filename)
 
-    os.system("bedtools coverage -s " + flag_string + " -a " + regions_filename + " -b " + sequencing_filename + " > " + output_filename)
+    os.system("bedtools coverage -s -nonamecheck " + flag_string + " -a " + regions_filename + " -b " + sequencing_filename + " > " + output_filename)
 
     return output_filename

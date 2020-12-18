@@ -3,18 +3,16 @@ Get the 2d list (which is not a matrix) and then sum at each position to get the
 then get average of each position
 """
 
-import sys
 import glob
-import statistics
-import multiprocessing
 import math
-
+import multiprocessing
+import statistics
+import sys
 from collections import defaultdict
 
-from main_programs import gene_body_heatmap, gene_body_fold_change_heatmap
-
-from GC_bioinfo.utils.remove_files import remove_files
 from GC_bioinfo.utils.nested_multiprocessing_pool import NestedPool
+from GC_bioinfo.utils.remove_files import remove_files
+from main_programs import gene_body_heatmap, gene_body_fold_change_heatmap
 
 
 def print_usage():

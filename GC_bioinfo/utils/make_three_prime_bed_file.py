@@ -2,6 +2,7 @@ import csv
 
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 
+
 def make_three_bed_file(sequencing_filename):
     """
     Makes a new file containing only the 3' ends of the given file.

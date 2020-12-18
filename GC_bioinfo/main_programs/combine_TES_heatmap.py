@@ -1,13 +1,12 @@
-import sys
 import glob
-import os
 import multiprocessing
-
-from main_programs.TES_heatmap import get_matrix
+import os
+import sys
 
 from GC_bioinfo.utils.add_matrices import add_matrices
 from GC_bioinfo.utils.generate_heatmap import generate_heatmap, Ticks
 from GC_bioinfo.utils.remove_files import remove_files
+from main_programs.TES_heatmap import get_matrix
 
 
 def get_matrices(tsr_file, downstream_distance, upstream_distance, distance_upstream_of_gene_body_start, gene_body_file, interval_size, width, height, sequencing_filename_one, spike_in_one, sequencing_filename_two, spike_in_two):

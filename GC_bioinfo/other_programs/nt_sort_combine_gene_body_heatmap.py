@@ -1,17 +1,28 @@
-import sys
 import glob
-import os
 import multiprocessing
+import os
+import sys
 
-sys.path.append("..")
-
-from GC_bioinfo.utils.remove_files import remove_files
+from GC_bioinfo.other_programs import nt_sort_gene_body_heatmap
 from GC_bioinfo.utils.add_matrices import add_matrices
-from GC_bioinfo.utils.generate_heatmap import generate_heatmap, Ticks
-from GC_bioinfo.utils.average_matrix import average_matrix
-from GC_bioinfo.utils.scale_matrix import scale_matrix
+from GC_bioinfo.utils.remove_files import remove_files
 
-from GC_bioinfo.other_programs.nt_sort_gene_body_heatmap import get_matrix
+
+def get_combined_matrix(seq_files_data, matrix_params, filenames, nt, nt_content_distance, min_gene_length):
+
+    args = []
+    for seq_data in seq_files_data:
+        args.append( (seq_data, matrix_params, filenames, nt, nt_content_distance, min_gene_length) )
+
+    pool = multiprocessing.Pool(processes=2)
+    matrix_filenames = pool.starmap(nt_sort_gene_body_heatmap.build_matrix, args)
+
+    # Add the matricies together
+    combined_matrix = add_matrices(matrix_filenames)
+
+    remove_files(matrix_filenames)
+
+    return combined_matrix
 
 
 def print_usage():
@@ -28,7 +39,7 @@ def get_args(args):
         sys.exit(1)
 
     truQuant_output_file, upstream_distance, distance_past_tes, bp_width, width, height, gamma, max_black_value, spike_in_one, \
-    sequencing_filename_one, spike_in_two, sequencing_filename_two, output_filename_prefix, nt, nt_distance, min_gene_length = args
+    sequencing_filename_one, spike_in_two, sequencing_filename_two, output_filename_prefix, nt, nt_content_distance, min_gene_length = args
 
     tsr_file = glob.glob(truQuant_output_file.replace("-truQuant_output.txt", "") + "*TSR.tab")
 
@@ -99,50 +110,26 @@ def get_args(args):
 
     interval_size = try_to_convert_to_int(interval_size, "interval size")
 
-    nt_distance = int(nt_distance)
+    nt_content_distance = int(nt_content_distance)
     min_gene_length = int(min_gene_length)
 
-    return truQuant_output_file, tsr_file, upstream_distance, distance_past_tes, bp_width, width, height, gamma, max_black_value, \
-           interval_size, spike_in_one, sequencing_filename_one, spike_in_two, sequencing_filename_two, output_filename_prefix, \
-            nt, nt_distance, min_gene_length
+    seq_files_data = [(sequencing_filename_one, spike_in_one), (sequencing_filename_two, spike_in_two)]
+    matrix_params = (upstream_distance, distance_past_tes, width, height, interval_size)
+    heatmap_params = (bp_width, width, height, gamma, max_black_value, interval_size)
+    filenames = (truQuant_output_file, tsr_file, output_filename_prefix)
 
-
-def get_combined_matrix(truQuant_output_file, tsr_file, distance_past_tes, sequencing_filename_one, spike_in_one, sequencing_filename_two, spike_in_two,
-                        interval_size, upstream_distance, width, height, nt, nt_distance, min_gene_length):
-
-    mat_one = get_matrix(tsr_file, distance_past_tes, nt, truQuant_output_file, nt_distance, interval_size, upstream_distance,
-               sequencing_filename_one, width, spike_in_one, min_gene_length)
-
-    mat_two = get_matrix(tsr_file, distance_past_tes, nt, truQuant_output_file, nt_distance, interval_size,
-                         upstream_distance,
-                         sequencing_filename_two, width, spike_in_two, min_gene_length)
-
-    # Add the matricies together
-    combined_matrix = add_matrices([mat_one, mat_two])
-
-    remove_files(mat_one, mat_two)
-
-    return combined_matrix
+    return seq_files_data, matrix_params, heatmap_params, filenames, nt, nt_content_distance, min_gene_length
 
 
 def main(args):
-    truQuant_output_file, tsr_file, upstream_distance, distance_past_tes, bp_width, width, height, gamma, max_black_value, \
-        interval_size, spike_in_one, sequencing_filename_one, spike_in_two, sequencing_filename_two, \
-        output_filename_prefix, nt, nt_distance, min_gene_length = get_args(args)
+    seq_files_data, matrix_params, heatmap_params, filenames, nt, nt_content_distance, min_gene_length = get_args(args)
 
-    combined_matrix = get_combined_matrix(truQuant_output_file, tsr_file, distance_past_tes, sequencing_filename_one, spike_in_one,
-                                          sequencing_filename_two, spike_in_two, interval_size,
-                                          upstream_distance, width, height, nt, nt_distance, min_gene_length)
+    combined_matrix = get_combined_matrix(seq_files_data, matrix_params, filenames, nt, nt_content_distance, min_gene_length)
 
-    # Step 4. Make the heatmap using the resulting file
+    output_filename_prefix = filenames[-1]
 
-    # Minor tick marks every 10 kb and major tick marks every 50 kb
-    t = Ticks(minor_tick_mark_interval_size=(10_000 / interval_size), major_tick_mark_interval_size=(50_000 / interval_size))
-
-    output_filename = output_filename_prefix + "_gamma_" + str(gamma) + "_max_" + str (max_black_value) + \
-                      "_width_" + str(bp_width) + "bp_gene_body_combined_heatmap.tiff"
-
-    generate_heatmap(combined_matrix, 'gray', output_filename, gamma, 0, max_black_value, ticks=t)
+    # Make the heatmap of the combined matrix
+    nt_sort_gene_body_heatmap.make_heatmap(combined_matrix, heatmap_params, output_filename_prefix)
 
     # Step 5. Remove the averaged_matrix file
     remove_files(combined_matrix)

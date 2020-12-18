@@ -4,8 +4,8 @@ This program is the interface and driver for tsrFinder
 
 import os
 import sys
-from multiprocessing import Process
 from collections import defaultdict
+from multiprocessing import Process
 
 from GC_bioinfo.utils.constants import tsr_finder_location
 from GC_bioinfo.utils.tsr_finder_step_four_from_rocky import run_step_four

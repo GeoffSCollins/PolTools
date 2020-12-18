@@ -2,9 +2,6 @@
 If there is a poly A tail at the end of the sequence (at least 10 A's), convert those A's to N's
 """
 
-
-from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
-
 import sys
 
 

@@ -1,6 +1,6 @@
+import os.path
 import random
 import string
-import os.path
 
 
 def generate_random_filename(extension=".bed"):

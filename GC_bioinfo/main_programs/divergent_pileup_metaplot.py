@@ -1,14 +1,14 @@
-import sys
-import os
 import multiprocessing
+import os
+import sys
 
-from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
-from GC_bioinfo.utils.remove_files import remove_files
-from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.verify_bed_file import verify_bed_files
-from GC_bioinfo.utils.get_region_length import determine_region_length
-from GC_bioinfo.utils.output_metaplot_data import output_metaplot_data
 from GC_bioinfo.utils.check_dependencies import check_dependencies
+from GC_bioinfo.utils.get_region_length import determine_region_length
+from GC_bioinfo.utils.make_random_filename import generate_random_filename
+from GC_bioinfo.utils.output_metaplot_data import output_metaplot_data
+from GC_bioinfo.utils.remove_files import remove_files
+from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
+from GC_bioinfo.utils.verify_bed_file import verify_bed_files
 from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
 
 

@@ -1,13 +1,14 @@
 import sys
-from Bio import Seq
 from itertools import product
 
-from GC_bioinfo.utils.run_bedtools_getfasta import run_getfasta
+from Bio import Seq
+
 from GC_bioinfo.utils.fasta_reader import read_fasta
 from GC_bioinfo.utils.get_region_length import determine_region_length
 from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
-from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
 from GC_bioinfo.utils.remove_files import remove_files
+from GC_bioinfo.utils.run_bedtools_getfasta import run_getfasta
+from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
 
 
 class InvalidSearchException(Exception):

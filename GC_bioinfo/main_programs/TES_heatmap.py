@@ -2,24 +2,22 @@
 Do ±20 bp from the TES and plot every 200 bp the number of 3' ends
 """
 
-import sys
-import os
 import csv
 import glob
-
+import os
+import sys
 from collections import defaultdict
 
-from GC_bioinfo.utils.generate_blacklist_regions_for_gene_body_heatmap import blacklist_extended_gene_bodies
-from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
-from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
-from GC_bioinfo.utils.remove_files import remove_files
-from GC_bioinfo.utils.constants import rna_blacklist_file
-from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
 from GC_bioinfo.utils.average_matrix import average_matrix
-from GC_bioinfo.utils.scale_matrix import scale_matrix
-from GC_bioinfo.utils.set_matrix_bounds import set_matrix_bounds
+from GC_bioinfo.utils.constants import rna_blacklist_file
+from GC_bioinfo.utils.generate_blacklist_regions_for_gene_body_heatmap import blacklist_extended_gene_bodies
 from GC_bioinfo.utils.generate_heatmap import generate_heatmap, Ticks
+from GC_bioinfo.utils.make_random_filename import generate_random_filename
+from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
+from GC_bioinfo.utils.remove_files import remove_files
+from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
+from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
+from GC_bioinfo.utils.scale_matrix import scale_matrix
 
 
 def make_incremented_regions(truQuant_output_file, downstream_distance, upstream_distance, distance_upstream_of_gene_body_start, interval_size):

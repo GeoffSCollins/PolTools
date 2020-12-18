@@ -1,11 +1,11 @@
-import sys
 import multiprocessing
+import sys
 
 from GC_bioinfo.utils.make_five_prime_bed_file import make_five_bed_file
 from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
-from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
-from GC_bioinfo.utils.remove_files import remove_files
 from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
+from GC_bioinfo.utils.remove_files import remove_files
+from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
 
 tsrs_dict = {}
 

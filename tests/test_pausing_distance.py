@@ -1,9 +1,6 @@
 import unittest.mock
 import sys
 
-sys.path.append("../GC_bioinfo")
-
-# TODO
 class TestPausingDistance(unittest.TestCase):
     pass
     #

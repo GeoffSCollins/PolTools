@@ -1,15 +1,15 @@
 import csv
-import sys
 import multiprocessing
+import sys
 
+from GC_bioinfo.utils.check_dependencies import check_dependencies
+from GC_bioinfo.utils.make_random_filename import generate_random_filename
+from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
+from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
+from GC_bioinfo.utils.remove_files import remove_files
 from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
 from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
-from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
-from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.remove_files import remove_files
 from GC_bioinfo.utils.verify_bed_file import verify_bed_files
-from GC_bioinfo.utils.check_dependencies import check_dependencies
-from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
 
 
 def make_incremented_regions(regions_filename, upstream_distance, downstream_distance, interval_size):

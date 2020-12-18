@@ -2,6 +2,7 @@ from itertools import chain
 
 from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
 
+
 def output_metaplot_data(averages, region_length, prime_name):
     """
 

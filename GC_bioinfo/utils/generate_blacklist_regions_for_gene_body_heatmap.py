@@ -4,6 +4,7 @@ from GC_bioinfo.main_programs import truQuant
 from GC_bioinfo.utils.constants import annotation_file
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 
+
 def _define_pause_regions_and_gene_bodies(max_tsrs_dict, annotations_dict, truQuant_regions_dict, downstream_extension):
     # This function will define the pause region as the max TSR for each gene and gene bodies as the end of
     # the pause region to the TES of the annotation

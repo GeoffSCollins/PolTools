@@ -2,22 +2,21 @@
 The goal of this is to make the plot that David described
 """
 
-import sys
-import os
 import csv
 import glob
-
+import os
+import sys
 from collections import defaultdict
 
-from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
-from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
+from GC_bioinfo.utils.average_matrix import average_matrix
+from GC_bioinfo.utils.constants import rna_blacklist_file
+from GC_bioinfo.utils.generate_blacklist_regions_for_gene_body_heatmap import blacklist_extended_gene_bodies
+from GC_bioinfo.utils.generate_heatmap import generate_heatmap, Ticks
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
 from GC_bioinfo.utils.remove_files import remove_files
-from GC_bioinfo.utils.constants import rna_blacklist_file
-from GC_bioinfo.utils.generate_heatmap import generate_heatmap, Ticks
-from GC_bioinfo.utils.generate_blacklist_regions_for_gene_body_heatmap import blacklist_extended_gene_bodies
-from GC_bioinfo.utils.average_matrix import average_matrix
+from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
+from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
 from GC_bioinfo.utils.scale_matrix import scale_matrix
 
 
@@ -118,6 +117,51 @@ def read_coverage_file(coverage_file, width):
     return sorted_matrix_filename, num_lines
 
 
+def build_matrix(seq_file_data, matrix_params, filenames):
+    sequencing_filename, spike_in = seq_file_data
+    truQuant_output_file, tsr_file, output_filename_prefix = filenames
+    upstream_distance, distance_past_tes, width, height, interval_size = matrix_params
+
+    blacklist_regions_file = blacklist_extended_gene_bodies(tsr_file, distance_past_tes)
+
+    # Step 1. Make regions to quantify
+    intervals_filename = make_incremented_regions(truQuant_output_file, distance_past_tes, interval_size,
+                                                  upstream_distance)
+
+    # Step 2. Quantify them
+    quantified_regions_filename = quantify_intervals(sequencing_filename, blacklist_regions_file, intervals_filename)
+
+    # Step 3. Read the coverage data and add them to a 2d list
+    sorted_matrix_filename, num_lines = read_coverage_file(quantified_regions_filename, width)
+
+    remove_files(intervals_filename, quantified_regions_filename, blacklist_regions_file)
+
+    # Make the dimensions correct
+    num_lines_to_average = int(num_lines / height)
+    averaged_matrix_filename = average_matrix(sorted_matrix_filename, num_lines_to_average)
+
+    remove_files(sorted_matrix_filename)
+
+    spike_in_normalized_matrix = scale_matrix(averaged_matrix_filename, spike_in)
+
+    remove_files(averaged_matrix_filename)
+
+    return spike_in_normalized_matrix
+
+
+def make_heatmap(matrix, heatmap_params, output_filename_prefix):
+    bp_width, width, height, gamma, max_black_value, interval_size = heatmap_params
+
+    # Minor tick marks every 10 kb and major tick marks every 50 kb
+    t = Ticks(minor_tick_mark_interval_size=(10_000 / interval_size),
+              major_tick_mark_interval_size=(50_000 / interval_size))
+
+    output_filename = output_filename_prefix + "_gamma_" + str(gamma) + "_max_" + str(
+        max_black_value) + "_width_" + str(bp_width) + "bp_gene_body_heatmap.tiff"
+
+    generate_heatmap(matrix, 'gray', output_filename, gamma, 0, max_black_value, ticks=t)
+
+
 def print_usage():
     sys.stderr.write("Usage: \n")
     sys.stderr.write("GC_bioinfo gene_body_heatmap <truQuant output file> <Upstream Distance>" +
@@ -189,47 +233,25 @@ def get_args(args):
         spike_in = float(spike_in)
     except ValueError:
         sys.stderr.write("The spike in correction factor could not be converted to a float")
-        
 
+    seq_file_data = (sequencing_filename, spike_in)
+    matrix_params = (upstream_distance, distance_past_tes, width, height, interval_size)
+    heatmap_params = (bp_width, width, height, gamma, max_black_value, interval_size)
+    filenames = (truQuant_output_file, tsr_file, output_filename_prefix)
 
-    return truQuant_output_file, tsr_file, upstream_distance, distance_past_tes, bp_width, width, height, gamma, max_black_value, interval_size, spike_in, sequencing_filename, output_filename_prefix
+    return seq_file_data, matrix_params, heatmap_params, filenames
 
 
 def main(args):
-    truQuant_output_file, tsr_file, upstream_distance, distance_past_tes, bp_width, width, height, gamma, max_black_value, interval_size, spike_in, sequencing_filename, output_filename_prefix = get_args(args)
+    seq_file_data, matrix_params, heatmap_params, filenames = get_args(args)
 
-    blacklist_regions_file = blacklist_extended_gene_bodies(tsr_file, distance_past_tes)
+    output_filename_prefix = filenames[-1]
 
-    # Step 1. Make regions to quantify
-    intervals_filename = make_incremented_regions(truQuant_output_file, distance_past_tes, interval_size, upstream_distance)
+    matrix = build_matrix(seq_file_data, matrix_params, filenames)
 
-    # Step 2. Quantify them
-    quantified_regions_filename = quantify_intervals(sequencing_filename, blacklist_regions_file, intervals_filename)
+    make_heatmap(matrix, heatmap_params, output_filename_prefix)
 
-    # Step 3. Read the coverage data and add them to a 2d list
-    sorted_matrix_filename, num_lines = read_coverage_file(quantified_regions_filename, width)
-
-    remove_files(intervals_filename, quantified_regions_filename, blacklist_regions_file)
-
-    # Make the dimensions correct
-    num_lines_to_average = int(num_lines / height)
-    averaged_matrix_filename = average_matrix(sorted_matrix_filename, num_lines_to_average)
-
-    remove_files(sorted_matrix_filename)
-
-    spike_in_normalized_matrix = scale_matrix(averaged_matrix_filename, spike_in)
-
-    remove_files(averaged_matrix_filename)
-
-    # Step 4. Make the heatmap using the resulting file
-
-    # Minor tick marks every 10 kb and major tick marks every 50 kb
-    t = Ticks(minor_tick_mark_interval_size=(10_000 / interval_size), major_tick_mark_interval_size=(50_000 / interval_size))
-
-    output_filename = output_filename_prefix + "_gamma_" + str(gamma) + "_max_" + str(max_black_value) + "_width_" + str(bp_width) + "bp_gene_body_heatmap.tiff"
-
-    generate_heatmap(spike_in_normalized_matrix, 'gray', output_filename, gamma, 0, max_black_value, ticks=t)
-
+    remove_files(matrix)
 
 if __name__ == '__main__':
     main(sys.argv[1:])

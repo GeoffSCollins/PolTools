@@ -1,14 +1,11 @@
 import unittest.mock
-import sys
 import io
 
-from main_programs import five_prime_metaplot, three_prime_metaplot
+from GC_bioinfo.main_programs import five_prime_metaplot, three_prime_metaplot
 
-from utils.make_random_filename import generate_random_filename
-from utils.remove_files import remove_files
-from quiet_stderr import Quieter
-
-sys.path.append("../GC_bioinfo")
+from GC_bioinfo.utils.make_random_filename import generate_random_filename
+from GC_bioinfo.utils.remove_files import remove_files
+from quiter import Quieter
 
 class TestFiveAndThreeMetaplots(unittest.TestCase):
     """

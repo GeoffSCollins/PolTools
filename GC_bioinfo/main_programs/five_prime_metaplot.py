@@ -2,6 +2,7 @@ import sys
 
 from GC_bioinfo.utils.run_metaplot import run_metaplot, parse_input
 
+
 def main(args):
     """
     GC_bioinfo five_prime_metaplot.py <Regions Filename> <Sequencing Files>

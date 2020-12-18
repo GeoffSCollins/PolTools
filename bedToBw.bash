@@ -16,21 +16,25 @@ rm ${file%.bed}"-RV.bedGraph" ${file%.bed}"-FW.bedGraph" ${file%.bed}".tmp"
 
 }
 
+genome="/media/genomes/combinedgenome/combinedhg38_moth.chrom.sizes"
 
-bedToBw 2020-04-23-WT_6h_dTAG_Flavo_Exp3_New-dedup-hg38.bed 1.0535 /media/genomes/hg38/hg38.chrom.sizes &
-bedToBw 2020-04-23-WT_6h_dTAG_6h_PFA_Flavo_Exp3_New-dedup-hg38.bed 0.9517 /media/genomes/hg38/hg38.chrom.sizes &
-
-bedToBw 2020-04-23-UL87F_No_dTAG_No_Flavo_Exp3_New-dedup-hg38.bed 1.1031 /media/genomes/hg38/hg38.chrom.sizes &
-bedToBw 2020-04-23-UL87F_6h_dTAG_No_Flavo_Exp3_New-dedup-hg38.bed 0.8685 /media/genomes/hg38/hg38.chrom.sizes &
-
-bedToBw 2020-04-23-UL87F_No_dTAG_Flavo_Exp3_New-dedup-hg38.bed 1.1302 /media/genomes/hg38/hg38.chrom.sizes &
-bedToBw 2020-04-23-UL87F_6h_dTAG_Flavo_Exp3_New-dedup-hg38.bed 1.0419 /media/genomes/hg38/hg38.chrom.sizes &
-
-bedToBw 2020-04-23-UL87F_6h_dTAG_6h_PFA_No_Flavo_Exp3_New-dedup-hg38.bed 0.8822 /media/genomes/hg38/hg38.chrom.sizes &
-bedToBw 2020-04-23-UL87F_6h_dTAG_6h_PFA_Flavo_Exp3_New-dedup-hg38.bed  1.0770 /media/genomes/hg38/hg38.chrom.sizes &
-
-bedToBw 2020-04-23-UL87F_No_dTAG_6h_PFA_No_Flavo_Exp3_New-dedup-hg38.bed 1.2171 /media/genomes/hg38/hg38.chrom.sizes &
-bedToBw 2020-04-23-UL87F_No_dTAG_6h_PFA_Flavo_Exp3_New-dedup-hg38.bed 0.8176 /media/genomes/hg38/hg38.chrom.sizes 
-
-
-
+bedToBw Sample21-dedup.bed 0.876971972 $genome &
+bedToBw Sample22-dedup.bed 1.29952819 $genome &
+bedToBw Sample23-dedup.bed 1.825712356 $genome &
+bedToBw Sample24-dedup.bed 2.771789905 $genome &
+bedToBw Sample25-dedup.bed 1.273699439 $genome &
+bedToBw Sample26-dedup.bed 1.18758729 $genome &
+bedToBw Sample27-dedup.bed 0.601445391 $genome &
+bedToBw Sample28-dedup.bed 0.799385596 $genome &
+bedToBw Sample29-dedup.bed 1.157654349 $genome &
+bedToBw Sample30-dedup.bed 1.479850181 $genome &
+bedToBw Sample31-dedup.bed 0.726676314 $genome &
+bedToBw Sample32-dedup.bed 0.557766921 $genome &
+bedToBw Sample33-dedup.bed 0.872404903 $genome &
+bedToBw Sample34-dedup.bed 1.731372368 $genome &
+bedToBw Sample35-dedup.bed 1.375630735 $genome &
+bedToBw Sample36-dedup.bed 2.587498112 $genome &
+bedToBw Sample37-dedup.bed 0.679189383 $genome &
+bedToBw Sample38-dedup.bed 0.706914671 $genome &
+bedToBw Sample39-dedup.bed 0.863500812 $genome &
+bedToBw Sample40-dedup.bed 0.953032069 $genome &

@@ -4,11 +4,16 @@ from GC_bioinfo.utils.make_random_filename import generate_random_filename
 
 
 def add_matrices(list_of_matrices):
+    # Temporarily set the width and the height of the output matrix to 0
+    width = 0
+    height = 0
+
     for i, matrix_filename in enumerate(list_of_matrices):
         current_matrix = []
         with open(matrix_filename) as file:
             for line in file:
-                current_matrix.append([float(val) for val in line.split()])
+                if line:
+                    current_matrix.append([float(val) for val in line.split()])
 
         if i == 0:
             # Get the width and height
