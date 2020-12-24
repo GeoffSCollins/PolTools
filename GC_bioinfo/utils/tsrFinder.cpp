@@ -6,8 +6,11 @@
 #include <math.h>
 #include <unordered_map>
 #include <stdint.h>
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
 
 using namespace std;
+using namespace boost::multiprecision;
 
 vector<string> splitString(const string& str, const string& delim) {
     vector<string> tokens;
@@ -115,33 +118,34 @@ map<string, vector<string>> readStepTwoFile(string fileName, string &strand) {
 }
 
 
-void buildMap(unordered_map<string, vector<__int128>> &tsrMap, vector<string> regions, int stepSize) {
+void buildMap(unordered_map<string, vector<uint256_t>> &tsrMap, vector<string> regions, int stepSize) {
     // For each region in the map values (given from step 2 file)
     for (string region: regions) {
         vector<string> splitRegion = splitString(region, "\t");
         // Split the string by tabs to grab the entries
 
-        __int128 tss = stoi(splitRegion[0]);
-        __int128 tssPlusOne = stoi(splitRegion[1]);
-        __int128 readLenSum = stoi(splitRegion[2]);
-        __int128 readCount = stoi(splitRegion[3]);
+        uint256_t tss = stoi(splitRegion[0]);
+        uint256_t tssPlusOne = stoi(splitRegion[1]);
+        uint256_t readLenSum = stoi(splitRegion[2]);
+        uint256_t readCount = stoi(splitRegion[3]);
 
          // For each sub region of length stepsize starting at the tss + 1 - the stepSize to the tss + 1
          // This is the window loop?
-         for (int position = tss + 1 - stepSize; position < tss + 1; position++) {
-            int startRegion = position;
-            int endRegion = position + stepSize;
+         for (uint256_t position = tss + 1 - stepSize; position < tss + 1; position++) {
+            uint256_t startRegion = position;
+            uint256_t endRegion = position + stepSize;
 
             // Don't deal with negative positions
             if (startRegion < 0) {
                 continue;
             }
 
-            string mapKey = to_string(startRegion) + "-" + to_string(endRegion);
+            string mapKey = boost::lexical_cast<std::string>(startRegion);
+            mapKey += "-" + boost::lexical_cast<std::string>(endRegion);
 
             if (tsrMap.find(mapKey) == tsrMap.end()) {
                 // This means the TSR was not added to the map
-                vector<__int128> mapData = {0, 0, 0, 0, 0};
+                vector<uint256_t> mapData = {0, 0, 0, 0, 0};
                 tsrMap[mapKey] = mapData;
             }
 
@@ -171,7 +175,7 @@ string stepThree(string stepTwoFilename, int stepSize, int minSeqDepth, int minA
     for(auto const& key: dataByChromosome) {
         string chrom = key.first;
         vector<string> regions = key.second;
-        unordered_map<string, vector<__int128>> tsrMap;
+        unordered_map<string, vector<uint256_t>> tsrMap;
 
         buildMap(tsrMap, regions, stepSize);
 
@@ -181,21 +185,28 @@ string stepThree(string stepTwoFilename, int stepSize, int minSeqDepth, int minA
             int windowStart = stoi(splitString(subMapKey, "-")[0]);
             int windowEnd = stoi(splitString(subMapKey, "-")[1]);
 
-            int readLenSum = tsrMap[subMapKey][0];
-            int readCount = tsrMap[subMapKey][1];
+            uint256_t readLenSum = tsrMap[subMapKey][0];
+            uint256_t readCount = tsrMap[subMapKey][1];
 
-            int maxTSS = tsrMap[subMapKey][2];
-            int maxReadCount = tsrMap[subMapKey][3];
-            __int128 avgTSSHelper = tsrMap[subMapKey][4];
+            uint256_t maxTSS = tsrMap[subMapKey][2];
+            uint256_t maxReadCount = tsrMap[subMapKey][3];
+            uint256_t avgTSSHelper = tsrMap[subMapKey][4];
 
             // Only keep the ones with RCOVSUM >= MINSEQDEPTH and (RLSUM / RCOVSUM) >= AVGTRANSLEN
             if (readCount >= minSeqDepth && (readLenSum / readCount) >= minAvgTranscriptLength) {
                 // We need to get the other values and then print it out
-                long double averageTSS = avgTSSHelper / readCount;
+                uint256_t averageTSS = avgTSSHelper / readCount;
+                int256_t maxTSSMinusAverageTSS = maxTSS + 1 - averageTSS;
 
-                string data = chrom + "\t" + to_string(windowStart) + "\t" + to_string(windowEnd) + "\t" + to_string(readLenSum) + "\t" + to_string(readCount);
-                data += "\t" + strand + "\t" + to_string(maxTSS) + "\t" + to_string(maxTSS + 1) + "\t" + to_string(maxReadCount) + "\t";
-                data += to_string(averageTSS) + "\t" + to_string(maxTSS + 1 - averageTSS);
+                string data = chrom + "\t" + boost::lexical_cast<std::string>(windowStart) + "\t";
+                data += boost::lexical_cast<std::string>(windowEnd) + "\t";
+                data += boost::lexical_cast<std::string>(readLenSum) + "\t";
+                data += boost::lexical_cast<std::string>(readCount) + "\t";
+                data += strand + "\t" + boost::lexical_cast<std::string>(maxTSS) + "\t";
+                data += boost::lexical_cast<std::string>(maxTSS + 1) + "\t";
+                data += boost::lexical_cast<std::string>(maxReadCount) + "\t";
+                data += boost::lexical_cast<std::string>(averageTSS) + "\t";
+                data += boost::lexical_cast<std::string>(maxTSSMinusAverageTSS);
 
                 sortedOutputData[chrom][windowStart] = data;
             }

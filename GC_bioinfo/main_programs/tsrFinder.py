@@ -9,6 +9,7 @@ from multiprocessing import Process
 
 from GC_bioinfo.utils.constants import tsr_finder_location
 from GC_bioinfo.utils.tsr_finder_step_four_from_rocky import run_step_four
+from GC_bioinfo.utils.remove_files import remove_files
 
 
 def print_usage():
@@ -23,7 +24,6 @@ try:
     args = sys.argv[1:]
 
     if len(args) != 6:
-        print_usage()
         sys.exit(1)
 
     bed_file = args[0]
@@ -35,15 +35,12 @@ try:
 
     # Make sure bed_file and chrom_size_file exist
     if not os.path.isfile(bed_file) or not os.path.isfile(chrom_size_file):
-        print_usage()
         sys.exit(1)
-
 
 except:
     # If the user did not input an argument correctly
     print_usage()
     sys.exit(1)
-
 
 chromosome_sizes = defaultdict(int)
 
@@ -108,8 +105,6 @@ def run_tsrFinderGC(filename):
 
     run_step_four(step_three_filename, window_size, chromosome_sizes, step_four_filename)
 
-
-
 jobs = []
 for filename in chromosome_files:
     j = Process(target=run_tsrFinderGC, args=(filename, ))
@@ -119,8 +114,8 @@ for filename in chromosome_files:
 for job in jobs:
     job.join()
 
-
-
 # # Step 3: Combine the output files and delete intermediate files
 os.system("cat " + " ".join(output_files) + " > " + output_filename)
-os.system("rm " + " ".join(tsr_finder_step_files + chromosome_files))
+
+remove_files(tsr_finder_step_files)
+remove_files(chromosome_files)
