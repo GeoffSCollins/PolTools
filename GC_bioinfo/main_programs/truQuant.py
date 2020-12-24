@@ -329,13 +329,9 @@ def gather_data(sequencing_file, blacklist_filename, annotated_dataset, region_f
     indv_gene_counts_dict = get_counts_in_paused_region(paused_region_filename, blacklisted_sequencing_filename)
     get_counts_in_gene_bodies(gene_body_region_filename, blacklisted_sequencing_filename, indv_gene_counts_dict)
 
-    indv_gene_counts_dict = {}
-
     # Only get the region data from the dataset which was annotated
     if annotated_dataset:
         five_prime_counts_dict, _ = build_counts_dict(sequencing_file)
-
-        sys.stderr.write(str(sequencing_file))
 
         for gene in truQuant_regions_dict:
             region_data_dict[gene] = get_region_data(truQuant_regions_dict[gene]["Pause"], five_prime_counts_dict)
