@@ -1,0 +1,3 @@
+Gene	Chromosome	Pause Region Left	Pause Region Right	Strand	Total 5' Reads	MaxTSS	MaxTSS 5' Reads	Weighted Pause Region Center	STDEV of TSSs	Gene Body Left	Gene Body Right	Gene Body Distance	sample.bed Pause Region	sample.bed Gene Body
+SAMD11	chr1	925664	925814	+	344	925739	86	925735	16.27837415	925814	944581	18767	344	2164
+NOC2L	chr1	959175	959325	-	905	959255	241	959251	16.25399228	944203	959175	14972	905	2412

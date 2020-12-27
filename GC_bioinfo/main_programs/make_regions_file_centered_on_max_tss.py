@@ -25,11 +25,16 @@ def expand_max_tss(max_tsss, region_size):
 
         position = int(position)
 
-        left = position - int(region_size / 2)
-        right = position + int(region_size / 2)
+        if region_size == 1:
+            # Only the maxTSS
+            left = position
+            right = position + 1
+        else:
+            left = position - int(region_size / 2)
+            right = position + int(region_size / 2)
 
         if strand == "-":
-            # If the strand is negative, we shift the right 1
+            # If the strand is negative, we shift to the right 1
             left += 1
             right += 1
 
@@ -51,7 +56,9 @@ def parse_args(args):
     truQuant_filename, region_size = args
 
     region_size = int(region_size)
-    verify_region_length_is_even(region_size)
+
+    if region_size != 1:
+        verify_region_length_is_even(region_size)
 
     return truQuant_filename, region_size
 
