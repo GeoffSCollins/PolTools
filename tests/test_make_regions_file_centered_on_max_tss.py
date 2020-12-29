@@ -6,7 +6,6 @@ from GC_bioinfo.main_programs import make_regions_file_centered_on_max_tss
 
 from quiter import Quieter
 
-# TODO:
 class TestMakeRegionsFileCenteredOnMaxTSS(unittest.TestCase):
     truQuant_file = str(Path(__file__).parent) + "/test_files/sample-truQuant_output.txt"
 
@@ -29,7 +28,7 @@ class TestMakeRegionsFileCenteredOnMaxTSS(unittest.TestCase):
 
         expected = [
             ["chr1", "925739", "925740", "SAMD11", "86", "+"],
-            ["chr1", "959256", "959257", "NOC2L", "241", "-"]
+            ["chr1", "959255", "959256", "NOC2L", "241", "-"]
         ]
 
         self.assertEqual(result, expected)
@@ -43,7 +42,7 @@ class TestMakeRegionsFileCenteredOnMaxTSS(unittest.TestCase):
 
         expected = [
             ["chr1", "925729", "925749", "SAMD11", "86", "+"],
-            ["chr1", "959246", "959266", "NOC2L", "241", "-"]
+            ["chr1", "959245", "959265", "NOC2L", "241", "-"]
         ]
 
         self.assertEqual(result, expected)
