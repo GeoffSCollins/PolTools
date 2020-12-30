@@ -23,7 +23,11 @@ def get_counts_helper(five_prime_counts_dict, region_length, regions_filename):
                 # Subtract one if the strand is negative because the +1 is on the left side
                 inr_position -= 1
 
-            inr_counts = five_prime_counts_dict[chromosome][strand][inr_position]
+            # Check if the there is a read at that position
+            if chromosome in five_prime_counts_dict:
+                inr_counts = five_prime_counts_dict[chromosome][strand][inr_position]
+            else:
+                inr_counts = 0
 
             counts_dict[gene_name] = inr_counts
 
@@ -65,10 +69,11 @@ def parse_args(args):
     verify_bed_files(regions_filename, sequencing_files_list)
 
     region_length = determine_region_length(regions_filename)
-    verify_region_length_is_even(region_length)
+
+    if region_length != 1:
+        verify_region_length_is_even(region_length)
 
     return regions_filename, region_length, sequencing_files_list
-
 
 
 def run_inr_reads(regions_filename, region_length, sequencing_files_list):
