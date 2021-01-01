@@ -1,3 +1,4 @@
+import math
 import multiprocessing
 import sys
 
@@ -8,7 +9,7 @@ from GC_bioinfo.utils.verify_bed_file import verify_bed_files
 from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
 
 
-def get_counts_helper(five_prime_counts_dict, region_length, regions_filename):
+def get_counts_helper(five_prime_counts_dict, regions_filename):
     # Counts_dict has keys of gene_names and values of the number of inr_counts
     counts_dict = {}
 
@@ -17,6 +18,7 @@ def get_counts_helper(five_prime_counts_dict, region_length, regions_filename):
         for line in file:
             chromosome, left, right, gene_name, _, strand = line.split()
 
+            region_length = int(right) - int(left)
             inr_position = int(left) + int(region_length / 2)
 
             if strand == "-":
@@ -34,9 +36,9 @@ def get_counts_helper(five_prime_counts_dict, region_length, regions_filename):
     return counts_dict
 
 
-def get_counts(region_length, regions_filename, sequencing_filename):
+def get_counts(regions_filename, sequencing_filename):
     five_prime_counts_dict, _ = build_counts_dict(sequencing_filename)
-    counts_dict = get_counts_helper(five_prime_counts_dict, region_length, regions_filename)
+    counts_dict = get_counts_helper(five_prime_counts_dict, regions_filename)
 
     return counts_dict
 
@@ -73,12 +75,12 @@ def parse_args(args):
     if region_length != 1:
         verify_region_length_is_even(region_length)
 
-    return regions_filename, region_length, sequencing_files_list
+    return regions_filename, sequencing_files_list
 
 
-def run_inr_reads(regions_filename, region_length, sequencing_files_list):
+def run_inr_reads(regions_filename, sequencing_files_list):
     pool = multiprocessing.Pool(processes=len(sequencing_files_list))
-    output_list = pool.starmap(get_counts, [(region_length, regions_filename, seq_file) for seq_file in sequencing_files_list])
+    output_list = pool.starmap(get_counts, [(regions_filename, seq_file) for seq_file in sequencing_files_list])
 
     output_data(output_list, [seq_file.split("/")[-1] for seq_file in sequencing_files_list])
 
@@ -91,8 +93,8 @@ def main(args):
     :param args:
     :return:
     """
-    regions_filename, region_length, sequencing_files_list = parse_args(args)
-    run_inr_reads(regions_filename, region_length, sequencing_files_list)
+    regions_filename, sequencing_files_list = parse_args(args)
+    run_inr_reads(regions_filename, sequencing_files_list)
 
 
 if __name__ == '__main__':
