@@ -84,7 +84,7 @@ class TestInrReads(unittest.TestCase):
         with open(region_file, 'w') as file:
             file.write(
                 "\t".join(
-                    ["chr1", "100", "101", "region", "0", "-"]
+                    ["chr1", "99", "100", "region", "0", "-"]
                 ) + '\n' +
                 "\t".join(
                     ["chr1", "90", "91", "second_region", "0", "-"]

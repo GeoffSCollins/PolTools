@@ -21,7 +21,7 @@ def get_counts_helper(five_prime_counts_dict, regions_filename):
             region_length = int(right) - int(left)
             inr_position = int(left) + int(region_length / 2)
 
-            if strand == "-":
+            if strand == "-" and region_length != 1:
                 # Subtract one if the strand is negative because the +1 is on the left side
                 inr_position -= 1
 
