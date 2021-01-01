@@ -96,7 +96,7 @@ def blacklist_extended_gene_bodies(tsr_file, downstream_extension):
     blacklist_filename = generate_random_filename()
 
     # 1: Make the regions we are going to be searching for max TSSs in max TSRs
-    search_regions_dict, annotations_dict = truQuant.make_search_regions_list(annotation_file, annotation_extension)
+    search_regions_dict, annotations_dict = truQuant.make_search_regions(annotation_file, annotation_extension)
 
     # 2: Make the pause regions and gene bodies
     gene_tsr_dict, flow_through_tsrs = truQuant.map_tsrs_to_search_regions(tsr_file, search_regions_dict)
