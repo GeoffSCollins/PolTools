@@ -15,9 +15,10 @@ def get_pausing_distances_helper(transcripts_dict, regions_filename):
         for line in file:
             chromosome, left, right, gene_name, fold_change, strand = line.rstrip().split()
 
+            region_length = int(right) - int(left)
             five_prime_position = int(left) + int(region_length / 2)
 
-            if strand == "-":
+            if strand == "-" and region_length != 1:
                 # Subtract one if the strand is negative because the +1 is on the left side
                 five_prime_position -= 1
 
@@ -25,9 +26,9 @@ def get_pausing_distances_helper(transcripts_dict, regions_filename):
             if five_prime_position in transcripts_dict[chromosome][strand]:
                 # Go through all the transcripts that have this 5' end
                 for three_prime_end in transcripts_dict[chromosome][strand][five_prime_position]:
-                    transcript_length = abs(five_prime_position - three_prime_end)
+                    # The three prime ends are inclusive, so we need to add 1 to the transcript length
+                    transcript_length = abs(five_prime_position - three_prime_end) + 1
 
-                    # if transcript_length <= 100 and transcript_length > 17:
                     if transcript_length <= 100:
                         all_pause_distances[transcript_length] += 1
 
@@ -36,8 +37,8 @@ def get_pausing_distances_helper(transcripts_dict, regions_filename):
 
 def get_pausing_distances(regions_filename, sequencing_filename):
     transcripts_dict = build_transcripts_dict(sequencing_filename)
-
     all_pause_distances = get_pausing_distances_helper(transcripts_dict, regions_filename)
+
     return all_pause_distances
 
 
@@ -53,14 +54,15 @@ def parse_input(args):
         sys.exit(1)
 
     regions_filename = args[0]
-    global region_length
 
     region_length = determine_region_length(regions_filename)
-    verify_region_length_is_even(region_length)
+
+    if region_length != 1:
+        verify_region_length_is_even(region_length)
 
     sequencing_files = args[1:]
 
-    return regions_filename, region_length, sequencing_files
+    return regions_filename, sequencing_files
 
 
 def output_pausing_distances(pausing_distances, sequencing_files):
@@ -79,14 +81,14 @@ def pausing_distance_distribution_from_maxTSS(regions_filename, sequencing_files
 
 def main(args):
     """
-    pausing_distance_distribution_from_maxTSS.py <regions file> <sequencing files>
+    pausing_distance_distribution_from_maxTSS <regions file> <sequencing files>
     More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/pausing_distance_distribution_from_maxTSS.rst
 
     :param args: list of the sequencing files
     :type args: list
     :return:
     """
-    regions_filename, region_length, sequencing_files = parse_input(args)
+    regions_filename, sequencing_files = parse_input(args)
     pausing_distance_distribution_from_maxTSS(regions_filename, sequencing_files)
 
 if __name__ == '__main__':
