@@ -42,7 +42,7 @@ class TestMakeRegionsFileCenteredOnMaxTSS(unittest.TestCase):
 
         expected = [
             ["chr1", "925729", "925749", "SAMD11", "86", "+"],
-            ["chr1", "959245", "959265", "NOC2L", "241", "-"]
+            ["chr1", "959246", "959266", "NOC2L", "241", "-"]
         ]
 
         self.assertEqual(result, expected)

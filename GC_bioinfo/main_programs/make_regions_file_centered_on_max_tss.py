@@ -33,6 +33,11 @@ def expand_max_tss(max_tsss, region_size):
             left = position - int(region_size / 2)
             right = position + int(region_size / 2)
 
+            if strand == "-":
+                # We shift the right by 1
+                left = int(left) + 1
+                right = int(right) + 1
+
         expanded_regions.append( [chromosome, left, right, gene_name, five_prime_reads, strand] )
 
     return expanded_regions
