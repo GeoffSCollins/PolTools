@@ -61,14 +61,14 @@ def map_tsrs_to_search_regions(tsr_filename, search_regions_dict):
     os.system("bedtools intersect -s -a " + search_regions_filename +
               " -b " + tsr_filename + " -wa -wb > " + mapped_tsrs_filename)
     os.system("bedtools intersect -s -v -a " + tsr_filename +
-              " -b " + search_regions_filename + " > " + flow_through_tsrs_filename)
+              " -b " + search_regions_filename + " -wa > " + flow_through_tsrs_filename)
 
     with open(mapped_tsrs_filename) as file:
         for line in file:
             gene_name = line.split()[3]
             mapped_tsr = line.split()[6:]
             tsr_chromosome, tsr_left, tsr_right, tsr_read_sum, tsr_strength, tsr_strand, tss_left, tss_right, \
-            tss_strength, avg_tss, max_tss_mins_avg_tss = mapped_tsr
+            tss_strength, avg_tss = mapped_tsr
 
             gene_tsr_dict[gene_name].append(
                 [tsr_chromosome, tsr_left, tsr_right, tsr_read_sum, tsr_strength, tsr_strand, avg_tss])
@@ -76,7 +76,7 @@ def map_tsrs_to_search_regions(tsr_filename, search_regions_dict):
     with open(flow_through_tsrs_filename) as file:
         for line in file:
             tsr_chromosome, tsr_left, tsr_right, tsr_read_sum, tsr_strength, tsr_strand, tss_left, tss_right, \
-            tss_strength, avg_tss, max_tss_mins_avg_tss = line.split()
+            tss_strength, avg_tss = line.split()
             flow_through_tsrs.append(
                 [tsr_chromosome, tsr_left, tsr_right, tsr_read_sum, tsr_strength, tsr_strand, avg_tss])
 
@@ -164,7 +164,6 @@ def map_flow_through_tsrs(annotations_dict, flow_through_tsrs):
 
     with open(tsr_filename, 'w') as file:
         for tsr in flow_through_tsrs:
-            # Don't write last field because that is the average TSS
             file.write("\t".join(tsr) + "\n")
 
     # Write the annotations dict to a temporary file
@@ -189,7 +188,6 @@ def map_flow_through_tsrs(annotations_dict, flow_through_tsrs):
 
             mapped_flow_through_tsrs_dict[gene_name].append(
                 [tsr_chromosome, tsr_left, tsr_right, gene_name, tsr_counts, tsr_strand])
-
 
     remove_files(tsr_filename, annotation_file, mapped_tsrs_filename)
 
@@ -408,9 +406,9 @@ def run_tsrFinder(first_seq_file):
     blacklisted_first_sequencing_file = first_seq_file.replace(".bed", "-blacklisted.bed")
 
     tsr_file = blacklisted_first_sequencing_file.replace(".bed", "_150_20_30_600-TSR.tab")
-    run_subtract(first_seq_file, rna_blacklist_file, output_filename=blacklisted_first_sequencing_file)
-    os.system("GC_bioinfo tsrFinder " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file)
-
+    # run_subtract(first_seq_file, rna_blacklist_file, output_filename=blacklisted_first_sequencing_file)
+    # os.system("GC_bioinfo tsrFinder " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file)
+    #TODO
     return tsr_file
 
 

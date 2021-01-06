@@ -196,7 +196,6 @@ string stepThree(string stepTwoFilename, int stepSize, int minSeqDepth, int minA
             if (readCount >= minSeqDepth && (readLenSum / readCount) >= minAvgTranscriptLength) {
                 // We need to get the other values and then print it out
                 uint256_t averageTSS = avgTSSHelper / readCount;
-                int256_t maxTSSMinusAverageTSS = maxTSS + 1 - averageTSS;
 
                 string data = chrom + "\t" + boost::lexical_cast<std::string>(windowStart) + "\t";
                 data += boost::lexical_cast<std::string>(windowEnd) + "\t";
@@ -206,7 +205,6 @@ string stepThree(string stepTwoFilename, int stepSize, int minSeqDepth, int minA
                 data += boost::lexical_cast<std::string>(maxTSS + 1) + "\t";
                 data += boost::lexical_cast<std::string>(maxReadCount) + "\t";
                 data += boost::lexical_cast<std::string>(averageTSS) + "\t";
-                data += boost::lexical_cast<std::string>(maxTSSMinusAverageTSS);
 
                 sortedOutputData[chrom][windowStart] = data;
             }

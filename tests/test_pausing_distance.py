@@ -8,7 +8,6 @@ from GC_bioinfo.utils.remove_files import remove_files
 
 from quiter import Quieter
 
-# Todo
 class TestPausingDistance(unittest.TestCase):
 
     def test_no_arguments(self):

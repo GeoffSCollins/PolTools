@@ -65,7 +65,7 @@ class TestTruQuant(unittest.TestCase):
 
         tsr_filename = generate_random_filename(".tab")
 
-        additional_columns = ["tss_left", "tss_right", "tss_strength", "avg_tss", "max_tss_minus_avg_tss"]
+        additional_columns = ["tss_left", "tss_right", "tss_strength", "avg_tss"]
 
         with open(tsr_filename, 'w') as file:
             file.write("\t".join(["chr1", "40", "60", "no_overlap", "0", "+"] + additional_columns) + "\n")
@@ -102,7 +102,8 @@ class TestTruQuant(unittest.TestCase):
             "gene_name": [
                 ["chr1", "20", "40", "read_sum", "30", "+", "avg_tss"],
                 ["chr1", "40", "60", "read_sum", "90", "+", "avg_tss"],
-                ["chr1", "60", "80", "read_sum", "18", "+", "avg_tss"]
+                ["chr1", "60", "80", "read_sum", "18", "+", "avg_tss"],
+                ["chr1", "120", "140", "read_sum", "90", "+", "avg_tss"]
             ]
         }
 
@@ -115,7 +116,8 @@ class TestTruQuant(unittest.TestCase):
         expected_non_max_tsrs_dict = {
             "gene_name": [
                 ["chr1", "20", "40", "read_sum", "30", "+", "avg_tss"],
-                ["chr1", "60", "80", "read_sum", "18", "+", "avg_tss"]
+                ["chr1", "60", "80", "read_sum", "18", "+", "avg_tss"],
+                ["chr1", "120", "140", "read_sum", "90", "+", "avg_tss"]
             ]
         }
 
