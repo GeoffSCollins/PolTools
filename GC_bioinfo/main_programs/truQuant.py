@@ -406,9 +406,8 @@ def run_tsrFinder(first_seq_file):
     blacklisted_first_sequencing_file = first_seq_file.replace(".bed", "-blacklisted.bed")
 
     tsr_file = blacklisted_first_sequencing_file.replace(".bed", "_150_20_30_600-TSR.tab")
-    # run_subtract(first_seq_file, rna_blacklist_file, output_filename=blacklisted_first_sequencing_file)
-    # os.system("GC_bioinfo tsrFinder " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file)
-    #TODO
+    run_subtract(first_seq_file, rna_blacklist_file, output_filename=blacklisted_first_sequencing_file)
+    os.system("GC_bioinfo tsrFinder " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file)
     return tsr_file
 
 
