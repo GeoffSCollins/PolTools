@@ -16,10 +16,10 @@ def _verify_file(filename):
     if first_line == "":
         return
 
-    if len(first_line.split()) != 6:
+    if len(first_line.split()) < 6:
         raise InvalidBedFormatException("Not all columns found in ", filename, first_line)
 
-    chromosome, left, right, name, score, strand = first_line.split()
+    chromosome, left, right, name, score, strand = first_line.split()[:6]
 
     try:
         left = int(left)
