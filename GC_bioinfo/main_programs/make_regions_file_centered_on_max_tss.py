@@ -65,13 +65,13 @@ def parse_args(args):
 
 def print_usage():
     sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo make_regions_file_centered_on_max_tss.py <truQuant output file> <region size>\n")
+    sys.stderr.write("GC_bioinfo make_regions_file_centered_on_max_tss <truQuant output file> <region size>\n")
     sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/make_regions_file_centered_on_max_tss.rst\n")
 
 
 def main(args):
     """
-    GC_bioinfo make_regions_file_centered_on_max_tss.py <truQuant output file> <region size>
+    GC_bioinfo make_regions_file_centered_on_max_tss <truQuant output file> <region size>
     More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/make_regions_file_centered_on_max_tss.rst
 
     :param args:

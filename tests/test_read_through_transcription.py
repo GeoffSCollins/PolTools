@@ -6,7 +6,6 @@ from GC_bioinfo.utils.remove_files import remove_files
 
 from quiter import Quieter
 
-#TODO
 class TestReadThroughTranscription(unittest.TestCase):
     def test_make_incremented_regions(self):
 

@@ -5,7 +5,7 @@ from GC_bioinfo.utils.run_metaplot import run_metaplot, parse_input
 
 def main(args):
     """
-    GC_bioinfo five_prime_metaplot.py <Regions Filename> <Sequencing Files>
+    GC_bioinfo five_prime_metaplot <Regions Filename> <Sequencing Files>
     More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/five_prime_metaplot.rst
 
     :param args: arguments provided to the program

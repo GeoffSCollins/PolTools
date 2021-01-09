@@ -61,7 +61,7 @@ def output_data(avgs_dict, region_length):
 
 def print_usage():
     sys.stderr.write("Usage: ")
-    sys.stderr.write("python3 base_distribution.py <Regions Filename>")
+    sys.stderr.write("python3 base_distribution <Regions Filename>")
     sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/base_distribution.rst")
 
 
@@ -94,7 +94,7 @@ def run_base_distribution(regions_file, region_length):
 
 def main(args):
     """
-    base_distribution.py <Regions Filename>
+    base_distribution <Regions Filename>
     More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/base_distribution.rst
 
     :param args: list of the sequencing files

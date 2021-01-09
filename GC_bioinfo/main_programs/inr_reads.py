@@ -56,7 +56,7 @@ def output_data(output_list, sequencing_filenames):
 
 def print_usage():
     sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo inr_reads.py <regions file> <sequencing files>\n")
+    sys.stderr.write("GC_bioinfo inr_reads <regions file> <sequencing files>\n")
     sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/inr_reads.rst\n")
 
 
@@ -87,7 +87,7 @@ def run_inr_reads(regions_filename, sequencing_files_list):
 
 def main(args):
     """
-    GC_bioinfo inr_reads.py <regions file> <sequencing files>
+    GC_bioinfo inr_reads <regions file> <sequencing files>
     More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/inr_reads.rst
 
     :param args:

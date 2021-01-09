@@ -116,7 +116,7 @@ def parse_args(args):
 
 def print_usage():
     sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo divergent_pileup_metaplot.py <Regions Filename> <Sequencing Files>\n")
+    sys.stderr.write("GC_bioinfo divergent_pileup_metaplot <Regions Filename> <Sequencing Files>\n")
     sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/divergent_pileup_metaplot.rst\n")
 
 
@@ -144,7 +144,7 @@ def run_divergent_pileup_plots(regions_filename, sequencing_files_list, region_l
 
 def main(args):
     """
-    python3 divergent_pileup_metaplot.py <Regions Filename> <Sequencing Files>
+    python3 divergent_pileup_metaplot <Regions Filename> <Sequencing Files>
     More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/divergent_pileup_metaplot.rst
 
     :param args: arguments provided to the program

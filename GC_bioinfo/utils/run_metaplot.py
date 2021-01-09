@@ -79,12 +79,12 @@ def run_metaplot(regions_filename, sequencing_files_list, region_length, end):
 
 def print_five_prime_metaplot_usage():
     sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo five_prime_metaplot.py <Regions Filename> <Sequencing Files>\n")
+    sys.stderr.write("GC_bioinfo five_prime_metaplot <Regions Filename> <Sequencing Files>\n")
     sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/five_prime_metaplot.rst\n")
 
 def print_three_prime_metaplot_usage():
     sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo three_prime_metaplot.py <Regions Filename> <Sequencing Files>\n")
+    sys.stderr.write("GC_bioinfo three_prime_metaplot <Regions Filename> <Sequencing Files>\n")
     sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/three_prime_metaplot.rst\n")
 
 

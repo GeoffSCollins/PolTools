@@ -184,7 +184,7 @@ def make_bedgraphs(fasta_file, window_size, chrom_size_dict):
 
 
 def print_usage():
-    sys.stderr.write("python3 rolling_average_bigwigs.py <window size> <chrom sizes file> <genome fasta file>\n")
+    sys.stderr.write("python3 rolling_average_bigwigs <window size> <chrom sizes file> <genome fasta file>\n")
 
 
 def get_args(args):

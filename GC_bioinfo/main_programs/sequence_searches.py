@@ -55,8 +55,8 @@ def clean_sequence_searches(sequence_searches):
 
 def print_usage():
     sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo sequence_searches.py <regions file> <Sequence,startPosition:endPosition>\n")
-    sys.stderr.write("Ex. GC_bioinfo sequence_searches.py genes.bed TATA,-34:-28\n")
+    sys.stderr.write("GC_bioinfo sequence_searches <regions file> <Sequence,startPosition:endPosition>\n")
+    sys.stderr.write("Ex. GC_bioinfo sequence_searches genes.bed TATA,-34:-28\n")
     sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/sequence_searches.rst\n")
 
 
@@ -140,8 +140,8 @@ def run_sequence_searches(regions_file, searching_sequences, region_length):
 
 def main(args):
     """
-    GC_bioinfo sequence_searches.py <regions file> <Sequence,startPosition:endPosition>
-    Ex. GC_bioinfo sequence_searches.py genes.bed TATA,-34:-28
+    GC_bioinfo sequence_searches <regions file> <Sequence,startPosition:endPosition>
+    Ex. GC_bioinfo sequence_searches genes.bed TATA,-34:-28
     More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/sequence_searches.rst
 
     :param args: list of the sequencing files

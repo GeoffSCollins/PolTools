@@ -71,7 +71,7 @@ def output_hub_data(output_location, sequencing_files):
 
 
 def print_usage():
-    print("python3 bigwigs_to_track_hubs.py <output location on PriceNAS> <bigwigs (can use * operator)>")
+    print("python3 bigwigs_to_track_hubs <output location on PriceNAS> <bigwigs (can use * operator)>")
 
 
 def parse_args(args):
