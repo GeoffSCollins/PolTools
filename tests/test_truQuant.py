@@ -257,6 +257,8 @@ class TestTruQuant(unittest.TestCase):
 
         self.assertEqual(blacklist, expected_blacklist)
 
+        remove_files(blacklist_filename)
+
     def test_get_counts(self):
 
         pause_regions_filename = generate_random_filename()
