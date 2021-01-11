@@ -19,10 +19,8 @@ def average_matrix(filename, num_lines_to_average):
 
     with open(averaged_matrix_filename, 'w') as file:
         curr_sums = [0] * len(lines[0].split())
-        averaged = False
         for i, line in enumerate(lines):
             vals = line.split()
-            averaged = False
 
             for j, val in enumerate(vals):
                 curr_sums[j] += int(val)
@@ -33,11 +31,5 @@ def average_matrix(filename, num_lines_to_average):
 
                 file.write("\t".join(avgs) + "\n")
                 curr_sums = [0] * len(curr_sums)
-                averaged = True
-
-        if not averaged:
-            # Average the last lines
-            avgs = [str(curr_sum / ((i+1) % num_lines_to_average)) for curr_sum in curr_sums]
-            file.write("\t".join(avgs) + "\n")
 
     return averaged_matrix_filename

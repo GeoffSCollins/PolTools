@@ -124,7 +124,8 @@ class TestAverageMatrix(unittest.TestCase):
             for line in file:
                 r.append([float(val) for val in line.split()])
 
-        self.assertEqual(r, [[2.5, 1], [6.5, 1.75], [9.5, 2]])
+        # The last line is discarded because it cannot be evenly divided
+        self.assertEqual(r, [[2.5, 1], [6.5, 1.75]])
 
         remove_files(test_mat, result_mat)
 
