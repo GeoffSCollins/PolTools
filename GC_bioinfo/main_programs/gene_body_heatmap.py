@@ -1,7 +1,3 @@
-"""
-The goal of this is to make the plot that David described
-"""
-
 import csv
 import glob
 import os
@@ -149,12 +145,14 @@ def build_matrix(seq_file_data, matrix_params, filenames):
     return spike_in_normalized_matrix
 
 
-def make_heatmap(matrix, heatmap_params, output_filename_prefix):
+def make_heatmap(matrix, heatmap_params, tick_params, output_filename_prefix):
     bp_width, width, height, gamma, max_black_value, interval_size = heatmap_params
 
+    minor_ticks_bp, major_ticks_bp = tick_params
+
     # Minor tick marks every 10 kb and major tick marks every 50 kb
-    t = Ticks(minor_tick_mark_interval_size=(10_000 / interval_size),
-              major_tick_mark_interval_size=(50_000 / interval_size))
+    t = Ticks(minor_tick_mark_interval_size=(minor_ticks_bp / interval_size),
+              major_tick_mark_interval_size=(major_ticks_bp / interval_size))
 
     output_filename = output_filename_prefix + "_gamma_" + str(gamma) + "_max_" + str(
         max_black_value) + "_width_" + str(bp_width) + "bp_gene_body_heatmap.tiff"
@@ -245,11 +243,15 @@ def get_args(args):
 def main(args):
     seq_file_data, matrix_params, heatmap_params, filenames = get_args(args)
 
+    minor_ticks = 10_000 # Minor ticks every 10kb
+    major_ticks = 50_000 # Minor ticks every 10kb
+    tick_params = (minor_ticks, major_ticks)
+
     output_filename_prefix = filenames[-1]
 
     matrix = build_matrix(seq_file_data, matrix_params, filenames)
 
-    make_heatmap(matrix, heatmap_params, output_filename_prefix)
+    make_heatmap(matrix, heatmap_params, tick_params, output_filename_prefix)
 
     remove_files(matrix)
 

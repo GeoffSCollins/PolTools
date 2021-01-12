@@ -124,8 +124,12 @@ def main(args):
 
     output_filename_prefix = filenames[-1]
 
+    minor_ticks = 10_000  # Minor ticks every 10kb
+    major_ticks = 50_000  # Minor ticks every 10kb
+    tick_params = (minor_ticks, major_ticks)
+
     # Make the heatmap of the combined matrix
-    gene_body_heatmap.make_heatmap(combined_matrix, heatmap_params, output_filename_prefix)
+    gene_body_heatmap.make_heatmap(combined_matrix, heatmap_params, tick_params, output_filename_prefix)
 
     # Step 5. Remove the averaged_matrix file
     remove_files(combined_matrix)

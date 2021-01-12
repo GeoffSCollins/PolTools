@@ -21,7 +21,7 @@ def set_max_fold_change(fold_change_matrix_filename, max_fold_change):
     return set_matrix_bounds(fold_change_matrix_filename, -1 * max_fold_change, max_fold_change)
 
 
-def make_ticks_image(width, interval_size):
+def make_ticks_image(width, interval_size, tick_params):
     # Make the tick marks
     # Minor tick marks every 10 kb and major tick marks every 50 kb
     t = Ticks(minor_tick_mark_interval_size=(10_000 / interval_size),
@@ -35,7 +35,7 @@ def make_ticks_image(width, interval_size):
         for row in ticks_matrix:
             file.write("\t".join([str(val) for val in row]) + "\n")
 
-    ticks_image_filename = generate_random_filename().replace(".bed", ".tiff")
+    ticks_image_filename = generate_random_filename(".tiff")
 
     os.system("/usr/bin/Rscript " + generate_heatmap_location + " " +
               " ".join([ticks_matrix_filename, "gray", ticks_image_filename, "2.2"]))
@@ -74,7 +74,7 @@ def get_fold_change_matrix(numerator_seq_files_data, denominator_seq_files_data,
     return fold_change_matrix_filename
 
 
-def make_rgb_heatmap(fold_change_matrix_filename, heatmap_params, output_filename_prefix):
+def make_rgb_heatmap(fold_change_matrix_filename, heatmap_params, tick_params, output_filename_prefix):
     bp_width, width, height, gamma, max_fold_change, interval_size = heatmap_params
 
     only_heatmap_filename = generate_random_filename(extension=".tiff")
@@ -82,7 +82,7 @@ def make_rgb_heatmap(fold_change_matrix_filename, heatmap_params, output_filenam
     generate_heatmap(fold_change_matrix_filename, 'red/blue', only_heatmap_filename, gamma, (-1 * max_fold_change),
                      max_fold_change, ticks=None)
 
-    ticks_image_filename = make_ticks_image(width, interval_size)
+    ticks_image_filename = make_ticks_image(width, interval_size, tick_params)
 
     # Combine the two images together
     output_filename = output_filename_prefix + "_max_" + str(max_fold_change) + "_width_" + str(
@@ -197,7 +197,11 @@ def main(args):
 
     output_filename_prefix = filenames[-1]
 
-    make_rgb_heatmap(fold_change_matrix_filename, heatmap_params, output_filename_prefix)
+    minor_ticks = 10_000  # Minor ticks every 10kb
+    major_ticks = 50_000  # Minor ticks every 10kb
+    tick_params = (minor_ticks, major_ticks)
+
+    make_rgb_heatmap(fold_change_matrix_filename, heatmap_params, tick_params, output_filename_prefix)
 
 
 if __name__ == '__main__':
