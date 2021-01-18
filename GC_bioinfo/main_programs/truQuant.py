@@ -3,6 +3,8 @@ import math
 import multiprocessing
 import os
 import sys
+import argparse
+
 from collections import defaultdict
 from pathlib import Path
 
@@ -385,29 +387,12 @@ def output_data(output_filename, region_data_dict, gene_counts_dict, truQuant_re
             output_writer.writerow(output_list)
 
 
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo truQuant <Sequencing Files>\n")
-    sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/truQuant.rst\n")
-
-
-def parse_input(args):
-    if len(args) == 0:
-        print_usage()
-        sys.exit(1)
-
-    seq_files = args
-    verify_bed_files(seq_files)
-
-    return seq_files
-
-
-def run_tsrFinder(first_seq_file):
+def run_tsrFinder(first_seq_file, max_threads):
     blacklisted_first_sequencing_file = first_seq_file.replace(".bed", "-blacklisted.bed")
 
     tsr_file = blacklisted_first_sequencing_file.replace(".bed", "_150_20_30_600-TSR.tab")
     run_subtract(first_seq_file, rna_blacklist_file, output_filename=blacklisted_first_sequencing_file)
-    os.system("GC_bioinfo tsrFinder " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file)
+    os.system("GC_bioinfo tsrFinder " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file + " -t " + max_threads)
     return tsr_file
 
 
@@ -429,25 +414,27 @@ def build_annotation(tsr_file, search_regions_dict, output_region_filenames, ann
     return truQuant_regions_dict
 
 
-def get_counts(sequencing_files, blacklist_filename, output_region_filenames, truQuant_regions_dict):
-    pool = multiprocessing.Pool(processes=len(sequencing_files))
+def get_counts(sequencing_files, blacklist_filename, output_region_filenames, truQuant_regions_dict, max_threads):
+    pool = multiprocessing.Pool(processes=max_threads)
 
     count_information_list = pool.starmap(gather_data,
                                           [(sequencing_file, blacklist_filename, i == 0, output_region_filenames,
                                             truQuant_regions_dict) for i, sequencing_file in
                                            enumerate(sequencing_files)])
 
+    pool.close()
+
     region_data_dict, gene_counts_dict = combine_indv_gene_counts_dict(count_information_list, sequencing_files)
 
     return region_data_dict, gene_counts_dict
 
 
-def run_truQuant(annotation_extension, percent_for_blacklisting, sequencing_files, pause_region_radius):
+def run_truQuant(annotation_extension, percent_for_blacklisting, sequencing_files, pause_region_radius, max_threads):
 
     output_directory = str(Path(sequencing_files[0]).parent) + "/"
 
     # Run tsrFinder then define the required files
-    tsr_file = run_tsrFinder(sequencing_files[0])
+    tsr_file = run_tsrFinder(sequencing_files[0], max_threads)
     tsr_basename = os.path.basename(tsr_file)
 
     paused_region_filename = output_directory + tsr_basename.replace('-TSR.tab', '-paused_regions.bed')
@@ -466,10 +453,63 @@ def run_truQuant(annotation_extension, percent_for_blacklisting, sequencing_file
 
     # Get the number of counts (multithreaded)
     region_data_dict, gene_counts_dict = get_counts(sequencing_files, blacklist_filename, output_region_filenames,
-                                                    truQuant_regions_dict)
+                                                    truQuant_regions_dict, max_threads)
 
     # Output the data
     output_data(output_filename, region_data_dict, gene_counts_dict, truQuant_regions_dict, sequencing_files)
+
+
+def parse_input(args):
+    def positive_int(num):
+        try:
+            val = int(num)
+            if val <= 0:
+                raise Exception("Go to the except")
+        except:
+            raise argparse.ArgumentTypeError(num + " must be positive")
+
+        return val
+
+    def between_zero_and_one(number):
+        try:
+            num = float(number)
+            if num < 0 or num > 1:
+                raise argparse.ArgumentTypeError(number + " must be positive and less than one")
+        except:
+            raise argparse.ArgumentTypeError(number + " must be positive and less than one")
+
+        return num
+
+    parser = argparse.ArgumentParser(prog='GC_bioinfo truQuant',
+                                     description='Annotate and quantify the human genome from PRO-Seq data\n' +
+                                     "More information can be found at " +
+                                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/truQuant.rst")
+
+    parser.add_argument('-a', '--annotation_extension', dest='annotation_extension', metavar='annotation_extension', nargs='?', type=int, default=1000)
+
+    parser.add_argument('-b', '--blacklist_percent', dest='percent_for_blacklisting', metavar='blacklisting %', nargs='?', type=between_zero_and_one, default=0.3)
+
+    parser.add_argument('-r', '--pause_radius', dest='pause_region_radius', metavar='pause_region_radius', type=positive_int, nargs='?', default=75)
+
+    parser.add_argument('-t', '--threads', dest='threads', metavar='threads', type=positive_int, nargs='?', default=multiprocessing.cpu_count())
+
+    parser.add_argument('seq_file_for_annotation', metavar='sequencing_file_for_annotation', type=str,
+                        help='Bed formatted file from a sequencing experiment which will be used to annotate the genome.')
+
+    parser.add_argument('seq_files', metavar='sequencing_files', nargs='*', type=str,
+                        help='Bed formatted files from the sequencing experiment')
+
+    args = parser.parse_args(args)
+
+    seq_files = [args.seq_file_for_annotation] + args.seq_files
+    annotation_extension = args.annotation_extension
+    percent_for_blacklisting = args.percent_for_blacklisting
+    pause_region_radius = args.pause_region_radius
+    max_threads = args.threads
+
+    verify_bed_files(seq_files)
+
+    return seq_files, annotation_extension, percent_for_blacklisting, pause_region_radius, max_threads
 
 
 def main(args):
@@ -483,13 +523,9 @@ def main(args):
     """
     check_dependencies("bedtools")
 
-    sequencing_files = parse_input(args)
+    sequencing_files, annotation_extension, percent_for_blacklisting, pause_region_radius, max_threads = parse_input(args)
 
-    annotation_extension = 1000
-    percent_for_blacklisting = 0.3
-    pause_region_radius = 75
-
-    run_truQuant(annotation_extension, percent_for_blacklisting, sequencing_files, pause_region_radius)
+    run_truQuant(annotation_extension, percent_for_blacklisting, sequencing_files, pause_region_radius, max_threads)
 
 
 if __name__ == "__main__":

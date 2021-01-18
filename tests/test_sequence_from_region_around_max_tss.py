@@ -10,14 +10,41 @@ from quiter import Quieter
 
 class TestSequenceFromRegionAroundMaxTSS(unittest.TestCase):
 
-    def test_incorrect_number_of_arguments(self):
+    def test_arguments(self):
         with self.assertRaises(SystemExit):
             with Quieter():
-                sequence_from_region_around_max_tss.main([])
+                sequence_from_region_around_max_tss.parse_args([])
 
         with self.assertRaises(SystemExit):
             with Quieter():
-                sequence_from_region_around_max_tss.main(["max_tss_file"])
+                sequence_from_region_around_max_tss.parse_args(["max_tss_file"])
+
+        with self.assertRaises(SystemExit):
+            with Quieter():
+                sequence_from_region_around_max_tss.parse_args(["max_tss_file", 'left'])
+
+        max_tss_file = generate_random_filename()
+
+        with open(max_tss_file, 'w') as file:
+            file.write(
+                "\t".join(["chr16", "53607", "53608", "POLR3K", "0", "-"]) + "\n" +
+                "\t".join(["chr16", "53872", "53873", "SNRNP25", "0", "+"]) + "\n"
+            )
+
+        result = sequence_from_region_around_max_tss.parse_args([max_tss_file, '-5', '10'])
+        search = [
+            [
+                "-",
+                5
+            ],
+            [
+                '+',
+                10
+            ]
+        ]
+        self.assertEqual(result, (max_tss_file, search))
+
+        remove_files(max_tss_file)
 
     def test_get_regions_file(self):
 
@@ -61,7 +88,7 @@ class TestSequenceFromRegionAroundMaxTSS(unittest.TestCase):
                 "\t".join(["chr16", "53872", "53873", "SNRNP25", "0", "+"]) + "\n"
             )
 
-        sequence_from_region_around_max_tss.main([max_tss_file, "-5_+5"])
+        sequence_from_region_around_max_tss.main([max_tss_file, "-5", "+5"])
 
         result = [line for line in stdout.getvalue().split("\n") if line]
 
@@ -86,7 +113,7 @@ class TestSequenceFromRegionAroundMaxTSS(unittest.TestCase):
                 "\t".join(["chr16", "53872", "53873", "SNRNP25", "0", "+"]) + "\n"
             )
 
-        sequence_from_region_around_max_tss.main([max_tss_file, "-36_-19"])
+        sequence_from_region_around_max_tss.main([max_tss_file, "-36", "-19"])
 
         result = [line for line in stdout.getvalue().split("\n") if line]
 
@@ -111,7 +138,8 @@ class TestSequenceFromRegionAroundMaxTSS(unittest.TestCase):
                 "\t".join(["chr16", "53872", "53873", "SNRNP25", "0", "+"]) + "\n"
             )
 
-        sequence_from_region_around_max_tss.main([max_tss_file, "+5_+35"])
+        # sequence_from_region_around_max_tss.main([max_tss_file, "+5:+35"])
+        sequence_from_region_around_max_tss.main([max_tss_file, "+5", "+35"])
 
         result = [line for line in stdout.getvalue().split("\n") if line]
 

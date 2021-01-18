@@ -1,6 +1,7 @@
 import csv
 import multiprocessing
 import sys
+import argparse
 
 from GC_bioinfo.utils.check_dependencies import check_dependencies
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
@@ -89,11 +90,11 @@ def get_coverage_files_helper(filename, region_intervals_file):
     return coverage_file
 
 
-def get_coverage_files(blacklisted_filenames, region_intervals_file):
+def get_coverage_files(blacklisted_filenames, region_intervals_file, max_threads):
     # Go through all of the blacklisted sequencing files and make 3' end files
-    pool = multiprocessing.Pool(processes=len(blacklisted_filenames))
+    pool = multiprocessing.Pool(processes=max_threads)
     coverage_files = pool.starmap(get_coverage_files_helper, [(filename, region_intervals_file) for filename in blacklisted_filenames])
-
+    pool.close()
     return coverage_files
 
 
@@ -137,68 +138,69 @@ def output_data(combined_dict, sequencing_files, upstream_distance, interval_siz
         real_position += interval_size
 
 
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo read_through_transcription <Regions Filename> <TSR Filename> " +
-          "<Upstream Distance> <Downstream Distance> <Interval Distance> <Sequencing Files>\n")
-    sys.stderr.write("\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/read_through_transcription.rst\n")
-
-
 def parse_input(args):
-    if len(args) == 0:
-        print_usage()
-        sys.exit(1)
 
-    if len(args) < 6:
-        sys.stderr.write("You did not provide all of the necessary arguments. Please try again.\n")
-        print_usage()
-        sys.exit(1)
+    def positive_int(value):
+        try:
+            val = int(value)
+            if val < 0:
+                raise argparse.ArgumentTypeError(value + " must be a postive integer")
 
-    regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size = args[:5]
-    sequencing_files = args[5:]
+        except:
+            raise argparse.ArgumentTypeError(value + " must be a postive integer")
 
-    verify_bed_files(regions_filename, sequencing_files)
+        return val
 
-    try:
-        upstream_distance = int(upstream_distance)
+    parser = argparse.ArgumentParser(prog='GC_bioinfo read_through_transcription',
+                                     description='Quantify three prime ends around the TES of genes\n' +
+                                     "More information can be found at " +
+                                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/read_through_transcription.rst")
 
-    except ValueError as _:
-        # The values are not integers
-        raise ValueError("The upstream distance you provided is not an integer.")
+    parser.add_argument('regions_filename', metavar='regions_filename', type=str,
+                        help='Bed formatted regions file with an even region length or a region length of one.')
 
-    try:
-        downstream_distance = int(downstream_distance)
+    parser.add_argument('tsr_file', metavar='tsr_file', type=str,
+                        help='tsrFinder output file')
 
-    except ValueError as _:
-        # The values are not integers
-        raise ValueError("The downstream distance you provided is not an integer.")
+    parser.add_argument('upstream_distance', metavar='upstream_distance', type=positive_int,
+                        help='Distance upstream of the TES')
 
-    try:
-        interval_size = int(interval_size)
+    parser.add_argument('downstream_distance', metavar='downstream_distance', type=positive_int,
+                        help='Distance downstream of the TES')
 
-    except ValueError as _:
-        # The values are not integers
-        raise ValueError("The downstream distance you provided is not an integer.")
+    parser.add_argument('interval_size', metavar='interval_size', type=positive_int,
+                        help='Size of the intervals to split the regions to quantify into')
+
+    parser.add_argument('seq_files', metavar='sequencing_files', nargs='+', type=str,
+                        help='Bed formatted files from the sequencing experiment')
+
+    parser.add_argument('-t', '--threads', dest='threads', metavar='threads', type=positive_int, nargs='?',
+                        default=multiprocessing.cpu_count())
+
+    args = parser.parse_args(args)
+
+    regions_filename = args.regions_filename
+    tsr_file = args.tsr_file
+    upstream_distance = args.upstream_distance
+    downstream_distance = args.downstream_distance
+    interval_size = args.interval_size
+    sequencing_files = args.seq_files
+    max_threads = args.threads
+
+    return regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size, sequencing_files, max_threads
 
 
-    if upstream_distance < 0 or downstream_distance < 0 or interval_size < 0:
-        sys.stderr.write("Distances cannot be negative. Please enter a positive number.\n")
-        sys.exit(1)
-
-    return regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size, sequencing_files
-
-
-def run_read_through_transcription(regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size, sequencing_files):
+def run_read_through_transcription(regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size, sequencing_files, max_threads):
     # 1. Make the region intervals file from upstream distance to downstream distance in intervals
     incremented_regions_filename = make_incremented_regions(regions_filename, upstream_distance, downstream_distance, interval_size)
 
     # Blacklist the TSRs
     if tsr_file != 'no':
         blacklisted_filenames = blacklist_tsrs(sequencing_files, tsr_file)
-        coverage_files = get_coverage_files(blacklisted_filenames, incremented_regions_filename)
+        coverage_files = get_coverage_files(blacklisted_filenames, incremented_regions_filename, max_threads)
         remove_files(blacklisted_filenames)
     else:
-        coverage_files = get_coverage_files(sequencing_files, incremented_regions_filename)
+        coverage_files = get_coverage_files(sequencing_files, incremented_regions_filename, max_threads)
 
     combined_dict = coverage_files_to_dictionary(coverage_files, sequencing_files)
 
@@ -220,10 +222,10 @@ def main(args):
     """
     check_dependencies("bedtools")
     # The user must give us a bed file with the regions and a list of the sequencing files
-    regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size, sequencing_files = parse_input(args)
+    regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size, sequencing_files, max_threads = parse_input(args)
 
     run_read_through_transcription(regions_filename, tsr_file, upstream_distance, downstream_distance, interval_size,
-                                   sequencing_files)
+                                   sequencing_files, max_threads)
 
 
 if __name__ == '__main__':

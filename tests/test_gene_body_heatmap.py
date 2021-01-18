@@ -1,19 +1,12 @@
 import unittest.mock
 
-from GC_bioinfo.main_programs import gene_body_heatmap, combine_gene_body_heatmap, gene_body_fold_change_heatmap
+from GC_bioinfo.main_programs import gene_body_heatmap, gene_body_combined_heatmap, gene_body_fold_change_heatmap
 
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.remove_files import remove_files
 from quiter import Quieter
 
 class TestGeneBodyHeatmap(unittest.TestCase):
-    def test_invalid_number_of_arguments(self):
-        # There must be 11 arguments
-        for i in range(13):
-            if i != 11:
-                with self.assertRaises(SystemExit):
-                    with Quieter():
-                        gene_body_heatmap.main(['placeholder' for _ in range(i)])
 
     def test_make_incremented_regions(self):
         regions_filename = generate_random_filename()
@@ -111,24 +104,6 @@ class TestGeneBodyHeatmap(unittest.TestCase):
         self.assertEqual(matrix_height, 3)
 
         remove_files(coverage_file, matrix_filename)
-
-
-class TestCombineGeneBodyHeatmap(unittest.TestCase):
-    def test_invalid_number_of_arguments(self):
-        # Should print the usage
-        with self.assertRaises(SystemExit):
-            with Quieter():
-                combine_gene_body_heatmap.main([])
-
-
-class TestGeneBodyFoldChangeHeatmap(unittest.TestCase):
-    def test_invalid_number_of_arguments(self):
-        # Should print the usage
-        with self.assertRaises(SystemExit):
-            with Quieter():
-                gene_body_fold_change_heatmap.main([])
-
-
 
 
 if __name__ == '__main__':

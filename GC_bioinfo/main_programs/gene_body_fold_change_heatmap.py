@@ -4,13 +4,15 @@ The goal of this is to make the plot that David described
 import glob
 import os
 import sys
+import argparse
+import multiprocessing
 
 from PIL import Image
 
-from GC_bioinfo.main_programs import combine_gene_body_heatmap
+from GC_bioinfo.main_programs import gene_body_combined_heatmap
 from GC_bioinfo.utils.constants import generate_heatmap_location
 from GC_bioinfo.utils.generate_heatmap import generate_heatmap, Ticks, make_ticks_matrix
-from GC_bioinfo.utils.make_fold_change_matrix import make_fold_change_matrix
+from GC_bioinfo.utils.make_log_two_fold_change_matrix import make_log_two_fold_change_matrix
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.nested_multiprocessing_pool import NestedPool
 from GC_bioinfo.utils.remove_files import remove_files
@@ -22,11 +24,13 @@ def set_max_fold_change(fold_change_matrix_filename, max_fold_change):
 
 
 def make_ticks_image(width, interval_size, tick_params):
-    # Make the tick marks
-    # Minor tick marks every 10 kb and major tick marks every 50 kb
-    t = Ticks(minor_tick_mark_interval_size=(10_000 / interval_size),
-              major_tick_mark_interval_size=(50_000 / interval_size))
+    minor_ticks_bp, major_ticks_bp = tick_params
 
+    # Make the tick marks
+    t = Ticks(minor_tick_mark_interval_size=(minor_ticks_bp / interval_size),
+              major_tick_mark_interval_size=(major_ticks_bp / interval_size))
+
+    # Ticks matrix with a height of 50 px and a max black value of 1
     ticks_matrix = make_ticks_matrix(width, 50, 1, t)
 
     # Write to a file
@@ -57,25 +61,42 @@ def combine_images(ticks_image_filename, only_heatmap_filename, output_filename)
     final_image.save(output_filename + ".tiff")
 
 
-def get_fold_change_matrix(numerator_seq_files_data, denominator_seq_files_data, matrix_params, filenames):
-    numerator_args = (numerator_seq_files_data, matrix_params, filenames)
+def get_fold_change_matrix(numerator_seq_files_data, denominator_seq_files_data, matrix_params, filenames, max_threads):
 
-    denominator_args = (denominator_seq_files_data, matrix_params, filenames)
+    # If max threads is 1, we make the pool have 1 thread and each combined heatmap have one thread
+    # If it is 2 or 3, the two combined heatmaps will be made concurrently
+    # 4 or more means run at max speed
+    if max_threads == 1:
+        pool_threads = 1
+        comb_heatmap_threads = 1
+    elif max_threads == 2 or max_threads == 3:
+        pool_threads = 2
+        comb_heatmap_threads = 1
+    else:
+        pool_threads = 2
+        comb_heatmap_threads = 2
 
-    pool = NestedPool(2)
-    numerator_matrix_filename, denominator_matrix_filename = pool.starmap(combine_gene_body_heatmap.get_combined_matrix,
+    numerator_args = (numerator_seq_files_data, matrix_params, filenames, comb_heatmap_threads)
+    denominator_args = (denominator_seq_files_data, matrix_params, filenames, comb_heatmap_threads)
+
+    # We use max_threads / 2 because we will be running two instances of the combined
+    pool = NestedPool(pool_threads)
+    numerator_matrix_filename, denominator_matrix_filename = pool.starmap(gene_body_combined_heatmap.get_combined_matrix,
                                                                           [numerator_args, denominator_args])
+    pool.close()
 
     # Make the fold change matrix
-    fold_change_matrix_filename = make_fold_change_matrix(numerator_matrix_filename, denominator_matrix_filename)
+    log_two_fold_change_matrix_filename = make_log_two_fold_change_matrix(numerator_matrix_filename, denominator_matrix_filename)
 
     remove_files(numerator_matrix_filename, denominator_matrix_filename)
 
-    return fold_change_matrix_filename
+    return log_two_fold_change_matrix_filename
 
 
-def make_rgb_heatmap(fold_change_matrix_filename, heatmap_params, tick_params, output_filename_prefix):
-    bp_width, width, height, gamma, max_fold_change, interval_size = heatmap_params
+def make_rgb_heatmap(fold_change_matrix_filename, heatmap_params, output_filename_prefix):
+    bp_width, width, height, gamma, max_fold_change, interval_size, minor_ticks_bp, major_ticks_bp = heatmap_params
+
+    tick_params = minor_ticks_bp, major_ticks_bp
 
     only_heatmap_filename = generate_random_filename(extension=".tiff")
 
@@ -94,24 +115,117 @@ def make_rgb_heatmap(fold_change_matrix_filename, heatmap_params, tick_params, o
                  ticks_image_filename, only_heatmap_filename)
 
 
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo gene_body_fold_change_heatmap <truQuant output file> <Upstream Distance>" +
-                     " <Distance Past TES> <Width (bp)> <Width (px)> <Height> <Gamma> <Max fold change> <Spike in Correction> <Sequencing Filename>" +
-                     "<Numerator Spike in Correction> <Numerator Sequencing Filename> <Numerator Spike in Correction> <Numerator Sequencing Filename>" +
-                     "<Denomenator Spike in Correction> <Denomenator Sequencing Filename> <Denomenator Spike in Correction> <Denomenator Sequencing Filename> <Output Filename> \n")
-    sys.stderr.write("\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/gene_body_fold_change_heatmap.rst\n")
-
-
 def get_args(args):
-    if len(args) != 17:
-        print(len(args))
-        print_usage()
-        sys.exit(1)
+    def positive_int(num):
+        try:
+            val = int(num)
+            if val <= 0:
+                raise Exception("Go to the except")
+        except:
+            raise argparse.ArgumentTypeError(num + " must be positive")
 
-    truQuant_output_file, upstream_distance, distance_past_tes, bp_width, width, height, gamma, max_fold_change, \
-    numerator_spike_in_one, numerator_sequencing_filename_one, numerator_spike_in_two, numerator_sequencing_filename_two,\
-    denominator_spike_in_one, denominator_sequencing_filename_one, denominator_spike_in_two, denominator_sequencing_filename_two, output_filename_prefix = args
+        return val
+
+    def positive_float(num):
+        try:
+            val = float(num)
+            if val <= 0:
+                raise Exception("Go to the except")
+        except:
+            raise argparse.ArgumentTypeError(num + " must be positive")
+
+        return val
+
+    parser = argparse.ArgumentParser(prog='GC_bioinfo gene_body_fold_change_heatmap',
+                                     description="Generate a heatmap of 3' ends for each gene sorted by gene length " +
+                                                 "aligned by the TSS\n" +
+                                                 "More information can be found at " +
+                                                 "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/gene_body_fold_change_heatmap.rst")
+
+    parser.add_argument('truQuant_output_file', metavar='truQuant_output_file', type=str,
+                        help='truQuant output file which ends in -truQuant_output.txt')
+
+    parser.add_argument('numerator_correction_factor_one', metavar='numerator_correction_factor_one', type=positive_float,
+                        help='Correction factor for the first numerator dataset')
+
+    parser.add_argument('numerator_seq_file_one', metavar='numerator_seq_file_one', type=str,
+                        help='First numerator bed formatted sequencing file')
+
+    parser.add_argument('numerator_correction_factor_two', metavar='numerator_correction_factor_two', type=positive_float,
+                        help='Correction factor for the second numerator dataset')
+
+    parser.add_argument('numerator_seq_file_two', metavar='numerator_seq_file_two', type=str,
+                        help='Second numerator bed formatted sequencing file')
+
+    parser.add_argument('denominator_correction_factor_one', metavar='denominator_correction_factor_one',
+                        type=positive_float,
+                        help='Correction factor for the first denominator dataset')
+
+    parser.add_argument('denominator_seq_file_one', metavar='denominator_seq_file_one', type=str,
+                        help='First denominator bed formatted sequencing file')
+
+    parser.add_argument('denominator_correction_factor_two', metavar='denominator_correction_factor_two',
+                        type=positive_float,
+                        help='Correction factor for the second denominator dataset')
+
+    parser.add_argument('denominator_seq_file_two', metavar='denominator_seq_file_two', type=str,
+                        help='Second denominator bed formatted sequencing file')
+
+    parser.add_argument('output_prefix', metavar='output_prefix', type=str, help='Prefix for the output filename')
+
+    parser.add_argument('-u', '--upstream_distance', metavar='upstream_distance', dest='upstream_distance',
+                        type=positive_int, default=50_000, help='Distance upstream of the max TSS')
+
+    parser.add_argument('-d', '--distance_past_tes', metavar='distance_past_tes', dest='distance_past_tes',
+                        type=positive_int, default=50_000, help='Distance downstream of the transcription end site')
+
+    parser.add_argument('-b', '--bp_width', metavar='bp_width', dest='bp_width', default=400_000, type=positive_int,
+                        help='Total number of base pairs shown on the heatmap. This number must be greater than the ' +
+                             'upstream distance + distance past TES.')
+
+    parser.add_argument('-w', '--width', metavar='width', dest='width',
+                        type=positive_int, default=2_000, help='Width of the heatmap in pixels')
+
+    parser.add_argument('-e', '--height', metavar='height', dest='height',
+                        type=positive_int, default=2_000, help='Height of the heatmap in pixels')
+
+    parser.add_argument('-m', '--max_log2_fc', metavar='max_log2_fc', dest='max_log2_fc',
+                        type=positive_float, default=None, help='Max log2 fold change of the heatmap')
+
+    parser.add_argument('--minor_ticks', metavar='minor_ticks', dest='minor_ticks',
+                        type=positive_int, default=10_000, help='Distance between minor ticks (bp)')
+
+    parser.add_argument('--major_ticks', metavar='major_ticks', dest='major_ticks',
+                        type=positive_int, default=50_000, help='Distance between major ticks (bp)')
+
+    parser.add_argument('-t', '--threads', dest='threads', metavar='threads', type=positive_int, nargs='?',
+                        default=multiprocessing.cpu_count())
+
+    args = parser.parse_args(args)
+
+    truQuant_output_file = args.truQuant_output_file
+    upstream_distance = args.upstream_distance
+    distance_past_tes = args.distance_past_tes
+    bp_width = args.bp_width
+    width = args.width
+    height = args.height
+    max_log2_fc = args.max_log2_fc
+
+    numerator_spike_in_one = args.numerator_correction_factor_one
+    numerator_sequencing_filename_one = args.numerator_seq_file_one
+    numerator_spike_in_two = args.numerator_correction_factor_two
+    numerator_sequencing_filename_two = args.numerator_seq_file_two
+
+    denominator_spike_in_one = args.denominator_correction_factor_one
+    denominator_sequencing_filename_one = args.denominator_seq_file_one
+    denominator_spike_in_two = args.denominator_correction_factor_two
+    denominator_sequencing_filename_two = args.denominator_seq_file_two
+
+    output_filename_prefix = args.output_filename_prefix
+    minor_ticks = args.minor_ticks
+    major_ticks = args.major_ticks
+
+    max_threads = args.threads
 
     tsr_file = glob.glob(truQuant_output_file.replace("-truQuant_output.txt", "") + "*TSR.tab")
 
@@ -131,25 +245,6 @@ def get_args(args):
             sys.stderr.write("File " + file + " was not found.\n")
             sys.exit(1)
 
-
-    def try_to_convert_to_int(var, var_name):
-        try:
-            int_var = int(var)
-            return int_var
-        except ValueError:
-            sys.stderr.write("The " + var_name + " could not be converted to an integer")
-            sys.exit(1)
-
-    # Make sure the distance_past_tes, width, max_gene_length are all integers
-    upstream_distance = try_to_convert_to_int(upstream_distance, "5' buffer distance")
-    distance_past_tes = try_to_convert_to_int(distance_past_tes, "distance past the TES")
-    width = try_to_convert_to_int(width, "width (px)")
-    bp_width = try_to_convert_to_int(bp_width, "width (bp)")
-    height = try_to_convert_to_int(height, "height")
-
-    interval_size = bp_width / width
-    interval_size = try_to_convert_to_int(interval_size, "interval size")
-
     if bp_width % width != 0:
         sys.stderr.write("The width (bp) must be evenly divisible by the width (px). Exiting ...")
         sys.exit(1)
@@ -158,22 +253,11 @@ def get_args(args):
         sys.stderr.write("The width (bp) must be greater than width (px). Exiting ...")
         sys.exit(1)
 
-    def try_to_convert_to_float(var, var_name):
-        try:
-            int_var = float(var)
-            return int_var
-        except ValueError:
-            sys.stderr.write("The " + var_name + " could not be converted to a float")
-            sys.exit(1)
+    interval_size = int(bp_width / width)
 
-    gamma = try_to_convert_to_float(gamma, "gamma")
-    max_fold_change = try_to_convert_to_float(max_fold_change, "max fold change")
-    numerator_spike_in_one = try_to_convert_to_float(numerator_spike_in_one, "numerator spike in one")
-    numerator_spike_in_two = try_to_convert_to_float(numerator_spike_in_two, "numerator spike in two")
-    denominator_spike_in_one = try_to_convert_to_float(denominator_spike_in_one, "denominator spike in one")
-    denominator_spike_in_two = try_to_convert_to_float(denominator_spike_in_two, "denominator spike in two")
-
-
+    # We make a gamma variable because the heatmap generation function needs it
+    # However, the gamma will never be used
+    gamma = 2.2
 
     numerator_seq_files_data = [(numerator_sequencing_filename_one, numerator_spike_in_one),
                                 (numerator_sequencing_filename_two, numerator_spike_in_two)]
@@ -182,26 +266,21 @@ def get_args(args):
                                 (denominator_sequencing_filename_two, denominator_spike_in_two)]
 
     matrix_params = (upstream_distance, distance_past_tes, width, height, interval_size)
-    heatmap_params = (bp_width, width, height, gamma, max_fold_change, interval_size)
+    heatmap_params = (bp_width, width, height, gamma, max_log2_fc, interval_size, minor_ticks, major_ticks)
     filenames = (truQuant_output_file, tsr_file, output_filename_prefix)
 
-
-    return numerator_seq_files_data, denominator_seq_files_data, matrix_params, heatmap_params, filenames
+    return numerator_seq_files_data, denominator_seq_files_data, matrix_params, heatmap_params, filenames, max_threads
 
 
 def main(args):
-    numerator_seq_files_data, denominator_seq_files_data, matrix_params, heatmap_params, filenames = get_args(args)
+    numerator_seq_files_data, denominator_seq_files_data, matrix_params, heatmap_params, filenames, max_threads = get_args(args)
 
-    fold_change_matrix_filename = get_fold_change_matrix(
-        numerator_seq_files_data, denominator_seq_files_data, matrix_params, filenames)
+    log_two_fold_change_matrix_filename = get_fold_change_matrix(
+        numerator_seq_files_data, denominator_seq_files_data, matrix_params, filenames, max_threads)
 
     output_filename_prefix = filenames[-1]
 
-    minor_ticks = 10_000  # Minor ticks every 10kb
-    major_ticks = 50_000  # Minor ticks every 10kb
-    tick_params = (minor_ticks, major_ticks)
-
-    make_rgb_heatmap(fold_change_matrix_filename, heatmap_params, tick_params, output_filename_prefix)
+    make_rgb_heatmap(log_two_fold_change_matrix_filename, heatmap_params, output_filename_prefix)
 
 
 if __name__ == '__main__':

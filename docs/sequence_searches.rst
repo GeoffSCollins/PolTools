@@ -7,7 +7,7 @@ The ``sequence_searches`` tool is used determine the locations where a certain s
 .. note::
 
   This tool requires `bedtools <https://github.com/arq5x/bedtools2>`_ to be installed and hg38.fa to be downloaded to
-  ~/GC_bioinfo/src/static. This can be done by running the commands at the bottom of this page.
+  ~/GC_bioinfo/static. This can be done by running the commands at the bottom of this page.
 
 ===============================
 Usage and option summary

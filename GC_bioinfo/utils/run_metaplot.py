@@ -1,5 +1,6 @@
 import multiprocessing
 import sys
+import argparse
 
 from GC_bioinfo.utils.get_metaplot_averages import average_vertically
 from GC_bioinfo.utils.get_region_length import determine_region_length
@@ -64,8 +65,8 @@ def get_primes_data(regions_filename, sequencing_file, region_length, end):
     return list(zip(same_averages, rev_averages)), sequencing_file
 
 
-def run_metaplot(regions_filename, sequencing_files_list, region_length, end):
-    pool = multiprocessing.Pool(processes=len(sequencing_files_list))
+def run_metaplot(regions_filename, sequencing_files_list, region_length, end, max_threads):
+    pool = multiprocessing.Pool(processes=max_threads)
     averages = pool.starmap(get_primes_data, [(regions_filename, sequencing_file, region_length, end)
                                               for sequencing_file in sequencing_files_list])
 
@@ -77,37 +78,47 @@ def run_metaplot(regions_filename, sequencing_files_list, region_length, end):
     output_metaplot_data(averages, region_length, output_prefix)
 
 
-def print_five_prime_metaplot_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo five_prime_metaplot <Regions Filename> <Sequencing Files>\n")
-    sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/five_prime_metaplot.rst\n")
-
-def print_three_prime_metaplot_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo three_prime_metaplot <Regions Filename> <Sequencing Files>\n")
-    sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/three_prime_metaplot.rst\n")
-
-
 def parse_input(args, end):
     if end not in ["five", "three"]:
         sys.stderr.write("End provided is not five or three. Exiting ...")
         sys.exit(1)
 
-    if len(args) < 2:
-        if end == "five":
-            print_five_prime_metaplot_usage()
-            sys.exit(1)
-        else:
-            print_three_prime_metaplot_usage()
-            sys.exit(1)
+    if end == 'five':
+        prog = 'GC_bioinfo five_prime_metaplot'
+    else:
+        prog = 'GC_bioinfo three_prime_metaplot'
 
-    regions_filename = args[0]
-    sequencing_files_list = args[1:]
+    def positive_int(num):
+        try:
+            val = int(num)
+            if val <= 0:
+                raise Exception("Go to the except")
+        except:
+            raise argparse.ArgumentTypeError(num + " must be positive")
 
+        return val
+
+    parser = argparse.ArgumentParser(prog=prog,
+                                     description='Compute the number of ' + end + ' prime reads at each position of the given region.\n' +
+                                                 "More information can be found at " +
+                                                 "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/" + end + "_prime_metaplot.rst")
+
+    parser.add_argument('regions_file', metavar='regions', type=str,
+                        help='Bed formatted file containing all the regions you want to average the sequences')
+
+    parser.add_argument('seq_files', metavar='sequencing files', nargs='+', type=str,
+                        help='Bed formatted files from the sequencing experiment')
+
+    parser.add_argument('-t', '--threads', dest='threads', metavar='threads', type=positive_int, nargs='?',
+                        default=multiprocessing.cpu_count())
+
+    args = parser.parse_args(args)
+    regions_filename = args.regions_file
+    sequencing_files_list = args.seq_files
+    max_threads = args.threads
+
+    verify_bed_files(regions_filename)
     region_length = determine_region_length(regions_filename)
-
     verify_region_length_is_even(region_length)
 
-    verify_bed_files([regions_filename] + sequencing_files_list)
-
-    return regions_filename, sequencing_files_list, region_length
+    return regions_filename, sequencing_files_list, region_length, max_threads

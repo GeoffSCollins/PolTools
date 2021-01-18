@@ -1,5 +1,6 @@
 import multiprocessing
 import sys
+import argparse
 
 from GC_bioinfo.utils.get_region_length import determine_region_length
 from GC_bioinfo.utils.make_transcripts_dict import build_transcripts_dict
@@ -42,27 +43,43 @@ def get_pausing_distances(regions_filename, sequencing_filename):
     return all_pause_distances
 
 
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo pausing_distance_distribution_from_maxTSS <regions file> <sequencing files>\n")
-    sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/pausing_distance_distribution_from_maxTSS.rst\n")
-
-
 def parse_input(args):
-    if len(args) < 2:
-        print_usage()
-        sys.exit(1)
+    def positive_int(num):
+        try:
+            val = int(num)
+            if val <= 0:
+                raise Exception("Go to the except")
+        except:
+            raise argparse.ArgumentTypeError(num + " must be positive")
 
-    regions_filename = args[0]
+        return val
+
+    parser = argparse.ArgumentParser(prog='GC_bioinfo pausing_distance_distribution_from_maxTSS',
+                description='Quantify the number of transcripts at each length originating from the max TSS\n' +
+                            "More information can be found at " +
+                            "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/pausing_distance_distribution_from_maxTSS.rst"
+    )
+
+    parser.add_argument('regions_filename', metavar='regions_filename', type=str,
+                        help='Bed formatted regions file with an even region length or a region length of one.')
+
+    parser.add_argument('seq_files', metavar='sequencing_files', nargs='+', type=str,
+                        help='Bed formatted files from the sequencing experiment')
+
+    parser.add_argument('-t', '--threads', dest='threads', metavar='threads', type=positive_int, nargs='?',
+                        default=multiprocessing.cpu_count())
+
+    args = parser.parse_args(args)
+    regions_filename = args.regions_filename
+    sequencing_files = args.seq_files
+    max_threads = args.threads
 
     region_length = determine_region_length(regions_filename)
 
     if region_length != 1:
         verify_region_length_is_even(region_length)
 
-    sequencing_files = args[1:]
-
-    return regions_filename, sequencing_files
+    return regions_filename, sequencing_files, max_threads
 
 
 def output_pausing_distances(pausing_distances, sequencing_files):
@@ -73,9 +90,10 @@ def output_pausing_distances(pausing_distances, sequencing_files):
         print_tab_delimited([i] + [x[i] for x in pausing_distances])
 
 
-def pausing_distance_distribution_from_maxTSS(regions_filename, sequencing_files):
-    pool = multiprocessing.Pool(processes=len(sequencing_files))
+def pausing_distance_distribution_from_maxTSS(regions_filename, sequencing_files, max_threads):
+    pool = multiprocessing.Pool(processes=max_threads)
     pausing_distances = pool.starmap(get_pausing_distances, [(regions_filename, seq_filename) for seq_filename in sequencing_files])
+    pool.close()
     output_pausing_distances(pausing_distances, sequencing_files)
 
 
@@ -88,8 +106,8 @@ def main(args):
     :type args: list
     :return:
     """
-    regions_filename, sequencing_files = parse_input(args)
-    pausing_distance_distribution_from_maxTSS(regions_filename, sequencing_files)
+    regions_filename, sequencing_files, max_threads = parse_input(args)
+    pausing_distance_distribution_from_maxTSS(regions_filename, sequencing_files, max_threads)
 
 if __name__ == '__main__':
     main(sys.argv[1:])

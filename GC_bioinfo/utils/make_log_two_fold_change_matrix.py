@@ -4,7 +4,7 @@ import sys
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 
 
-def make_fold_change_matrix(numerator_filename, denominator_filename):
+def make_log_two_fold_change_matrix(numerator_filename, denominator_filename):
     # Going to divide the first by the second
     first_matrix = []
     with open(numerator_filename) as file:

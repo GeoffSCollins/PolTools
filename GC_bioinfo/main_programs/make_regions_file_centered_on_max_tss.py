@@ -1,5 +1,5 @@
-
 import sys
+import argparse
 
 from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
 from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
@@ -49,24 +49,26 @@ def output_data(expanded_regions):
 
 
 def parse_args(args):
-    if len(args) != 2:
-        print_usage()
-        sys.exit(1)
+    parser = argparse.ArgumentParser(prog='GC_bioinfo make_regions_file_centered_on_max_tss',
+        description='Make a region file centered on the max TSS from truQuant\n' +
+                     "More information can be found at " +
+                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/make_regions_file_centered_on_max_tss.rst")
 
-    truQuant_filename, region_size = args
+    parser.add_argument('truQuant_file', metavar='truQuant_file', type=str,
+                        help='truQuant output file ending in -truQuant_output.txt')
 
-    region_size = int(region_size)
+    parser.add_argument('region_size', metavar='region_size', type=int,
+                        help='size of the region to be generated. This must be an even integer or 1')
+
+    args = parser.parse_args(args)
+
+    truQuant_filename = args.truQuant_file
+    region_size = args.region_size
 
     if region_size != 1:
         verify_region_length_is_even(region_size)
 
     return truQuant_filename, region_size
-
-
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo make_regions_file_centered_on_max_tss <truQuant output file> <region size>\n")
-    sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/make_regions_file_centered_on_max_tss.rst\n")
 
 
 def main(args):

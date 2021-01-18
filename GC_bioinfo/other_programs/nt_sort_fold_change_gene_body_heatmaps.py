@@ -10,7 +10,7 @@ from PIL import Image
 from GC_bioinfo.other_programs import nt_sort_combine_gene_body_heatmap
 from GC_bioinfo.utils.constants import generate_heatmap_location
 from GC_bioinfo.utils.generate_heatmap import generate_heatmap, Ticks, make_ticks_matrix
-from GC_bioinfo.utils.make_fold_change_matrix import make_fold_change_matrix
+from GC_bioinfo.utils.make_log_two_fold_change_matrix import make_log_two_fold_change_matrix
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.nested_multiprocessing_pool import NestedPool
 from GC_bioinfo.utils.remove_files import remove_files
@@ -67,7 +67,7 @@ def get_fold_change_matrix(numerator_seq_files_data, denominator_seq_files_data,
                                                                           [numerator_args, denominator_args])
 
     # Make the fold change matrix
-    fold_change_matrix_filename = make_fold_change_matrix(numerator_matrix_filename, denominator_matrix_filename)
+    fold_change_matrix_filename = make_log_two_fold_change_matrix(numerator_matrix_filename, denominator_matrix_filename)
 
     remove_files(numerator_matrix_filename, denominator_matrix_filename)
 

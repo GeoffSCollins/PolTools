@@ -14,7 +14,7 @@ from GC_bioinfo.utils.nested_multiprocessing_pool import NestedPool
 from GC_bioinfo.utils.remove_files import remove_files
 from main_programs import gene_body_heatmap, gene_body_fold_change_heatmap
 
-
+# TODO
 def print_usage():
     sys.stderr.write("Usage: \n")
     sys.stderr.write("GC_bioinfo quantify_gene_body_fold_change_heatmap <truQuant output file> <5' Buffer Distance>" +
@@ -72,6 +72,7 @@ def get_combined_coverage_dict(filename_one, spike_in_one, filename_two, spike_i
     pool = multiprocessing.Pool(processes=2)
     all_coverage_data = pool.starmap(get_coverage_data, ((filename_one, spike_in_one, blacklist_regions_file, intervals_filename),
                                                          (filename_two, spike_in_two, blacklist_regions_file, intervals_filename)))
+    pool.close()
     return add_coverage_data(all_coverage_data[0], all_coverage_data[1])
 
 
@@ -154,6 +155,8 @@ def main(args):
     denominator_args = (denominator_sequencing_filename_one, denominator_spike_in_one, denominator_sequencing_filename_two, denominator_spike_in_two, blacklist_regions_file, intervals_filename)
 
     numerator_coverage_dict, denominator_coverage_dict = pool.starmap(get_combined_coverage_dict, [numerator_args, denominator_args])
+
+    pool.close()
 
     fold_change_dict = get_fold_change_dict(numerator_coverage_dict, denominator_coverage_dict)
 

@@ -1,6 +1,7 @@
 import sys
-from itertools import product
+import argparse
 
+from itertools import product
 from Bio import Seq
 
 from GC_bioinfo.utils.fasta_reader import read_fasta
@@ -53,20 +54,22 @@ def clean_sequence_searches(sequence_searches):
     return cleaned_sequence_searches
 
 
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo sequence_searches <regions file> <Sequence,startPosition:endPosition>\n")
-    sys.stderr.write("Ex. GC_bioinfo sequence_searches genes.bed TATA,-34:-28\n")
-    sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/sequence_searches.rst\n")
-
-
 def parse_input(args):
-    if len(args) < 2:
-        print_usage()
-        sys.exit(0)
+    parser = argparse.ArgumentParser(prog='GC_bioinfo sequence_searches',
+                                     description='Determine if a sequence in present in a region around the max TSS\n' +
+                                     'More information can be found at ' +
+                                     'https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/sequence_searches.rst')
 
-    regions_file = args[0]
-    searching_sequences = args[1:]
+    parser.add_argument('regions_filename', metavar='regions_filename', type=str,
+                        help='Bed formatted regions file with an even region length or a region length of one.')
+
+    parser.add_argument('searching_sequences', metavar='searching_sequences', type=str, nargs='+',
+                        help='Search region formatted as follows: (Sequence),(-/+)left:(-/+)right. Ex: TATA,-30:-20')
+
+    args = parser.parse_args(args)
+
+    regions_file = args.regions_filename
+    searching_sequences = args.searching_sequences
 
     region_length = determine_region_length(regions_file)
 

@@ -1,8 +1,10 @@
 import unittest.mock
 import io
+import multiprocessing
 
 from GC_bioinfo.main_programs import five_prime_metaplot, three_prime_metaplot
 
+from GC_bioinfo.utils.run_metaplot import parse_input
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.remove_files import remove_files
 from quiter import Quieter
@@ -12,35 +14,48 @@ class TestFiveAndThreeMetaplots(unittest.TestCase):
     This test file also tests the run_metaplot util
     """
 
-    def test_no_arguments(self):
-        # Should print the usage
+    def test_parse_input(self):
+        # No arguments throws error
         with self.assertRaises(SystemExit):
             with Quieter():
-                five_prime_metaplot.main([])
+                parse_input([], 'five')
 
         with self.assertRaises(SystemExit):
             with Quieter():
-                three_prime_metaplot.main([])
+                parse_input([], 'three')
 
-    def test_only_regions_file(self):
-        # Should print the usage
-        with self.assertRaises(SystemExit):
-            with Quieter():
-                five_prime_metaplot.main(["placeholder"])
+        # Needs a region file and at least one seq file
+        regions_file = generate_random_filename()
+        with open(regions_file, 'w') as file:
+            file.write(
+                "\t".join(['chr1', '1', '3', 'name', '0', '+'])
+            )
 
-        with self.assertRaises(SystemExit):
-            with Quieter():
-                three_prime_metaplot.main(["placeholder"])
-
-    def test_three_arguemnts(self):
-        # Should print the usage
-        with self.assertRaises(SystemExit):
-            with Quieter():
-                five_prime_metaplot.main(["placeholder"])
+        region_length = 2
+        max_threads = multiprocessing.cpu_count()
 
         with self.assertRaises(SystemExit):
             with Quieter():
-                three_prime_metaplot.main(["placeholder"])
+                parse_input([], 'five')
+
+        with self.assertRaises(SystemExit):
+            with Quieter():
+                parse_input([], 'three')
+
+        # These will work!!
+        result = parse_input([regions_file, 'seq_file'], 'five')
+        self.assertEqual(result, (regions_file, ['seq_file'], 2, max_threads))
+        result = parse_input([regions_file, 'seq_file'], 'three')
+        self.assertEqual(result, (regions_file, ['seq_file'], 2, max_threads))
+
+        # Test the threading is working
+        result = parse_input([regions_file, 'seq_file', '-t', '4'], 'three')
+        self.assertEqual(result, (regions_file, ['seq_file'], 2, 4))
+
+        result = parse_input([regions_file, 'seq_file', '--threads', '4'], 'three')
+        self.assertEqual(result, (regions_file, ['seq_file'], 2, 4))
+
+        remove_files(regions_file)
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_positive_read_five(self, stdout):

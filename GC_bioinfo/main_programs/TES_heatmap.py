@@ -1,11 +1,9 @@
-"""
-Do ±20 bp from the TES and plot every 200 bp the number of 3' ends
-"""
-
 import csv
 import glob
 import os
 import sys
+import argparse
+
 from collections import defaultdict
 
 from GC_bioinfo.utils.average_matrix import average_matrix
@@ -20,7 +18,7 @@ from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
 from GC_bioinfo.utils.scale_matrix import scale_matrix
 
 
-def make_incremented_regions(truQuant_output_file, downstream_distance, upstream_distance, distance_upstream_of_gene_body_start, interval_size):
+def make_incremented_regions(truQuant_output_file, downstream_distance, upstream_distance, bp_width, interval_size):
     # Using the regions provided, make incremented regions centered on the TES
     with open(truQuant_output_file) as file:
         lines = []
@@ -41,15 +39,15 @@ def make_incremented_regions(truQuant_output_file, downstream_distance, upstream
             region_right = int(gene_body_right) + downstream_distance
 
             # Cut off the region if it goes before the start of the gene body - distance_upstream_of_gene_body_start
-            if region_left < (int(max_tss) - distance_upstream_of_gene_body_start):
-                region_left = int(max_tss) - distance_upstream_of_gene_body_start
+            if region_left < (int(max_tss) - bp_width):
+                region_left = int(max_tss) - bp_width
         else:
             region_left = int(gene_body_left) - downstream_distance
             region_right = int(max_tss) + upstream_distance
 
             # Cut off the region if it goes before the start of the gene body + distance_upstream_of_gene_body_start
-            if region_right > int(max_tss) + distance_upstream_of_gene_body_start:
-                region_right = int(max_tss) + distance_upstream_of_gene_body_start
+            if region_right > int(max_tss) + bp_width:
+                region_right = int(max_tss) + bp_width
 
 
         if region_left < 0:
@@ -134,13 +132,15 @@ def read_coverage_file(coverage_file, width):
     return sorted_matrix_filename, num_lines
 
 
-def get_matrix(tsr_file, downstream_distance, upstream_distance, distance_upstream_of_gene_body_start,
-               truQuant_output_file, interval_size, sequencing_filename, width, height, spike_in):
+def get_matrix(seq_file_data, matrix_params, filenames):
+    sequencing_filename, spike_in = seq_file_data
+    upstream_distance, downstream_distance, width, height, bp_width, interval_size = matrix_params
+    truQuant_output_file, tsr_file, output_filename_prefix = filenames
 
     blacklist_regions_file = blacklist_extended_gene_bodies(tsr_file, downstream_distance)
 
     # Make the intervals file to quantify
-    intervals_filename = make_incremented_regions(truQuant_output_file, downstream_distance, upstream_distance, distance_upstream_of_gene_body_start, interval_size)
+    intervals_filename = make_incremented_regions(truQuant_output_file, downstream_distance, upstream_distance, bp_width, interval_size)
 
     # Quantify it
     quantified_regions_filename = quantify_intervals(sequencing_filename, blacklist_regions_file, intervals_filename)
@@ -160,35 +160,104 @@ def get_matrix(tsr_file, downstream_distance, upstream_distance, distance_upstre
     return spike_in_matrix
 
 
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo TES_heatmap <truQuant output file> <Width> <Height> <Downstream Distance> <Upstream Distance> <Distance Upstream of Gene Body Start> "
-                     "<Gamma> <Max black value> <Spike in Correction> <Sequencing Filename> <Output Filename> \n")
-    sys.stderr.write("\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/gene_body_heatmap.rst\n")
+def make_heatmap(matrix, heatmap_params, output_filename_prefix):
+    bp_width, width, height, gamma, max_black_value, interval_size, minor_ticks_bp, major_ticks_bp = heatmap_params
+
+    # Minor tick marks every 10 kb and major tick marks every 50 kb
+    t = Ticks(minor_tick_mark_interval_size=(minor_ticks_bp / interval_size),
+              major_tick_mark_interval_size=(major_ticks_bp / interval_size))
+
+    output_filename = output_filename_prefix + "_max_" + str(max_black_value) + "_gamma_" + str(
+        gamma) + "_width_" + str(bp_width) + "bp_TES_heatmap.tiff"
+
+    generate_heatmap(matrix, 'gray', output_filename, gamma, 0, max_black_value, ticks=t)
 
 
 def get_args(args):
-    if len(args) != 11:
-        print_usage()
-        sys.exit(1)
+    def positive_int(num):
+        try:
+            val = int(num)
+            if val <= 0:
+                raise Exception("Go to the except")
+        except:
+            raise argparse.ArgumentTypeError(num + " must be positive")
 
-    truQuant_output_file, width, height, downstream_distance, upstream_distance, distance_upstream_of_gene_body_start, \
-        gamma, max_black_value, spike_in, sequencing_filename, output_prefix = args
+        return num
 
-    gene_body_file = glob.glob(truQuant_output_file.replace("-truQuant_output.txt", "") + "*gene_body_regions.bed")
+    def positive_float(num):
+        try:
+            val = float(num)
+            if val <= 0:
+                raise Exception("Go to the except")
+        except:
+            raise argparse.ArgumentTypeError(num + " must be positive")
 
-    if not gene_body_file:
-        sys.stderr.write("No gene body file was found for that run of truQuant. Exiting ...\n")
-        sys.exit(1)
+        return num
 
-    if len(gene_body_file) != 1:
-        sys.stderr.write("More than one gene body file was found. Exiting ...\n")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(prog='GC_bioinfo TES_heatmap',
+                                     description="Generate a heatmap of 3' ends for each gene sorted by gene length " +
+                                     "aligned by the transcription end site\n" +
+                                     "More information can be found at " +
+                                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/TES_heatmap.rst")
 
-    gene_body_file = gene_body_file[0]
+    parser.add_argument('truQuant_output_file', metavar='truQuant_output_file', type=str,
+                        help='truQuant output file which ends in -truQuant_output.txt')
+
+    parser.add_argument('correction_factor', metavar='correction_factor', type=positive_float,
+                        help='Correction factor for the dataset')
+
+    parser.add_argument('seq_file', metavar='seq_file', type=str,
+                        help='Bed formatted sequencing file')
+
+    parser.add_argument('output_prefix', metavar='output_prefix', type=str, help='Prefix for the output filename')
+
+    parser.add_argument('-w', '--width', metavar='width', dest='width',
+                        type=positive_int, default=2_000, help='Width of the heatmap in pixels')
+
+    parser.add_argument('-e', '--height', metavar='height', dest='height',
+                        type=positive_int, default=2_000, help='Height of the heatmap in pixels')
+
+    parser.add_argument('-d', '--downstream_distance', metavar='downstream_distance', dest='downstream_distance',
+                        type=positive_int, default=50_000, help='Distance downstream from the transcription end site')
+
+    parser.add_argument('-u', '--upstream_distance', metavar='upstream_distance', dest='upstream_distance',
+                        type=positive_int, default=50_000, help='Distance upstream of the start of the gene body')
+
+    parser.add_argument('-b', '--bp_width', metavar='bp_width', dest='bp_width', default=400_000, type=positive_int,
+                        help='Total number of base pairs shown on the heatmap. This number must be greater than the ' +
+                             'upstream distance + distance past TES.')
+
+    parser.add_argument('-g', '--gamma', metavar='gamma', dest='gamma',
+                        type=positive_float, default=2.2, help='Gamma value of the heatmap')
+
+    parser.add_argument('-m', '--max_black', metavar='max_black', dest='max_black',
+                        type=positive_float, default=None, help='Max black value of the heatmap')
+
+    parser.add_argument('--minor_ticks', metavar='minor_ticks', dest='minor_ticks',
+                        type=positive_int, default=10_000, help='Distance between minor ticks (bp)')
+
+    parser.add_argument('--major_ticks', metavar='major_ticks', dest='major_ticks',
+                        type=positive_int, default=50_000, help='Distance between major ticks (bp)')
+
+
+    args = parser.parse_args(args)
+
+    truQuant_output_file = args.truQuant_output_file
+    spike_in = args.spike_in
+    sequencing_filename = args.sequencing_filename
+    output_filename_prefix = args.output_filename_prefix
+    width = args.width
+    height = args.height
+    downstream_distance = args.downstream_distance
+    upstream_distance = args.upstream_distance
+    bp_width = args.bp_width
+    gamma = args.gamma
+    max_black_value = args.max_black_value
+    minor_ticks = args.minor_ticks
+    major_ticks = args.major_ticks
 
     # Find all regions to blacklist
-    tsr_file = glob.glob(gene_body_file.replace("gene_body_regions.bed", "") + "*TSR.tab")
+    tsr_file = glob.glob(truQuant_output_file.replace("gene_body_regions.bed", "") + "*TSR.tab")
 
     if not tsr_file:
         sys.stderr.write("No tsrFinder file was found. Exiting ...\n")
@@ -204,59 +273,32 @@ def get_args(args):
         sys.stderr.write("File " + sequencing_filename + " was not found.\n")
         sys.exit(1)
 
-    def try_to_convert_to_int(var, var_name):
-        try:
-            int_var = int(var)
-            return int_var
-        except ValueError:
-            sys.stderr.write("The " + var_name + " could not be converted to an integer")
-            sys.exit(1)
-
-
-    width = try_to_convert_to_int(width, "width")
-    height = try_to_convert_to_int(height, "height")
-    downstream_distance = try_to_convert_to_int(downstream_distance, "downstream distance")
-    upstream_distance = try_to_convert_to_int(upstream_distance, "upstream distance")
-    distance_upstream_of_gene_body_start = try_to_convert_to_int(distance_upstream_of_gene_body_start, "distance upstream of gene body start")
-    interval_size = int((downstream_distance + upstream_distance) / width)
-
     # If the interval size is not an integer, then we can't use it
-    if (downstream_distance + upstream_distance) % width:
+    if bp_width % width:
         sys.stderr.write("The heatmap width in px must be a factor of the base pair width (bp width / px width must be an integer)")
         sys.exit(1)
 
-    try:
-        gamma = float(gamma)
-    except ValueError:
-        sys.stderr.write("The gamma could not be converted to a float")
+    interval_size = int(bp_width / width)
 
-    try:
-        max_black_value = float(max_black_value)
-    except ValueError:
-        sys.stderr.write("The gamma could not be converted to a float")
+    seq_file_data = (sequencing_filename, spike_in)
+    matrix_params = (upstream_distance, downstream_distance, bp_width, width, height, interval_size)
+    heatmap_params = (bp_width, width, height, gamma, max_black_value, interval_size, minor_ticks, major_ticks)
+    filenames = (truQuant_output_file, tsr_file, output_filename_prefix)
 
-    try:
-        spike_in = float(spike_in)
-    except ValueError:
-        sys.stderr.write("The spike in correction factor could not be converted to a float")
-
-    return truQuant_output_file, tsr_file, width, height, downstream_distance, upstream_distance, distance_upstream_of_gene_body_start, \
-           gamma, max_black_value, interval_size, spike_in, sequencing_filename, output_prefix
+    return seq_file_data, matrix_params, heatmap_params, filenames
 
 
 def main(args):
-    truQuant_output_file, tsr_file, width, height, downstream_distance, upstream_distance, distance_upstream_of_gene_body_start, \
-        gamma, max_black_value, interval_size, spike_in, sequencing_filename, output_prefix = get_args(args)
+    seq_file_data, matrix_params, heatmap_params, filenames = get_args(args)
 
-    spike_in_matrix = get_matrix(tsr_file, downstream_distance, upstream_distance, distance_upstream_of_gene_body_start, truQuant_output_file, interval_size, sequencing_filename, width, height, spike_in)
+    matrix = get_matrix(seq_file_data, matrix_params, filenames)
+
+    output_filename_prefix = filenames[-1]
 
     # Make the heatmap
-    output_filename = output_prefix + "_max_" + str(max_black_value) + "_gamma_" + str(gamma) + "_width_" + str(downstream_distance + upstream_distance) + "bp_TES_heatmap.tiff"
+    make_heatmap(matrix, heatmap_params, output_filename_prefix)
 
-    t = Ticks(10_000 / interval_size, 50_000 / interval_size)
-    generate_heatmap(spike_in_matrix, "gray", output_filename, gamma, 0, max_black_value, t)
-
-    remove_files(spike_in_matrix)
+    remove_files(matrix)
 
 
 if __name__ == '__main__':

@@ -2,6 +2,8 @@ import csv
 import glob
 import os
 import sys
+import argparse
+
 from collections import defaultdict
 
 from GC_bioinfo.utils.average_matrix import average_matrix
@@ -145,10 +147,8 @@ def build_matrix(seq_file_data, matrix_params, filenames):
     return spike_in_normalized_matrix
 
 
-def make_heatmap(matrix, heatmap_params, tick_params, output_filename_prefix):
-    bp_width, width, height, gamma, max_black_value, interval_size = heatmap_params
-
-    minor_ticks_bp, major_ticks_bp = tick_params
+def make_heatmap(matrix, heatmap_params, output_filename_prefix):
+    bp_width, width, height, gamma, max_black_value, interval_size, minor_ticks_bp, major_ticks_bp = heatmap_params
 
     # Minor tick marks every 10 kb and major tick marks every 50 kb
     t = Ticks(minor_tick_mark_interval_size=(minor_ticks_bp / interval_size),
@@ -160,20 +160,87 @@ def make_heatmap(matrix, heatmap_params, tick_params, output_filename_prefix):
     generate_heatmap(matrix, 'gray', output_filename, gamma, 0, max_black_value, ticks=t)
 
 
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo gene_body_heatmap <truQuant output file> <Upstream Distance>" +
-                     " <Distance Past TES> <Width (bp)> <Width (px)> <Height> <Gamma> <Max black value> <Spike in Correction> <Sequencing Filename> <Output Filename> \n")
-    sys.stderr.write("\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/gene_body_heatmap.rst\n")
-
-
 def get_args(args):
-    if len(args) != 11:
-        print_usage()
-        sys.exit(1)
+    def positive_int(num):
+        try:
+            val = int(num)
+            if val <= 0:
+                raise Exception("Go to the except")
+        except:
+            raise argparse.ArgumentTypeError(num + " must be positive")
 
-    truQuant_output_file, upstream_distance, distance_past_tes, bp_width, width, height, gamma, max_black_value, spike_in,\
-        sequencing_filename, output_filename_prefix = args
+        return val
+
+    def positive_float(num):
+        try:
+            val = float(num)
+            if val <= 0:
+                raise Exception("Go to the except")
+        except:
+            raise argparse.ArgumentTypeError(num + " must be positive")
+
+        return val
+
+    parser = argparse.ArgumentParser(prog='GC_bioinfo gene_body_heatmap',
+                                     description="Generate a heatmap of 3' ends for each gene sorted by gene length " +
+                                     "aligned by the TSS\n" +
+                                     "More information can be found at " +
+                                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/gene_body_heatmap.rst")
+
+    parser.add_argument('truQuant_output_file', metavar='truQuant_output_file', type=str,
+                        help='truQuant output file which ends in -truQuant_output.txt')
+
+    parser.add_argument('correction_factor', metavar='correction_factor', type=positive_float,
+                        help='Correction factor for the dataset')
+
+    parser.add_argument('seq_file', metavar='seq_file', type=str,
+                        help='Bed formatted sequencing file')
+
+    parser.add_argument('output_prefix', metavar='output_prefix', type=str, help='Prefix for the output filename')
+
+    parser.add_argument('-u', '--upstream_distance', metavar='upstream_distance', dest='upstream_distance',
+                        type=positive_int, default=50_000, help='Distance upstream of the max TSS')
+
+    parser.add_argument('-d', '--distance_past_tes', metavar='distance_past_tes', dest='distance_past_tes',
+                        type=positive_int, default=50_000, help='Distance downstream of the transcription end site')
+
+    parser.add_argument('-b', '--bp_width', metavar='bp_width', dest='bp_width', default=400_000, type=positive_int,
+                        help='Total number of base pairs shown on the heatmap. This number must be greater than the ' +
+                        'upstream distance + distance past TES.')
+
+    parser.add_argument('-w', '--width', metavar='width', dest='width',
+                        type=positive_int, default=2_000, help='Width of the heatmap in pixels')
+
+    parser.add_argument('-e', '--height', metavar='height', dest='height',
+                        type=positive_int, default=2_000, help='Height of the heatmap in pixels')
+
+    parser.add_argument('-g', '--gamma', metavar='gamma', dest='gamma',
+                        type=positive_float, default=2.2, help='Gamma value of the heatmap')
+
+    parser.add_argument('-m', '--max_black', metavar='max_black', dest='max_black',
+                        type=positive_float, default=None, help='Max black value of the heatmap')
+
+    parser.add_argument('--minor_ticks', metavar='minor_ticks', dest='minor_ticks',
+                        type=positive_int, default=10_000, help='Distance between minor ticks (bp)')
+
+    parser.add_argument('--major_ticks', metavar='major_ticks', dest='major_ticks',
+                        type=positive_int, default=50_000, help='Distance between major ticks (bp)')
+
+    args = parser.parse_args(args)
+
+    truQuant_output_file = args.truQuant_output_file
+    upstream_distance = args.upstream_distance
+    distance_past_tes = args.distance_past_tes
+    bp_width = args.bp_width
+    width = args.width
+    height = args.height
+    gamma = args.gamma
+    max_black_value = args.max_black_value
+    spike_in = args.spike_in
+    sequencing_filename = args.sequencing_filename
+    output_filename_prefix = args.output_filename_prefix
+    minor_ticks = args.minor_ticks
+    major_ticks = args.major_ticks
 
     tsr_file = glob.glob(truQuant_output_file.replace("-truQuant_output.txt", "") + "*TSR.tab")
 
@@ -191,24 +258,6 @@ def get_args(args):
         sys.stderr.write("File " + sequencing_filename + " was not found.\n")
         sys.exit(1)
 
-    def try_to_convert_to_int(var, var_name):
-        try:
-            int_var = int(var)
-            return int_var
-        except ValueError:
-            sys.stderr.write("The " + var_name + " could not be converted to an integer")
-            sys.exit(1)
-
-    # Make sure the distance_past_tes, width, max_gene_length are all integers
-    upstream_distance = try_to_convert_to_int(upstream_distance, "5' buffer distance")
-    distance_past_tes = try_to_convert_to_int(distance_past_tes, "distance past the TES")
-    width = try_to_convert_to_int(width, "width (px)")
-    bp_width = try_to_convert_to_int(bp_width, "width (bp)")
-    height = try_to_convert_to_int(height, "height")
-
-    interval_size = bp_width / width
-    interval_size = try_to_convert_to_int(interval_size, "interval size")
-
     if bp_width % width != 0:
         sys.stderr.write("The width (bp) must be evenly divisible by the width (px). Exiting ...")
         sys.exit(1)
@@ -217,24 +266,11 @@ def get_args(args):
         sys.stderr.write("The width (bp) must be greater than width (px). Exiting ...")
         sys.exit(1)
 
-    try:
-        gamma = float(gamma)
-    except ValueError:
-        sys.stderr.write("The gamma could not be converted to a float")
-
-    try:
-        max_black_value = float(max_black_value)
-    except ValueError:
-        sys.stderr.write("The gamma could not be converted to a float")
-
-    try:
-        spike_in = float(spike_in)
-    except ValueError:
-        sys.stderr.write("The spike in correction factor could not be converted to a float")
+    interval_size = int(bp_width / width)
 
     seq_file_data = (sequencing_filename, spike_in)
     matrix_params = (upstream_distance, distance_past_tes, width, height, interval_size)
-    heatmap_params = (bp_width, width, height, gamma, max_black_value, interval_size)
+    heatmap_params = (bp_width, width, height, gamma, max_black_value, interval_size, minor_ticks, major_ticks)
     filenames = (truQuant_output_file, tsr_file, output_filename_prefix)
 
     return seq_file_data, matrix_params, heatmap_params, filenames
@@ -243,15 +279,11 @@ def get_args(args):
 def main(args):
     seq_file_data, matrix_params, heatmap_params, filenames = get_args(args)
 
-    minor_ticks = 10_000 # Minor ticks every 10kb
-    major_ticks = 50_000 # Minor ticks every 10kb
-    tick_params = (minor_ticks, major_ticks)
-
     output_filename_prefix = filenames[-1]
 
     matrix = build_matrix(seq_file_data, matrix_params, filenames)
 
-    make_heatmap(matrix, heatmap_params, tick_params, output_filename_prefix)
+    make_heatmap(matrix, heatmap_params, output_filename_prefix)
 
     remove_files(matrix)
 

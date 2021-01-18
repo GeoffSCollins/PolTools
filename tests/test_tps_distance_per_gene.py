@@ -1,3 +1,6 @@
+import io
+import multiprocessing
+
 import unittest.mock
 
 from GC_bioinfo.main_programs import tps_distance_per_gene
@@ -7,19 +10,33 @@ from GC_bioinfo.utils.make_random_filename import generate_random_filename
 
 from quiter import Quieter
 
-import io
-
-
 class TestTPSDistancePerGene(unittest.TestCase):
-    def test_invalid_number_of_arguments(self):
+    def test_arguments(self):
         # Should print the usage
         with self.assertRaises(SystemExit):
             with Quieter():
-                tps_distance_per_gene.main([])
+                tps_distance_per_gene.parse_args([])
 
         with self.assertRaises(SystemExit):
             with Quieter():
-                tps_distance_per_gene.main(["regions filename"])
+                tps_distance_per_gene.parse_args(["regions filename"])
+
+        regions_file = generate_random_filename()
+        with open(regions_file, 'w') as file:
+            file.write(
+                "\t".join(['chr1', '1', '3', 'name', '0', '+'])
+            )
+
+        max_threads = multiprocessing.cpu_count()
+        result = tps_distance_per_gene.parse_args([regions_file, 'seq_file'])
+        self.assertEqual(result, (regions_file, ['seq_file'], 2, max_threads))
+
+        result = tps_distance_per_gene.parse_args([regions_file, 'seq_file', '-t', '2'])
+        self.assertEqual(result, (regions_file, ['seq_file'], 2, 2))
+
+        result = tps_distance_per_gene.parse_args([regions_file, 'seq_file', '--threads', '2'])
+        self.assertEqual(result, (regions_file, ['seq_file'], 2, 2))
+
 
 
     def test_get_pausing_distances_helper(self):

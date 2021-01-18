@@ -1,6 +1,7 @@
 import multiprocessing
 import os
 import sys
+import argparse
 
 from GC_bioinfo.utils.check_dependencies import check_dependencies
 from GC_bioinfo.utils.get_region_length import determine_region_length
@@ -100,27 +101,41 @@ def get_pileups(region_files, rev_region_files, seq_files, region_length, orig_s
 
 
 def parse_args(args):
-    if len(args) < 2:
-        print_usage()
-        sys.exit(1)
+    def positive_int(num):
+        try:
+            val = int(num)
+            if val <= 0:
+                raise Exception("Go to the except")
+        except:
+            raise argparse.ArgumentTypeError(num + " must be positive")
+        return val
 
-    regions_filename = args[0]
-    sequencing_files_list = args[1:]
-    verify_bed_files(regions_filename, sequencing_files_list)
+    parser = argparse.ArgumentParser(prog='GC_bioinfo divergent_pileup_metaplot',
+        description='Generate a metaplot of the pileup reads.\n'+
+        'More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/divergent_pileup_metaplot.rst')
+
+    parser.add_argument('regions_file', metavar='regions_file', type=str,
+                        help='Bed formatted file containing all the regions you want to average the sequences')
+
+    parser.add_argument('seq_files', metavar='sequencing_files', nargs='+', type=str,
+                        help='Bed formatted files from the sequencing experiment')
+
+    parser.add_argument('-t', '--threads', dest='threads', metavar='threads', type=positive_int, nargs='?',
+                        default=multiprocessing.cpu_count())
+
+    args = parser.parse_args(args)
+    regions_filename = args.regions_file
+    max_threads = args.threads
 
     region_length = determine_region_length(regions_filename)
     verify_region_length_is_even(region_length)
 
-    return regions_filename, sequencing_files_list, region_length
+    sequencing_files_list = args.seq_files
+
+    return regions_filename, sequencing_files_list, region_length, max_threads
 
 
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo divergent_pileup_metaplot <Regions Filename> <Sequencing Files>\n")
-    sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/divergent_pileup_metaplot.rst\n")
-
-
-def run_divergent_pileup_plots(regions_filename, sequencing_files_list, region_length):
+def run_divergent_pileup_plots(regions_filename, sequencing_files_list, region_length, max_threads):
     # Make the opposite stranded regions file
     rev_region_filename = make_rev_region_file(regions_filename)
 
@@ -130,9 +145,11 @@ def run_divergent_pileup_plots(regions_filename, sequencing_files_list, region_l
 
     split_seq_filenames = [(split_bed_file(filename), filename) for filename in sequencing_files_list]
 
-    pool = multiprocessing.Pool(processes=len(sequencing_files_list))
+    pool = multiprocessing.Pool(processes=max_threads)
     averages = pool.starmap(get_pileups, [(region_files, rev_region_files, seq_files, region_length, filename)
                                           for (seq_files, filename) in split_seq_filenames])
+
+    pool.close()
 
     split_seq_filenames_to_delete = [tup[0] for tup in split_seq_filenames]
 
@@ -152,8 +169,8 @@ def main(args):
     :return:
     """
     check_dependencies("bedtools")
-    regions_filename, sequencing_files_list, region_length = parse_args(args)
-    run_divergent_pileup_plots(regions_filename, sequencing_files_list, region_length)
+    regions_filename, sequencing_files_list, region_length, max_threads = parse_args(args)
+    run_divergent_pileup_plots(regions_filename, sequencing_files_list, region_length, max_threads)
 
 
 if __name__ == '__main__':

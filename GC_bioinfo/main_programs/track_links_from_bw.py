@@ -1,4 +1,5 @@
 import sys
+import argparse
 
 
 def generate_links(bigwig_files):
@@ -80,20 +81,19 @@ def sort_links(links):
     return sorted_links_list
 
 
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo track_links_from_bw <bigwig files>\n")
-    sys.stderr.write(
-        "More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/track_links_from_bw.rst\n")
-
-
 def parse_args(args):
-    if len(args) == 0:
-        sys.stderr.write("At least one bigwig file must be provided\n")
-        print_usage()
-        sys.exit(1)
+    parser = argparse.ArgumentParser(prog='GC_bioinfo track_links_from_bw',
+                                     description='Create track links for bigwig files\n' +
+                                     "More information can be found at " +
+                                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/track_links_from_bw.rst")
 
-    return args
+    parser.add_argument('bw_files', metavar='bigwig_files', nargs='+', type=str,
+                        help='Bigwig (.bw) files')
+
+    args = parser.parse_args(args)
+    bigwig_files = args.bw_files
+
+    return bigwig_files
 
 
 def main(args):

@@ -1,8 +1,4 @@
-
-
-
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
-
 
 
 def set_matrix_bounds(matrix_filename, minimum_value, maximum_value):

@@ -48,15 +48,28 @@ class TestBaseDistribution(unittest.TestCase):
         return sequence
 
 
-    def test_no_arguments(self):
+    def test_arguments(self):
+        # No arguments throws an error
         with self.assertRaises(SystemExit):
             with Quieter():
-                base_distribution.main([])
+                base_distribution.parse_args([])
 
-    def test_two_arguments(self):
+        regions_file = generate_random_filename()
+        with open(regions_file, 'w') as file:
+            file.write(
+                "\t".join(['chr1', '1', '3', 'name', '0', '+'])
+            )
+
+        # Regions file works file
+        result = base_distribution.parse_args([regions_file])
+        self.assertEqual(result, (regions_file, 2))
+
+        # Multiple arguments throws an error
         with self.assertRaises(SystemExit):
             with Quieter():
-                base_distribution.main([self.polr2a_region_file, self.ccnt1_region_file])
+                base_distribution.parse_args(['first', 'second'])
+
+        remove_files(regions_file)
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_polr2a(self, stdout):

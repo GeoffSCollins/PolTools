@@ -13,8 +13,8 @@ def main(args):
     :return:
     """
 
-    regions_filename, sequencing_files_list, region_length = parse_input(args, "three")
-    run_metaplot(regions_filename, sequencing_files_list, region_length, "three")
+    regions_filename, sequencing_files_list, region_length, max_threads = parse_input(args, "three")
+    run_metaplot(regions_filename, sequencing_files_list, region_length, "three", max_threads)
 
 if __name__ == '__main__':
     main(sys.argv[1:])

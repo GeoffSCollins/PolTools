@@ -1,8 +1,5 @@
 import sys
-
-# Input is a maxTSS file and the position
-# Output is the maxTSS file with the sequence at that position
-
+import argparse
 
 from GC_bioinfo.utils.get_region_length import determine_region_length
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
@@ -79,36 +76,50 @@ def output_sequence_dict(sequence_dict):
         print(sequence_dict[gene_name])
 
 
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo sequence_from_region_around_max_tss <maxTSS file> <region>\n")
-    sys.stderr.write(
-        "More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/sequence_from_region_around_max_tss.rst\n")
-
-
 def parse_args(args):
-    if len(args) != 2:
-        print_usage()
-        sys.exit(1)
+    # Argparse does not allow the input numbers to start with a -. So, we add a space to the input so it works.
+    for i, arg in enumerate(sys.argv):
+        if (arg[0] == '-') and arg[1].isdigit(): sys.argv[i] = ' ' + arg
 
-    max_tss_file, search_region = args
+    parser = argparse.ArgumentParser(prog='GC_bioinfo sequence_from_region_around_max_tss',
+                                     description='Get the sequence from a certain region around the max TSS\n' +
+                                                 "More information can be found at " +
+                                                 "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/sequence_from_region_around_max_tss.rst"
+                                     )
+
+    parser.add_argument('max_tss_file', metavar='max_tss_file', type=str,
+                        help='Bed formatted file which has the base of the max TSS')
+
+    parser.add_argument('left', metavar='left', type=int,
+                        help='Left end of the region to get the sequence.')
+
+    parser.add_argument('right', metavar='right', type=int,
+                        help='Left end of the region to get the sequence.')
+
+    args = parser.parse_args(args)
+    max_tss_file = args.max_tss_file
+    left = args.left
+    right = args.right
+
+    if 0 in [left, right]:
+        sys.stderr.write("There is no 0 nucleotide. Please try again.\n")
+        sys.exit(1)
 
     region_length = determine_region_length(max_tss_file)
 
     if region_length != 1:
         sys.stderr.write("The maxTSS bed file must have regions of 1 bp.\n")
-        print_usage()
         sys.exit(1)
 
     # Convert search region syntax to a list
     search_left = [
-        search_region[0],
-        int(search_region.split("_")[0][1:])
+        "+" if left > 0 else "-",
+        abs(left)
     ]
 
     search_right = [
-        search_region.split("_")[1][0],
-        int(search_region.split("_")[1][1:])
+        "+" if right > 0 else "-",
+        abs(right)
     ]
 
     search = [search_left, search_right]

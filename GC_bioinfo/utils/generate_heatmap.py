@@ -1,7 +1,3 @@
-"""
-This util will call an R function which will make a heatmap
-"""
-
 import os
 import sys
 
@@ -9,6 +5,7 @@ from GC_bioinfo.utils.constants import generate_heatmap_location
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.remove_files import remove_files
 from GC_bioinfo.utils.set_matrix_bounds import set_matrix_bounds
+from GC_bioinfo.utils.get_max_value_from_matrix import get_max_value_from_matrix
 
 
 class Ticks:
@@ -141,11 +138,14 @@ def generate_heatmap(matrix_filename, color_scheme, output_filename, gamma, min_
         sys.stderr.write("The gamma must be positive. It was set to " + str(gamma) + "\n")
         sys.exit(1)
 
+    # Set the max and min values
+    if max_value != None:
+        finalized_matrix = set_matrix_bounds(matrix_filename, min_value, max_value)
+    else:
+        max_value = get_max_value_from_matrix(matrix_filename)
+
     if center_value == "default":
         center_value = (max_value + min_value) / 2
-
-    # Set the max and min values
-    finalized_matrix = set_matrix_bounds(matrix_filename, min_value, max_value)
 
     if ticks:
         new_matrix_filename = add_ticks_matrix(finalized_matrix, ticks)

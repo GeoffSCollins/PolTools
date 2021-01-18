@@ -1,5 +1,7 @@
 import unittest.mock
 
+import multiprocessing
+
 from GC_bioinfo.main_programs import read_through_transcription
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.remove_files import remove_files
@@ -49,31 +51,40 @@ class TestReadThroughTranscription(unittest.TestCase):
 
         remove_files(regions_filename, region_intervals_filename)
 
-    def test_no_arguments(self):
+    def test_arguments(self):
         with self.assertRaises(SystemExit):
             with Quieter():
-                read_through_transcription.main([])
-
-    def test_incorrect_number_of_arguemnts(self):
-        with self.assertRaises(SystemExit):
-            with Quieter():
-                read_through_transcription.main(['Regions Filename', 'TSR Filename', 'Upstream Distance', 'Downstream Distance', 'Sequencing Files'])
+                read_through_transcription.parse_input(['Regions Filename', 'TSR Filename', '1000', '50000', '50'])
 
         with self.assertRaises(SystemExit):
             with Quieter():
-                read_through_transcription.main(['Regions Filename', 'TSR Filename', 'Upstream Distance', 'Downstream Distance'])
+                read_through_transcription.parse_input(['Regions Filename', 'TSR Filename', '1000', '50000'])
 
         with self.assertRaises(SystemExit):
             with Quieter():
-                read_through_transcription.main(['Regions Filename', 'TSR Filename', 'Upstream Distance'])
+                read_through_transcription.parse_input(['Regions Filename', 'TSR Filename', '1000'])
 
         with self.assertRaises(SystemExit):
             with Quieter():
-                read_through_transcription.main(['Regions Filename', 'TSR Filename'])
+                read_through_transcription.parse_input(['Regions Filename', 'TSR Filename'])
 
         with self.assertRaises(SystemExit):
             with Quieter():
-                read_through_transcription.main(['Regions Filename'])
+                read_through_transcription.parse_input(['Regions Filename'])
+
+        max_threads = multiprocessing.cpu_count()
+
+        result = read_through_transcription.parse_input(['Regions Filename', 'TSR Filename', '1000', '50000', '50', 'seq_file'])
+        self.assertEqual(result, ('Regions Filename', 'TSR Filename', 1000, 50000, 50, ['seq_file'], max_threads))
+
+        # Test threading works
+        result = read_through_transcription.parse_input(['Regions Filename', 'TSR Filename', '1000', '50000', '50', 'seq_file', '-t', '4'])
+        self.assertEqual(result, ('Regions Filename', 'TSR Filename', 1000, 50000, 50, ['seq_file'], 4))
+
+        result = read_through_transcription.parse_input(['Regions Filename', 'TSR Filename', '1000', '50000', '50', 'seq_file', '--threads', '4'])
+        self.assertEqual(result, ('Regions Filename', 'TSR Filename', 1000, 50000, 50, ['seq_file'], 4))
+
+
 
 
 if __name__ == '__main__':

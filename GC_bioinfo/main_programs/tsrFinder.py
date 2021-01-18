@@ -4,42 +4,56 @@ This program is the interface and driver for tsrFinder
 
 import os
 import sys
+import argparse
+import multiprocessing
+
 from collections import defaultdict
-from multiprocessing import Process
+from multiprocessing import Pool
 
 from GC_bioinfo.utils.constants import tsr_finder_location
 from GC_bioinfo.utils.tsr_finder_step_four_from_rocky import run_step_four
 from GC_bioinfo.utils.remove_files import remove_files
 
+def positive_int(num):
+    try:
+        val = int(num)
+        if val <= 0:
+            raise Exception("Go to the except")
+    except:
+        raise argparse.ArgumentTypeError(num + " must be positive")
 
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo tsrFinder <Sequencing File> <TSR Window Size> <TSR Read Depth> <Minimum Average Read Length> ")
-    sys.stderr.write("<Maximum Fragment Length> <Chromosome Sizes File>\n")
-    sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/tsrFinder.rst\n")
+    return val
+
+parser = argparse.ArgumentParser(prog='GC_bioinfo tsrFinder',
+                                 description='Find transcription start regions\n' +
+                                 "More information can be found at " +
+                                 "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/tsrFinder.rst")
+
+parser.add_argument('seq_file', metavar='seq_file', type=str, help='Bed formatted sequencing file to find the TSRs')
+parser.add_argument('window_size', metavar='window_size', type=positive_int, help='Base pair size of the sliding window')
+parser.add_argument('min_seq_depth', metavar='min_seq_depth', type=positive_int, help="Minimum number of 5' ends to be considered a TSR")
+parser.add_argument('min_avg_transcript_length', metavar='min_avg_transcript_length', type=positive_int, help="Minimum average transcript length to be considered a TSR")
+parser.add_argument('max_fragment_size', metavar='max_fragment_size', type=positive_int, help="Maximum fragment size for a read to be counted in tsrFinder")
+parser.add_argument('chrom_size_file', metavar='chrom_size_file', type=str, help="Chromosome sizes file")
+parser.add_argument('-t', '--threads', dest='threads', metavar='threads', type=positive_int, nargs='?', default=multiprocessing.cpu_count())
+
+args = parser.parse_args(sys.argv[1:])
+bed_file = args.seq_file
+window_size = args.window_size
+min_seq_depth = args.min_seq_depth
+min_avg_transcript_length = args.min_avg_transcript_length
+max_fragment_size = args.max_fragment_size
+chrom_size_file = args.chrom_size_file
+max_threads = args.threads
 
 
-# Step 0: Setup. Get all the command line arguments. Build the chromosome sizes dictionary.
-try:
-    args = sys.argv[1:]
+# Make sure bed_file and chrom_size_file exist
+if not os.path.isfile(bed_file):
+    sys.stderr.write(bed_file + " was not found. Exiting ...\n")
+    sys.exit(1)
 
-    if len(args) != 6:
-        sys.exit(1)
-
-    bed_file = args[0]
-    window_size = int(args[1])
-    min_seq_depth = int(args[2])
-    min_avg_transcript_length = int(args[3])
-    max_fragment_size = int(args[4])
-    chrom_size_file = args[5]
-
-    # Make sure bed_file and chrom_size_file exist
-    if not os.path.isfile(bed_file) or not os.path.isfile(chrom_size_file):
-        sys.exit(1)
-
-except:
-    # If the user did not input an argument correctly
-    print_usage()
+if not os.path.isfile(chrom_size_file):
+    sys.stderr.write(chrom_size_file + " was not found. Exiting ...\n")
     sys.exit(1)
 
 chromosome_sizes = defaultdict(int)
@@ -47,10 +61,7 @@ chromosome_sizes = defaultdict(int)
 with open(chrom_size_file) as file:
     for line in file:
         chromosome, size = line.split()
-
         chromosome_sizes[chromosome] = int(size)
-
-
 
 # Step 1. Split the bed file into files by chromosome and strands
 
@@ -105,14 +116,11 @@ def run_tsrFinderGC(filename):
 
     run_step_four(step_three_filename, window_size, chromosome_sizes, step_four_filename)
 
-jobs = []
-for filename in chromosome_files:
-    j = Process(target=run_tsrFinderGC, args=(filename, ))
-    j.start()
-    jobs.append(j)
+pool = Pool(max_threads)
 
-for job in jobs:
-    job.join()
+pool.map(run_tsrFinderGC, (filename for filename in chromosome_files))
+
+pool.close()
 
 # # Step 3: Combine the output files and delete intermediate files
 os.system("cat " + " ".join(output_files) + " > " + output_filename)

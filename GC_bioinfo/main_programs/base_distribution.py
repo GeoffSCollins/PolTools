@@ -1,4 +1,5 @@
 import sys
+import argparse
 
 from GC_bioinfo.utils.check_dependencies import check_dependencies
 from GC_bioinfo.utils.fasta_reader import read_fasta
@@ -59,26 +60,6 @@ def output_data(avgs_dict, region_length):
         position += 1
 
 
-def print_usage():
-    sys.stderr.write("Usage: ")
-    sys.stderr.write("python3 base_distribution <Regions Filename>")
-    sys.stderr.write("More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/base_distribution.rst")
-
-
-def parse_input(args):
-    if len(args) != 1:
-        print_usage()
-        sys.exit(1)
-
-    regions_file = args[0]
-    verify_bed_files(regions_file)
-
-    region_length = determine_region_length(regions_file)
-    verify_region_length_is_even(region_length)
-
-    return regions_file, region_length
-
-
 def run_base_distribution(regions_file, region_length):
     # 1. Get the sequences of the region
     fasta_file = run_getfasta(regions_file)
@@ -92,6 +73,25 @@ def run_base_distribution(regions_file, region_length):
     output_data(avgs_dict, region_length)
 
 
+def parse_args(args):
+    parser = argparse.ArgumentParser(prog='GC_bioinfo base_distribution',
+        description='Compute the average base composition at each position of the given region.\n' +
+                    "More information can be found at " +
+                    "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/base_distribution.rst")
+
+    parser.add_argument('regions_file', metavar='regions_file', type=str,
+                        help='Bed formatted file containing all the regions you want to average the sequences')
+
+    args = parser.parse_args(args)
+
+    regions_file = args.regions_file
+
+    verify_bed_files(regions_file)
+    region_length = determine_region_length(regions_file)
+    verify_region_length_is_even(region_length)
+    return args.regions_file, region_length
+
+
 def main(args):
     """
     base_distribution <Regions Filename>
@@ -102,7 +102,7 @@ def main(args):
     :return:
     """
     check_dependencies("bedtools")
-    regions_file, region_length = parse_input(args)
+    regions_file, region_length = parse_args(args)
     run_base_distribution(regions_file, region_length)
 
 

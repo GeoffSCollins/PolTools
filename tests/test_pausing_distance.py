@@ -1,6 +1,7 @@
-import unittest.mock
-
 import io
+import multiprocessing
+
+import unittest.mock
 
 import GC_bioinfo.main_programs.pausing_distance_distribution_from_maxTSS as pausing
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
@@ -10,15 +11,29 @@ from quiter import Quieter
 
 class TestPausingDistance(unittest.TestCase):
 
-    def test_no_arguments(self):
+    def test_arguments(self):
         with self.assertRaises(SystemExit):
             with Quieter():
-                pausing.main([])
+                pausing.parse_input(['regions_filename'])
 
-    def test_one_file(self):
-        with self.assertRaises(SystemExit):
-            with Quieter():
-                pausing.main(['placeholder'])
+        regions_file = generate_random_filename()
+        with open(regions_file, 'w') as file:
+            file.write(
+                "\t".join(['chr1', '1', '3', 'name', '0', '+'])
+            )
+
+        max_threads = multiprocessing.cpu_count()
+
+        result = pausing.parse_input([regions_file, 'seq_file'])
+        self.assertEqual(result, (regions_file, ['seq_file'], max_threads))
+
+        # Test the threading option
+        result = pausing.parse_input([regions_file, 'seq_file', '-t', '2'])
+        self.assertEqual(result, (regions_file, ['seq_file'], 2))
+        result = pausing.parse_input([regions_file, 'seq_file', '--threads', '2'])
+        self.assertEqual(result, (regions_file, ['seq_file'], 2))
+
+        remove_files(regions_file)
 
     def make_seq_file(self):
         seq_filename = generate_random_filename()

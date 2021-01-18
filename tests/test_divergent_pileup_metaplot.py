@@ -1,12 +1,9 @@
 import unittest.mock
 
-import sys
+import multiprocessing
 import io
 
-sys.path.append("../GC_bioinfo")
-
 from GC_bioinfo.main_programs import divergent_pileup_metaplot
-
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.remove_files import remove_files
 
@@ -24,20 +21,45 @@ class TestDivergentPileup(unittest.TestCase):
 
         return filename
 
-    def test_no_arguments(self):
+    def test_arguments(self):
+        # No arguments throws error
         with self.assertRaises(SystemExit):
             with Quieter():
-                divergent_pileup_metaplot.main([])
+                divergent_pileup_metaplot.parse_args([])
 
-    def test_one_argument(self):
+        # One argument throws an error
         with self.assertRaises(SystemExit):
             with Quieter():
-                divergent_pileup_metaplot.main(["placeholder"])
+                divergent_pileup_metaplot.parse_args(['one'])
 
-    def test_three_arguments(self):
+        regions_file = generate_random_filename()
+        with open(regions_file, 'w') as file:
+            file.write(
+                "\t".join(['chr1', '1', '3', 'name', '0', '+'])
+            )
+
+        region_length = 2
+        max_cpu_count = multiprocessing.cpu_count()
+
+        # Two args and three args are fine
+        result = divergent_pileup_metaplot.parse_args([regions_file, 'seq_file_one'])
+        self.assertEqual(result, (regions_file, ['seq_file_one'], region_length, max_cpu_count))
+        result = divergent_pileup_metaplot.parse_args([regions_file, ['seq_file_one', 'seq_file_two']])
+        # I don't know why, but in the test arguments with a list value must be inside a list and inside a string :O
+        self.assertEqual(result, (regions_file, ["['seq_file_one', 'seq_file_two']"], region_length, max_cpu_count))
+
+        # Test number of threads is working
+        result = divergent_pileup_metaplot.parse_args([regions_file, 'seq_file_one', '-t', '4'])
+        self.assertEqual(result, (regions_file, ['seq_file_one'], region_length, 4))
+        result = divergent_pileup_metaplot.parse_args([regions_file, 'seq_file_one', '--threads', '4'])
+        self.assertEqual(result, (regions_file, ['seq_file_one'], region_length, 4))
+
+        # Threads can't be 0 (negative values aren't recorded)
         with self.assertRaises(SystemExit):
             with Quieter():
-                divergent_pileup_metaplot.main(["placeholder" "placeholder"])
+                divergent_pileup_metaplot.parse_args([regions_file, 'seq_file_one', '-t', '0'])
+
+        remove_files(regions_file)
 
     def test_split_bed_file(self):
         filename = self.make_example_file()

@@ -1,11 +1,43 @@
+import multiprocessing
+
 import unittest.mock
+
+import GC_bioinfo.main_programs.truQuant as truQuant
 
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.remove_files import remove_files
 
-import GC_bioinfo.main_programs.truQuant as truQuant
+from quiter import Quieter
 
 class TestTruQuant(unittest.TestCase):
+
+    def test_arguments(self):
+        with self.assertRaises(SystemExit):
+            with Quieter():
+                truQuant.parse_input([])
+
+        seq_file_for_annotation = generate_random_filename()
+
+        with open(seq_file_for_annotation, 'w') as file:
+            file.write(
+                "\t".join(['chr1', '1', '3', 'name', '0', '+'])
+            )
+
+        max_threads = multiprocessing.cpu_count()
+
+        result = truQuant.parse_input([seq_file_for_annotation])
+        self.assertEqual(result, ([seq_file_for_annotation], 1000, 0.3, 75, max_threads))
+
+        result = truQuant.parse_input([seq_file_for_annotation, '-a', '500', '-b' '0.6', '-r', '10', '-t', '20'])
+        self.assertEqual(result, ([seq_file_for_annotation], 500, 0.6, 10, 20))
+
+        # Try making the blacklist percent greater than one
+        with self.assertRaises(SystemExit):
+            with Quieter():
+                truQuant.parse_input([seq_file_for_annotation, '-b', '1.5'])
+
+        remove_files(seq_file_for_annotation)
+
 
     def test_make_search_regions(self):
         # Tests both positive and negative strands with differing extensions

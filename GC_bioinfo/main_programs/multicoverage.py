@@ -1,5 +1,6 @@
 import multiprocessing
 import sys
+import argparse
 
 from GC_bioinfo.utils.make_five_prime_bed_file import make_five_bed_file
 from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
@@ -30,7 +31,7 @@ def output_data(data):
         print_tab_delimited(list(tsr) + [tup[1][tsr] for tup in data])
 
 
-def gather_data(read_type, seq_file, tsr_file):
+def gather_data(read_type, seq_file, regions_file):
     if read_type == "five":
         modified_seq_filename = make_five_bed_file(seq_file)
         need_to_remove_modified_seq_filename = True
@@ -43,9 +44,8 @@ def gather_data(read_type, seq_file, tsr_file):
         modified_seq_filename = seq_file
         need_to_remove_modified_seq_filename = False
 
-
     # Then quantify the 5' ends
-    coverage_file = run_coverage(tsr_file, modified_seq_filename)
+    coverage_file = run_coverage(regions_file, modified_seq_filename)
 
     data = organize_counts(coverage_file, seq_file)
 
@@ -57,35 +57,49 @@ def gather_data(read_type, seq_file, tsr_file):
     return data
 
 
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo multicoverage <five/three/whole> <regions file> <sequencing files>\n")
-    sys.stderr.write(
-        "More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/multicoverage.rst\n")
-
-
 def parse_args(args):
-    if len(args) < 3:
-        print_usage()
-        sys.exit(1)
+    def positive_int(num):
+        try:
+            val = int(num)
+            if val <= 0:
+                raise Exception("Go to the except")
+        except:
+            raise argparse.ArgumentTypeError(num + " must be positive")
 
-    read_type = sys.argv[1].lower()
+        return val
 
-    if read_type not in ["five", "three", "whole"]:
-        print_usage()
-        sys.exit(1)
+    parser = argparse.ArgumentParser(prog='GC_bioinfo multicoverage',
+        description='Quantify multiple sequencing files using the same regions\n' +
+                     "More information can be found at " +
+                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/multicoverage.rst")
 
-    tsr_file = sys.argv[2]
-    sequencing_files = sys.argv[3:]
+    parser.add_argument('read_type', metavar='read type', type=str, choices=["five", "three", "whole"],
+                        help='either five, three, or whole')
 
-    return read_type, tsr_file, sequencing_files
+    parser.add_argument('regions_filename', metavar='regions_filename', type=str,
+                        help='Bed formatted regions file with an even region length or a region length of one.')
+
+    parser.add_argument('seq_files', metavar='sequencing_files', nargs='+', type=str,
+                        help='Bed formatted files from the sequencing experiment')
+
+    parser.add_argument('-t', '--threads', dest='threads', metavar='threads', type=positive_int, nargs='?',
+                        default=multiprocessing.cpu_count())
+
+    args = parser.parse_args(args)
+    read_type = args.read_type
+    regions_file = args.regions_filename
+    sequencing_files = args.seq_files
+    max_threads = args.threads
+
+    return read_type, regions_file, sequencing_files, max_threads
 
 
 def main(args):
-    read_type, tsr_file, sequencing_files = parse_args(args)
+    read_type, regions_file, sequencing_files, max_threads = parse_args(args)
 
-    pool = multiprocessing.Pool(processes=len(sequencing_files))
-    data = pool.starmap(gather_data, [(read_type, seq_file, tsr_file) for seq_file in sequencing_files])
+    pool = multiprocessing.Pool(processes=max_threads)
+    data = pool.starmap(gather_data, [(read_type, seq_file, regions_file) for seq_file in sequencing_files])
+    pool.close()
     output_data(data)
 
 

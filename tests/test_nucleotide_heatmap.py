@@ -11,19 +11,30 @@ class TestNucleotideHeatmap(unittest.TestCase):
     def test_incorrect_number_of_arguments(self):
         with self.assertRaises(SystemExit):
             with Quieter():
-                nucleotide_heatmap.main([])
+                nucleotide_heatmap.parse_args([])
 
         with self.assertRaises(SystemExit):
             with Quieter():
-                nucleotide_heatmap.main(["max_tss_file"])
+                nucleotide_heatmap.parse_args(["max_tss_file"])
 
         with self.assertRaises(SystemExit):
             with Quieter():
-                nucleotide_heatmap.main(["max_tss_file", "region_width"])
+                nucleotide_heatmap.parse_args(["max_tss_file", "region_width"])
 
         with self.assertRaises(SystemExit):
             with Quieter():
-                nucleotide_heatmap.main(["max_tss_file", "region_width", "vertical_average", "extra"])
+                nucleotide_heatmap.parse_args(["max_tss_file", "region_width", "vertical_average", "extra"])
+
+        max_tss_file = generate_random_filename()
+        with open(max_tss_file, 'w') as file:
+            file.write(
+                "\t".join(['chr1', '1', '2', 'name', '0', '+'])
+            )
+
+        result = nucleotide_heatmap.parse_args([max_tss_file, '50', '2000', '2'])
+        self.assertEqual(result, (max_tss_file, 50, 2000, 2))
+
+        remove_files(max_tss_file)
 
     def test_expand_region(self):
         max_tss_file = generate_random_filename()
@@ -77,7 +88,7 @@ class TestNucleotideHeatmap(unittest.TestCase):
         test_nts = ["A", "T", "G", "C"]
 
         for i, nt in enumerate(test_nts):
-            matrix_filename = nucleotide_heatmap.convert_sequences_to_matrix_file(sequence, nt)
+            matrix_filename = nucleotide_heatmap.convert_sequences_to_matrix_file(sequence, nt, 1)
 
             with open(matrix_filename) as file:
                 result = [int(val) for val in file.readline().split()]

@@ -12,8 +12,8 @@ def main(args):
     :type args: list
     :return:
     """
-    regions_filename, sequencing_files_list, region_length = parse_input(args, "five")
-    run_metaplot(regions_filename, sequencing_files_list, region_length, "five")
+    regions_filename, sequencing_files_list, region_length, max_threads = parse_input(args, "five")
+    run_metaplot(regions_filename, sequencing_files_list, region_length, "five", max_threads)
 
 
 if __name__ == '__main__':

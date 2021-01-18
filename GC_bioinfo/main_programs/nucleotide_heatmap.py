@@ -1,6 +1,5 @@
-# This will make heatmaps for A, T, G, C for a certain distance surrounding the +1 nt
-
 import sys
+import argparse
 
 from GC_bioinfo.utils.verify_bed_file import verify_bed_files
 from GC_bioinfo.utils.get_region_length import determine_region_length
@@ -53,8 +52,15 @@ def get_sequences(regions_file):
     return sequences
 
 
-def convert_sequences_to_matrix_file(sequences, nucleotide):
+def convert_sequences_to_matrix_file(sequences, nucleotide, heatmap_width):
     matrix_file = generate_random_filename(".matrix")
+
+    # We want to expand each nucleotide a certain amount of times depending on the desired pixel width of the heatmap
+    repeat_amount = int(heatmap_width / len(sequences[0]))
+
+    # The repeat amount must be at least one to generate a heatmap
+    if repeat_amount < 1:
+        repeat_amount = 1
 
     with open(matrix_file, 'w') as file:
         for seq in sequences:
@@ -62,9 +68,11 @@ def convert_sequences_to_matrix_file(sequences, nucleotide):
 
             for nt in seq:
                 if nt == nucleotide:
-                    curr_seq_list.append("1")
+                    for _ in range(repeat_amount):
+                        curr_seq_list.append("1")
                 else:
-                    curr_seq_list.append("0")
+                    for _ in range(repeat_amount):
+                        curr_seq_list.append("0")
 
             file.write(
                 "\t".join(curr_seq_list) + "\n"
@@ -73,20 +81,39 @@ def convert_sequences_to_matrix_file(sequences, nucleotide):
     return matrix_file
 
 
-def print_usage():
-    sys.stderr.write("Usage: \n")
-    sys.stderr.write("GC_bioinfo nucleotide_heatmap <maxTSS file> <region width> <vertical average>\n")
-    # TODO: add the github link
-    sys.stderr.write(
-        "More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/multicoverage.rst\n")
-
-
 def parse_args(args):
-    if len(args) != 3:
-        print_usage()
-        sys.exit(1)
+    def positive_int(value):
+        try:
+            val = int(value)
+            if val < 0:
+                raise argparse.ArgumentTypeError(value + " must be a postive integer")
+        except:
+            raise argparse.ArgumentTypeError(value + " must be a postive integer")
 
-    max_tss_file, region_width, vertical_average = args
+        return val
+
+    parser = argparse.ArgumentParser(prog='GC_bioinfo nucleotide_heatmap',
+                                     description='Create a grayscale heatmap for each nucleotide.\n' +
+                                     "More information can be found at " +
+                                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/nucleotide_heatmap.rst")
+
+    parser.add_argument('max_tss_file', metavar='max_tss_file', type=str,
+                        help='Bed formatted file which has the base of the max TSS')
+
+    parser.add_argument('region_width', metavar='region_width', type=positive_int, help='Base pair width of the heatmap')
+
+    parser.add_argument('heatmap_width', metavar='heatmap_width', type=positive_int,
+                        help='Pixel width of the heatmap')
+
+    parser.add_argument('vertical_average', metavar='vertical_average', type=positive_int,
+                        help='Number of lines to average vertically')
+
+    args = parser.parse_args(args)
+
+    max_tss_file = args.max_tss_file
+    region_width = args.region_width
+    heatmap_width = args.heatmap_width
+    vertical_average = args.vertical_average
 
     # Verify maxTSS file exists
     verify_bed_files(max_tss_file)
@@ -96,30 +123,13 @@ def parse_args(args):
 
     if region_length != 1:
         sys.stderr.write("The maxTSS bed file must have regions of 1 bp.\n")
-        print_usage()
         sys.exit(1)
 
-    # Verify the region width is an integer
-    try:
-        region_width = int(region_width)
-    except:
-        sys.stderr.write("The region width must be an integer.\n")
-        print_usage()
-        sys.exit(1)
-
-    # Verify the vertical average is an integer
-    try:
-        vertical_average = int(vertical_average)
-    except:
-        sys.stderr.write("The vertical average must be an integer.\n")
-        print_usage()
-        sys.exit(1)
-
-    return max_tss_file, region_width, vertical_average
+    return max_tss_file, region_width, heatmap_width, vertical_average
 
 
 def main(args):
-    max_tss_file, region_width, vertical_average = parse_args(args)
+    max_tss_file, region_width, heatmap_width, vertical_average = parse_args(args)
 
     # Expand the maxTSS file to the desired width
     expanded_regions = expand_region(max_tss_file, region_width)
@@ -129,10 +139,10 @@ def main(args):
 
     # Convert the sequences into a list of 1's and 0's
     nt_binary_lists = {
-        "A": convert_sequences_to_matrix_file(sequences, "A"),
-        "T": convert_sequences_to_matrix_file(sequences, "T"),
-        "G": convert_sequences_to_matrix_file(sequences, "G"),
-        "C": convert_sequences_to_matrix_file(sequences, "C"),
+        "A": convert_sequences_to_matrix_file(sequences, "A", heatmap_width),
+        "T": convert_sequences_to_matrix_file(sequences, "T", heatmap_width),
+        "G": convert_sequences_to_matrix_file(sequences, "G", heatmap_width),
+        "C": convert_sequences_to_matrix_file(sequences, "C", heatmap_width),
     }
 
     # Average vertically

@@ -12,12 +12,14 @@ class TestMakeRegionsFileCenteredOnMaxTSS(unittest.TestCase):
     def test_no_input(self):
         with self.assertRaises(SystemExit):
             with Quieter():
-                make_regions_file_centered_on_max_tss.main([])
+                make_regions_file_centered_on_max_tss.parse_args([])
 
-    def test_only_truQuant_file(self):
         with self.assertRaises(SystemExit):
             with Quieter():
-                make_regions_file_centered_on_max_tss.main([self.truQuant_file])
+                make_regions_file_centered_on_max_tss.parse_args(['truQuant_file'])
+
+        result = make_regions_file_centered_on_max_tss.parse_args(['truQuant_file', '10'])
+        self.assertEqual(result, ('truQuant_file', 10))
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_get_max_tss(self, stdout):
