@@ -109,7 +109,9 @@ for chromosome in chromosome_file_writers:
 
 # Step 2: Run tsrFinder on both files concurrently
 def run_tsrFinderGC(filename):
-    os.system(tsr_finder_location + " " + filename + " " + " ".join(args[1:]))
+    os.system(tsr_finder_location + " " + filename + " " +
+              " ".join([str(window_size), str(min_seq_depth), str(min_avg_transcript_length),
+                        str(max_fragment_size), chrom_size_file]))
 
     step_three_filename = filename.replace(".bed", "-3-output.txt")
     step_four_filename = filename.replace(".bed", "-4-output.txt")

@@ -199,32 +199,32 @@ def get_args(args):
     parser.add_argument('output_prefix', metavar='output_prefix', type=str, help='Prefix for the output filename')
 
     parser.add_argument('-u', '--upstream_distance', metavar='upstream_distance', dest='upstream_distance',
-                        type=positive_int, default=50_000, help='Distance upstream of the max TSS')
+                        type=positive_int, default=50_000, help='Distance upstream of the max TSS. Default is 50,000 bp')
 
     parser.add_argument('-d', '--distance_past_tes', metavar='distance_past_tes', dest='distance_past_tes',
-                        type=positive_int, default=50_000, help='Distance downstream of the transcription end site')
+                        type=positive_int, default=50_000, help='Distance downstream of the transcription end site. Default is 50,000 bp')
 
     parser.add_argument('-b', '--bp_width', metavar='bp_width', dest='bp_width', default=400_000, type=positive_int,
                         help='Total number of base pairs shown on the heatmap. This number must be greater than the ' +
-                        'upstream distance + distance past TES.')
+                        'upstream distance + distance past TES. Default is 400,000 bp')
 
     parser.add_argument('-w', '--width', metavar='width', dest='width',
-                        type=positive_int, default=2_000, help='Width of the heatmap in pixels')
+                        type=positive_int, default=2_000, help='Width of the heatmap in pixels. Default is 2,000 bp')
 
     parser.add_argument('-e', '--height', metavar='height', dest='height',
-                        type=positive_int, default=2_000, help='Height of the heatmap in pixels')
+                        type=positive_int, default=2_000, help='Height of the heatmap in pixels. Default is 2,000 px')
 
     parser.add_argument('-g', '--gamma', metavar='gamma', dest='gamma',
-                        type=positive_float, default=2.2, help='Gamma value of the heatmap')
+                        type=positive_float, default=2.2, help='Gamma value of the heatmap. Default is 2.2 (no gamma correction)')
 
     parser.add_argument('-m', '--max_black', metavar='max_black', dest='max_black',
-                        type=positive_float, default=None, help='Max black value of the heatmap')
+                        type=positive_float, default=None, help='Max black value of the heatmap. Default is the maximum possible value')
 
     parser.add_argument('--minor_ticks', metavar='minor_ticks', dest='minor_ticks',
-                        type=positive_int, default=10_000, help='Distance between minor ticks (bp)')
+                        type=positive_int, default=10_000, help='Distance between minor ticks (bp). Default is 10,000 bp.')
 
     parser.add_argument('--major_ticks', metavar='major_ticks', dest='major_ticks',
-                        type=positive_int, default=50_000, help='Distance between major ticks (bp)')
+                        type=positive_int, default=50_000, help='Distance between major ticks (bp). Default is 50,000 bp')
 
     args = parser.parse_args(args)
 
@@ -235,10 +235,10 @@ def get_args(args):
     width = args.width
     height = args.height
     gamma = args.gamma
-    max_black_value = args.max_black_value
-    spike_in = args.spike_in
-    sequencing_filename = args.sequencing_filename
-    output_filename_prefix = args.output_filename_prefix
+    max_black_value = args.max_black
+    spike_in = args.correction_factor
+    sequencing_filename = args.seq_file
+    output_filename_prefix = args.output_prefix
     minor_ticks = args.minor_ticks
     major_ticks = args.major_ticks
 

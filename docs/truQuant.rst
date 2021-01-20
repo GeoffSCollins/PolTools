@@ -1,13 +1,13 @@
 ##############################
 *truQuant*
 ##############################
-The ``truQuant`` tool is used to build an annotation of the transcribed genes from PRO-Seq data. It also quantifies the
+The ``truQuant`` tool is used to build an annotation of transcribed genes from PRO-Seq data. It also quantifies the
 pause regions and gene bodies from the generated annotation while blacklisting enhancers, downstream promoters, and
 non RNA Polymerase II transcripts.
 
 .. note::
 
-    This tool requires `bedtools <https://github.com/arq5x/bedtools2>`_ and `tsrFinder <https://github.com/P-TEFb/tsrFinderM1>`_ be installed.
+    This tool requires `bedtools <https://github.com/arq5x/bedtools2>`_ be installed.
 
 ===============================
 Usage and option summary
@@ -15,18 +15,34 @@ Usage and option summary
 **Usage**:
 ::
 
-  GC_bioinfo truQuant <Sequencing Files>
+  truQuant [-h] [-a [annotation_extension]]
+                [-b [blacklisting_percent]]
+                [-r [pause_region_radius]] [-t [threads]]
+                sequencing_file_for_annotation
+                [sequencing_files [sequencing_files ...]]
 
 
-===========================    =========================================================================================================================================================
-Option                         Description
-===========================    =========================================================================================================================================================
-**Sequencing Files**           Sequencing files to quantify separated by spaces.
-===========================    =========================================================================================================================================================
+==================================   =========================================================================================================================================================
+Required Arguments                         Description
+==================================   =========================================================================================================================================================
+**Sequencing file for annotation**   Bed formatted file from a sequencing experiment.
+==================================   =========================================================================================================================================================
 
-.. note::
 
-  The first sequencing file provided will be used to generate the annotation.
+
+===============================    =========================================================================================================================================================
+Optional Arguments                         Description
+===============================    =========================================================================================================================================================
+**-a, --annotation_extension**     Distance of base pairs to extend the 5' end of all genes upstream. Default is 1000.
+**-b, --blacklisting_percent**     Percentage (number between 0 and 1) of reads in the pause region that is necessary to blacklist a TSR in the gene body. For example, a pause region with
+                                   100 reads and a blacklist percentage of 0.3 means a TSR in the gene body needs at least 30 reads to be blacklisted. Default is 0.3.
+**-r, --pause_region_radius**      Base pair amount to go upstream and downstream centered on the avgTSS. The pause region will be of size 2 * pause region radius. Default is 75.
+**-t, --threads**                  Maximum number of threads to run truQuant. Default is the max available on the system. Please note that truQuant will use a maximum of 46 threads
+                                   for finding TSRs and a one thread for each sequencing file (these two processes do not happen at the same time).
+**Sequencing Files**               Additional sequencing files can be provided to be quantified using the generated annotation. The files will be blacklisted then quantified using the
+                                   number of 5' end reads in the pause region and the number of 3' end reads in the gene body.
+===============================    =========================================================================================================================================================
+
 
 ==========================================================================
 Behavior
@@ -43,23 +59,21 @@ For example:
 
 .. code-block:: bash
 
-  $ head -n 5 control.bed
-  chr1    10080   10380   K00294:149:H35VNBBXY:6:2108:3742:16524  255     -
-  chr1    10563   10611   K00294:149:H35VNBBXY:6:1126:31730:23241 255     -
-  chr1    10563   10600   K00294:149:H35VNBBXY:6:2206:29630:38627 255     -
-  chr1    10564   10620   K00294:149:H35VNBBXY:6:1212:19441:27971 255     -
-  chr1    10564   10611   K00294:149:H35VNBBXY:6:1211:31121:35022 255     -
+  $ head -n 5 seq_file.bed
+  chr1    11981   12023   A00876:119:HW5F5DRXX:1:2168:2248:1407   255     -
+  chr1    13099   13117   A00876:119:HW5F5DRXX:1:2203:31403:26757 255     -
+  chr1    13356   13423   A00876:119:HW5F5DRXX:1:2151:15808:7827  255     -
+  chr1    13435   13477   A00876:119:HW5F5DRXX:1:2273:15781:19241 255     -
+  chr1    13739   13772   A00876:119:HW5F5DRXX:1:2256:29966:10520 255     -
 
-  $ head -n 5 treated.bed
-  chr1    10156   10374   K00294:149:H35VNBBXY:6:1209:23104:15891 255     -
-  chr1    10564   10593   K00294:149:H35VNBBXY:6:2220:4888:19777  255     -
-  chr1    10564   10597   K00294:149:H35VNBBXY:6:2104:25570:41651 255     -
-  chr1    10564   10600   K00294:149:H35VNBBXY:6:1205:16407:42724 255     -
-  chr1    10565   10597   K00294:149:H35VNBBXY:6:2221:2077:20709  255     -
-
-  $ GC_bioinfo truQuant control.bed treated.bed
-  $ head -n 1 control-truQuant_output.txt # Printing the headers
-  Gene    Chromosome      Pause Region Left       Pause Region Right      Strand  Total 5' Reads  MaxTSS  MaxTSS 5' Reads
-  Weighted Pause Region Center    STDEV of TSSs   Gene Body Left  Gene Body Right Gene Body Distance
-  control.bed Pause Region   treated.bed Pause Region   combined.bed Gene Body   treated.bed Gene Body
+  $ GC_bioinfo truQuant seq_file.bed
+  $ head -n 1 control-truQuant_output.txt
+  Gene    Chromosome      Pause Region Left       Pause Region Right      Strand  Total 5' Reads  MaxTSS  MaxTSS 5' Reads Weighted Pause Region Center    STDEV of TSSs   Gene Body Left  Gene Body Right Gene Body Distance      seq_file.bed Pause Region   seq_file.bed Gene Body
+  NOC2L   chr1    959177  959327  -       194     959255  46      959250  13.306459171023036      944203  959177  14974   194     18
+  KLHL17  chr1    960552  960702  +       234     960632  27      960626  25.417791063821863      960702  965719  5017    234     17
+  PLEKHN1 chr1    966439  966589  +       25      966521  8       966513  19.47408534437497       966589  975865  9276    25      11
+  HES4    chr1    1000013 1000163 -       239     1000096 87      1000086 27.14758979723915       998962  1000013 1051    239     68
+  ISG15   chr1    1000204 1000354 +       160     1000295 12      1000278 36.24344768368484       1000354 1014540 14186   160     111
+  AGRN    chr1    1020042 1020192 +       112     1020119 35      1020116 25.189637892253575      1020192 1056118 35926   112     76
+  RNF223  chr1    1074208 1074358 -       32      1074306 10      1074284 32.567238138964136      1070967 1074208 3241    32      8
 

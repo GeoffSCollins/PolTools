@@ -63,13 +63,13 @@ def parse_input(args):
     parser.add_argument('regions_filename', metavar='regions_filename', type=str,
                         help='Bed formatted regions file with an even region length or a region length of one.')
 
-    parser.add_argument('searching_sequences', metavar='searching_sequences', type=str, nargs='+',
+    parser.add_argument('search', metavar='search', type=str, nargs='+',
                         help='Search region formatted as follows: (Sequence),(-/+)left:(-/+)right. Ex: TATA,-30:-20')
 
     args = parser.parse_args(args)
 
     regions_file = args.regions_filename
-    searching_sequences = args.searching_sequences
+    searching_sequences = args.search
 
     region_length = determine_region_length(regions_file)
 

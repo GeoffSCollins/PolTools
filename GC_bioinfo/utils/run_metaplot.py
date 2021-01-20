@@ -103,10 +103,10 @@ def parse_input(args, end):
                                                  "More information can be found at " +
                                                  "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/" + end + "_prime_metaplot.rst")
 
-    parser.add_argument('regions_file', metavar='regions', type=str,
+    parser.add_argument('regions_file', metavar='regions_file', type=str,
                         help='Bed formatted file containing all the regions you want to average the sequences')
 
-    parser.add_argument('seq_files', metavar='sequencing files', nargs='+', type=str,
+    parser.add_argument('seq_files', metavar='sequencing_files', nargs='+', type=str,
                         help='Bed formatted files from the sequencing experiment')
 
     parser.add_argument('-t', '--threads', dest='threads', metavar='threads', type=positive_int, nargs='?',

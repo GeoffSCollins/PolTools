@@ -109,12 +109,12 @@ def get_args(args):
     width = args.width
     height = args.height
     gamma = args.gamma
-    max_black_value = args.max_black_value
+    max_black_value = args.max_black
     spike_in_one = args.correction_factor_one
     sequencing_filename_one = args.seq_file_one
     spike_in_two = args.correction_factor_two
     sequencing_filename_two = args.seq_file_two
-    output_filename_prefix = args.output_filename_prefix
+    output_filename_prefix = args.output_prefix
     minor_ticks = args.minor_ticks
     major_ticks = args.major_ticks
     max_threads = args.threads
@@ -127,6 +127,7 @@ def get_args(args):
 
     if len(tsr_file) != 1:
         sys.stderr.write("More than one tsrFinder file was found for this run of truQuant. Exiting ...\n")
+        sys.stderr.write("HERE: " + str(tsr_file))
         sys.exit(1)
 
     tsr_file = tsr_file[0]
@@ -141,10 +142,6 @@ def get_args(args):
 
     if not tsr_file:
         sys.stderr.write("No tsrFinder file was found. Exiting ...\n")
-        sys.exit(1)
-
-    if len(tsr_file) != 1:
-        sys.stderr.write("More than one tsrFinder file was found for this run of truQuant. Exiting ...\n")
         sys.exit(1)
 
     if bp_width % width != 0:

@@ -392,7 +392,7 @@ def run_tsrFinder(first_seq_file, max_threads):
 
     tsr_file = blacklisted_first_sequencing_file.replace(".bed", "_150_20_30_600-TSR.tab")
     run_subtract(first_seq_file, rna_blacklist_file, output_filename=blacklisted_first_sequencing_file)
-    os.system("GC_bioinfo tsrFinder " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file + " -t " + max_threads)
+    os.system("GC_bioinfo tsrFinder " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file + " -t " + str(max_threads))
     return tsr_file
 
 
@@ -487,7 +487,7 @@ def parse_input(args):
 
     parser.add_argument('-a', '--annotation_extension', dest='annotation_extension', metavar='annotation_extension', nargs='?', type=int, default=1000)
 
-    parser.add_argument('-b', '--blacklist_percent', dest='percent_for_blacklisting', metavar='blacklisting %', nargs='?', type=between_zero_and_one, default=0.3)
+    parser.add_argument('-b', '--blacklist_percent', dest='percent_for_blacklisting', metavar='blacklisting_percent', nargs='?', type=between_zero_and_one, default=0.3)
 
     parser.add_argument('-r', '--pause_radius', dest='pause_region_radius', metavar='pause_region_radius', type=positive_int, nargs='?', default=75)
 

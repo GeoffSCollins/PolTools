@@ -8,8 +8,8 @@ from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
 from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
 
 
-def get_pausing_distances_helper(transcripts_dict, regions_filename):
-    all_pause_distances = [0] * 101
+def get_pausing_distances_helper(transcripts_dict, regions_filename, max_transcript_length):
+    all_pause_distances = [0] * (max_transcript_length + 1)
 
     # Go through each gene and get the distances from each one
     with open(regions_filename) as file:
@@ -30,15 +30,15 @@ def get_pausing_distances_helper(transcripts_dict, regions_filename):
                     # The three prime ends are inclusive, so we need to add 1 to the transcript length
                     transcript_length = abs(five_prime_position - three_prime_end) + 1
 
-                    if transcript_length <= 100:
+                    if transcript_length <= max_transcript_length:
                         all_pause_distances[transcript_length] += 1
 
     return all_pause_distances
 
 
-def get_pausing_distances(regions_filename, sequencing_filename):
+def get_pausing_distances(regions_filename, sequencing_filename, max_transcript_length):
     transcripts_dict = build_transcripts_dict(sequencing_filename)
-    all_pause_distances = get_pausing_distances_helper(transcripts_dict, regions_filename)
+    all_pause_distances = get_pausing_distances_helper(transcripts_dict, regions_filename, max_transcript_length)
 
     return all_pause_distances
 
@@ -66,12 +66,17 @@ def parse_input(args):
     parser.add_argument('seq_files', metavar='sequencing_files', nargs='+', type=str,
                         help='Bed formatted files from the sequencing experiment')
 
+    parser.add_argument('-m', '--max_transcript_length', dest='max_transcript_length', metavar='max_transcript_length',
+                        type=positive_int, nargs='?',
+                        help='Set the maximum transcript length to be outputted. Default is 100', default=100)
+
     parser.add_argument('-t', '--threads', dest='threads', metavar='threads', type=positive_int, nargs='?',
                         default=multiprocessing.cpu_count())
 
     args = parser.parse_args(args)
     regions_filename = args.regions_filename
     sequencing_files = args.seq_files
+    max_transcript_length = args.max_transcript_length
     max_threads = args.threads
 
     region_length = determine_region_length(regions_filename)
@@ -79,7 +84,7 @@ def parse_input(args):
     if region_length != 1:
         verify_region_length_is_even(region_length)
 
-    return regions_filename, sequencing_files, max_threads
+    return regions_filename, sequencing_files, max_transcript_length, max_threads
 
 
 def output_pausing_distances(pausing_distances, sequencing_files):
@@ -90,9 +95,9 @@ def output_pausing_distances(pausing_distances, sequencing_files):
         print_tab_delimited([i] + [x[i] for x in pausing_distances])
 
 
-def pausing_distance_distribution_from_maxTSS(regions_filename, sequencing_files, max_threads):
+def pausing_distance_distribution_from_maxTSS(regions_filename, sequencing_files, max_transcript_length, max_threads):
     pool = multiprocessing.Pool(processes=max_threads)
-    pausing_distances = pool.starmap(get_pausing_distances, [(regions_filename, seq_filename) for seq_filename in sequencing_files])
+    pausing_distances = pool.starmap(get_pausing_distances, [(regions_filename, seq_filename, max_transcript_length) for seq_filename in sequencing_files])
     pool.close()
     output_pausing_distances(pausing_distances, sequencing_files)
 
@@ -106,8 +111,8 @@ def main(args):
     :type args: list
     :return:
     """
-    regions_filename, sequencing_files, max_threads = parse_input(args)
-    pausing_distance_distribution_from_maxTSS(regions_filename, sequencing_files, max_threads)
+    regions_filename, sequencing_files, max_transcript_length, max_threads = parse_input(args)
+    pausing_distance_distribution_from_maxTSS(regions_filename, sequencing_files, max_transcript_length, max_threads)
 
 if __name__ == '__main__':
     main(sys.argv[1:])

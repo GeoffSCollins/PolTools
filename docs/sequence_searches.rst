@@ -1,7 +1,7 @@
 ##############################
 *Sequence Searches*
 ##############################
-The ``sequence_searches`` tool is used determine the locations where a certain sequence (or multiple sequences) are found.
+The ``sequence_searches`` tool is used determine if a sequence is present in a certain location around regions.
 
 
 .. note::
@@ -15,35 +15,38 @@ Usage and option summary
 **Usage**:
 ::
 
-  GC_bioinfo sequence_searches <regions file> <Sequence,startPosition:endPosition>
+  GC_bioinfo GC_bioinfo sequence_searches [-h] regions_filename search [search ...]
+
+===========================    =========================================================================================================================================================
+Required Arguments             Description
+===========================    =========================================================================================================================================================
+**Regions filename**           Bed formatted file containing all the regions you want to quantify (must be centered on +1 nt). This file can be generated from the
+                               `make_regions_file_centered_on_max_tss program <make_regions_file_centered_on_max_tss.rst>`_
+**Search**                     Search region and sequence formatted as follows: (Sequence),(-/+)left:(-/+)right. Ex: TATA,-30:-20
+===========================    =========================================================================================================================================================
+
+===========================    =========================================================================================================================================================
+Optional Arguments             Description
+===========================    =========================================================================================================================================================
+**Search**                     Additional searches can be provided.
+===========================    =========================================================================================================================================================
 
 
-======================================   =========================================================================================================================================================
-Option                                   Description
-======================================   =========================================================================================================================================================
-**Regions Filename**                     Bed formatted file containing all the genes to quantify (regions will be determined
-                                         from the 3' end of each region in this file.
-**Sequence,startPosition:endPosition**   The sequence to search for (includes non standard bases like W) in the region
-                                         (endPosition is inclusive).
-======================================   =========================================================================================================================================================
 
 ==========================================================================
 Behavior
 ==========================================================================
-``sequence_searches`` will output the regions file provided with new columns for the searching sequences.
+``sequence_searches`` will output the regions file provided with new columns for the searches containing True or False values.
 
 For example:
 
 .. code-block:: bash
 
-  $ cat POLR2A_inr.bed
+  $ head POLR2A_inr.bed
   chr17   7484355 7484375 POLR2A  0       +
 
-  $ cat CCNT1_inr.bed
-  chr12   48716696        48716716        CCNT1   0       -
-
-  $ GC_bioinfo sequence_searches POLR2A_inr.bed GCTGCT,-3:3
-  Chromosome      Left    Right   Gene    Score   Strand  GCTGCT
+  $ GC_bioinfo sequence_searches POLR2A_inr.bed GCTGC,-3:3
+  Chromosome      Left    Right   Gene    Score   Strand  GCTGC
   chr17   7484355 7484375 POLR2A  0       +       True
 
 ===============================

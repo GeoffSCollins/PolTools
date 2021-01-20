@@ -100,7 +100,12 @@ def make_rgb_heatmap(fold_change_matrix_filename, heatmap_params, output_filenam
 
     only_heatmap_filename = generate_random_filename(extension=".tiff")
 
-    generate_heatmap(fold_change_matrix_filename, 'red/blue', only_heatmap_filename, gamma, (-1 * max_fold_change),
+    if max_fold_change != None:
+        negative_max_fold_change = -1 * max_fold_change
+    else:
+        negative_max_fold_change = None
+
+    generate_heatmap(fold_change_matrix_filename, 'red/blue', only_heatmap_filename, gamma, negative_max_fold_change,
                      max_fold_change, ticks=None)
 
     ticks_image_filename = make_ticks_image(width, interval_size, tick_params)
@@ -221,7 +226,7 @@ def get_args(args):
     denominator_spike_in_two = args.denominator_correction_factor_two
     denominator_sequencing_filename_two = args.denominator_seq_file_two
 
-    output_filename_prefix = args.output_filename_prefix
+    output_filename_prefix = args.output_prefix
     minor_ticks = args.minor_ticks
     major_ticks = args.major_ticks
 
