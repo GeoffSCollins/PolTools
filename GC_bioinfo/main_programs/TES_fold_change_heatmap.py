@@ -85,7 +85,7 @@ def get_args(args):
         except:
             raise argparse.ArgumentTypeError(num + " must be positive")
 
-        return num
+        return val
 
     def positive_float(num):
         try:
@@ -95,7 +95,7 @@ def get_args(args):
         except:
             raise argparse.ArgumentTypeError(num + " must be positive")
 
-        return num
+        return val
 
     parser = argparse.ArgumentParser(prog='GC_bioinfo TES_fold_change_heatmap',
                                      description="Generate a heatmap of 3' ends for each gene sorted by gene length " +
@@ -168,15 +168,15 @@ def get_args(args):
     args = parser.parse_args(args)
 
     truQuant_output_file = args.truQuant_output_file
-    numerator_spike_in_one = args.numerator_spike_in_one
-    numerator_sequencing_filename_one = args.numerator_sequencing_filename_one
-    numerator_spike_in_two = args.numerator_spike_in_two
-    numerator_sequencing_filename_two = args.numerator_sequencing_filename_two
-    denominator_spike_in_one = args.denominator_spike_in_one
-    denominator_sequencing_filename_one = args.denominator_sequencing_filename_one
-    denominator_spike_in_two = args.denominator_spike_in_two
-    denominator_sequencing_filename_two = args.denominator_sequencing_filename_two
-    output_filename_prefix = args.output_filename_prefix
+    numerator_spike_in_one = args.numerator_correction_factor_one
+    numerator_sequencing_filename_one = args.numerator_seq_file_one
+    numerator_spike_in_two = args.numerator_correction_factor_two
+    numerator_sequencing_filename_two = args.numerator_seq_file_two
+    denominator_spike_in_one = args.denominator_correction_factor_one
+    denominator_sequencing_filename_one = args.denominator_seq_file_one
+    denominator_spike_in_two = args.denominator_correction_factor_two
+    denominator_sequencing_filename_two = args.denominator_seq_file_two
+    output_filename_prefix = args.output_prefix
     width = args.width
     height = args.height
     downstream_distance = args.downstream_distance
@@ -189,7 +189,7 @@ def get_args(args):
     max_threads = args.threads
 
     # Find all regions to blacklist
-    tsr_file = glob.glob(truQuant_output_file.replace("gene_body_regions.bed", "") + "*TSR.tab")
+    tsr_file = glob.glob(truQuant_output_file.replace("-truQuant_output.txt", "") + "*TSR.tab")
 
     if not tsr_file:
         sys.stderr.write("No tsrFinder file was found. Exiting ...\n")
@@ -238,9 +238,9 @@ def main(args):
     output_prefix = filenames[-1]
 
     output_filename = output_prefix + "_max_" + str(max_log2_fc) +  "_width_" + str(bp_width) + \
-                      "bp_fold_change_TES_heatmap.tiff"
+                      "bp_fold_change_TES_heatmap"
 
-    only_heatmap_filename = generate_random_filename().replace(".bed", ".tiff")
+    only_heatmap_filename = generate_random_filename(".tiff")
 
     generate_heatmap(fold_change_matrix, 'red/blue', only_heatmap_filename, gamma, (-1 * max_log2_fc),
                      max_log2_fc)

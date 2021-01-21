@@ -43,7 +43,7 @@ def get_args(args):
         except:
             raise argparse.ArgumentTypeError(num + " must be positive")
 
-        return num
+        return val
 
     def positive_float(num):
         try:
@@ -53,7 +53,7 @@ def get_args(args):
         except:
             raise argparse.ArgumentTypeError(num + " must be positive")
 
-        return num
+        return val
 
     parser = argparse.ArgumentParser(prog='GC_bioinfo TES_combined_heatmap',
                                      description="Generate a heatmap of 3' ends for each gene sorted by gene length " +
@@ -113,24 +113,24 @@ def get_args(args):
     args = parser.parse_args(args)
 
     truQuant_output_file = args.truQuant_output_file
-    spike_in_one = args.spike_in_one
-    sequencing_filename_one = args.sequencing_filename_one
-    spike_in_two = args.spike_in_two
-    sequencing_filename_two = args.sequencing_filename_two
-    output_filename_prefix = args.output_filename_prefix
+    spike_in_one = args.correction_factor_one
+    sequencing_filename_one = args.seq_file_one
+    spike_in_two = args.correction_factor_two
+    sequencing_filename_two = args.seq_file_two
+    output_filename_prefix = args.output_prefix
     width = args.width
     height = args.height
     downstream_distance = args.downstream_distance
     upstream_distance = args.upstream_distance
     bp_width = args.bp_width
     gamma = args.gamma
-    max_black_value = args.max_black_value
+    max_black_value = args.max_black
     minor_ticks = args.minor_ticks
     major_ticks = args.major_ticks
     max_threads = args.threads
 
     # Find all regions to blacklist
-    tsr_file = glob.glob(truQuant_output_file.replace("gene_body_regions.bed", "") + "*TSR.tab")
+    tsr_file = glob.glob(truQuant_output_file.replace("-truQuant_output.txt", "") + "*TSR.tab")
 
     if not tsr_file:
         sys.stderr.write("No tsrFinder file was found. Exiting ...\n")
