@@ -58,7 +58,7 @@ def parse_args(args):
     parser = argparse.ArgumentParser(prog='GC_bioinfo tps_distance_per_gene',
                                      description='Determine the most common pausing distance from the max TSS for each gene.\n' +
                                                  "More information can be found at " +
-                                                 "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/tps_distance_per_gene.rst")
+                                                 "https://geoffscollins.github.io/GC_bioinfo/tps_distance_per_gene.html")
 
     parser.add_argument('regions_filename', metavar='regions_filename', type=str,
                         help='Bed formatted regions file with an even region length or a region length of one.')
@@ -115,7 +115,7 @@ def run_tps_distance_per_gene(regions_filename, sequencing_files_list, region_le
 def main(args):
     """
     GC_bioinfo tps_distance_per_gene <Regions Filename> <Sequencing Files>
-    More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/tps_distance_per_gene.rst
+    More information can be found at https://geoffscollins.github.io/GC_bioinfo/tps_distance_per_gene.html
 
     :param args:
     :return:

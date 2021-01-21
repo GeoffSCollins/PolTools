@@ -27,7 +27,7 @@ def positive_int(num):
 parser = argparse.ArgumentParser(prog='GC_bioinfo tsrFinder',
                                  description='Find transcription start regions\n' +
                                  "More information can be found at " +
-                                 "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/tsrFinder.rst")
+                                 "https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html")
 
 parser.add_argument('seq_file', metavar='seq_file', type=str, help='Bed formatted sequencing file to find the TSRs')
 parser.add_argument('window_size', metavar='window_size', type=positive_int, help='Base pair size of the sliding window')

@@ -84,7 +84,7 @@ def parse_args(args):
     parser = argparse.ArgumentParser(prog='GC_bioinfo sequence_from_region_around_max_tss',
                                      description='Get the sequence from a certain region around the max TSS\n' +
                                                  "More information can be found at " +
-                                                 "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/sequence_from_region_around_max_tss.rst"
+                                                 "https://geoffscollins.github.io/GC_bioinfo/sequence_from_region_around_max_tss.html"
                                      )
 
     parser.add_argument('max_tss_file', metavar='max_tss_file', type=str,

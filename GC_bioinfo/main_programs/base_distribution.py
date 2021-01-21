@@ -77,7 +77,7 @@ def parse_args(args):
     parser = argparse.ArgumentParser(prog='GC_bioinfo base_distribution',
         description='Compute the average base composition at each position of the given region.\n' +
                     "More information can be found at " +
-                    "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/base_distribution.rst")
+                    "https://geoffscollins.github.io/GC_bioinfo/base_distribution.html")
 
     parser.add_argument('regions_file', metavar='regions_file', type=str,
                         help='Bed formatted file containing all the regions you want to average the sequences')
@@ -95,7 +95,7 @@ def parse_args(args):
 def main(args):
     """
     base_distribution <Regions Filename>
-    More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/base_distribution.rst
+    More information can be found at https://geoffscollins.github.io/GC_bioinfo/base_distribution.html
 
     :param args: list of the sequencing files
     :type args: list

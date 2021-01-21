@@ -71,7 +71,7 @@ def parse_args(args):
     parser = argparse.ArgumentParser(prog='GC_bioinfo multicoverage',
         description='Quantify multiple sequencing files using the same regions\n' +
                      "More information can be found at " +
-                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/multicoverage.rst")
+                     "https://geoffscollins.github.io/GC_bioinfo/multicoverage.html")
 
     parser.add_argument('read_type', metavar='read type', type=str, choices=["five", "three", "whole"],
                         help='either five, three, or whole')

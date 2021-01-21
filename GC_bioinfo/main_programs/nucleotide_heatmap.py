@@ -95,7 +95,7 @@ def parse_args(args):
     parser = argparse.ArgumentParser(prog='GC_bioinfo nucleotide_heatmap',
                                      description='Create a grayscale heatmap for each nucleotide.\n' +
                                      "More information can be found at " +
-                                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/nucleotide_heatmap.rst")
+                                     "https://geoffscollins.github.io/GC_bioinfo/nucleotide_heatmap.html")
 
     parser.add_argument('max_tss_file', metavar='max_tss_file', type=str,
                         help='Bed formatted file which has the base of the max TSS')

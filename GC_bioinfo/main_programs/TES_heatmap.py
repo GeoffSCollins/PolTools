@@ -198,7 +198,7 @@ def get_args(args):
                                      description="Generate a heatmap of 3' ends for each gene sorted by gene length " +
                                      "aligned by the transcription end site\n" +
                                      "More information can be found at " +
-                                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/TES_heatmap.rst")
+                                     "https://geoffscollins.github.io/GC_bioinfo/TES_heatmap.html")
 
     parser.add_argument('truQuant_output_file', metavar='truQuant_output_file', type=str,
                         help='truQuant output file which ends in -truQuant_output.txt')

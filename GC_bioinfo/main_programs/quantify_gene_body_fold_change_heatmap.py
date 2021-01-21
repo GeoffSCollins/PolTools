@@ -21,7 +21,7 @@ def print_usage():
                      " <Distance Past TES> <Width> <Height> <Gamma> <Max fold change> <Interval Size> <Spike in Correction> <Sequencing Filename>" +
                      "<Numerator Spike in Correction> <Numerator Sequencing Filename> <Numerator Spike in Correction> <Numerator Sequencing Filename>" +
                      "<Denomenator Spike in Correction> <Denomenator Sequencing Filename> <Denomenator Spike in Correction> <Denomenator Sequencing Filename> <Output Filename> \n")
-    sys.stderr.write("\nMore information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/quantify_gene_body_fold_change_heatmap.rst\n")
+    sys.stderr.write("\nMore information can be found at https://geoffscollins.github.io/GC_bioinfo/quantify_gene_body_fold_change_heatmap.html\n")
 
 
 def read_coverage_file(coverage_file):

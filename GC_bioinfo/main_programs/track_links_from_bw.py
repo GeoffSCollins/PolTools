@@ -85,7 +85,7 @@ def parse_args(args):
     parser = argparse.ArgumentParser(prog='GC_bioinfo track_links_from_bw',
                                      description='Create track links for bigwig files\n' +
                                      "More information can be found at " +
-                                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/track_links_from_bw.rst")
+                                     "https://geoffscollins.github.io/GC_bioinfo/track_links_from_bw.html")
 
     parser.add_argument('bw_files', metavar='bigwig_files', nargs='+', type=str,
                         help='Bigwig (.bw) files')

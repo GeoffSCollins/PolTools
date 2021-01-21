@@ -483,7 +483,7 @@ def parse_input(args):
     parser = argparse.ArgumentParser(prog='GC_bioinfo truQuant',
                                      description='Annotate and quantify the human genome from PRO-Seq data\n' +
                                      "More information can be found at " +
-                                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/truQuant.rst")
+                                     "https://geoffscollins.github.io/GC_bioinfo/truQuant.html")
 
     parser.add_argument('-a', '--annotation_extension', dest='annotation_extension', metavar='annotation_extension', nargs='?', type=int, default=1000)
 
@@ -515,7 +515,7 @@ def parse_input(args):
 def main(args):
     """
     truQuant <Sequencing Files>
-    More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/truQuant.rst
+    More information can be found at https://geoffscollins.github.io/GC_bioinfo/truQuant.html
 
     :param args: list of the sequencing files
     :type args: list

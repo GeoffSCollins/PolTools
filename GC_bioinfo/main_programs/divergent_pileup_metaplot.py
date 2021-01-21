@@ -112,7 +112,7 @@ def parse_args(args):
 
     parser = argparse.ArgumentParser(prog='GC_bioinfo divergent_pileup_metaplot',
         description='Generate a metaplot of the pileup reads.\n'+
-        'More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/divergent_pileup_metaplot.rst')
+        'More information can be found at https://geoffscollins.github.io/GC_bioinfo/divergent_pileup_metaplot.html')
 
     parser.add_argument('regions_file', metavar='regions_file', type=str,
                         help='Bed formatted file containing all the regions you want to average the sequences')
@@ -162,7 +162,7 @@ def run_divergent_pileup_plots(regions_filename, sequencing_files_list, region_l
 def main(args):
     """
     python3 divergent_pileup_metaplot <Regions Filename> <Sequencing Files>
-    More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/divergent_pileup_metaplot.rst
+    More information can be found at https://geoffscollins.github.io/GC_bioinfo/divergent_pileup_metaplot.html
 
     :param args: arguments provided to the program
     :type args: list

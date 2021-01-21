@@ -57,7 +57,7 @@ def parse_input(args):
     parser = argparse.ArgumentParser(prog='GC_bioinfo pausing_distance_distribution_from_maxTSS',
                 description='Quantify the number of transcripts at each length originating from the max TSS\n' +
                             "More information can be found at " +
-                            "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/pausing_distance_distribution_from_maxTSS.rst"
+                            "https://geoffscollins.github.io/GC_bioinfo/pausing_distance_distribution_from_maxTSS.html"
     )
 
     parser.add_argument('regions_filename', metavar='regions_filename', type=str,
@@ -105,7 +105,7 @@ def pausing_distance_distribution_from_maxTSS(regions_filename, sequencing_files
 def main(args):
     """
     pausing_distance_distribution_from_maxTSS <regions file> <sequencing files>
-    More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/pausing_distance_distribution_from_maxTSS.rst
+    More information can be found at https://geoffscollins.github.io/GC_bioinfo/pausing_distance_distribution_from_maxTSS.html
 
     :param args: list of the sequencing files
     :type args: list

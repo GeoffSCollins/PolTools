@@ -52,7 +52,7 @@ def parse_args(args):
     parser = argparse.ArgumentParser(prog='GC_bioinfo make_regions_file_centered_on_max_tss',
         description='Make a region file centered on the max TSS from truQuant\n' +
                      "More information can be found at " +
-                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/make_regions_file_centered_on_max_tss.rst")
+                     "https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html")
 
     parser.add_argument('truQuant_file', metavar='truQuant_file', type=str,
                         help='truQuant output file ending in -truQuant_output.txt')
@@ -74,7 +74,7 @@ def parse_args(args):
 def main(args):
     """
     GC_bioinfo make_regions_file_centered_on_max_tss <truQuant output file> <region size>
-    More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/make_regions_file_centered_on_max_tss.rst
+    More information can be found at https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html
 
     :param args:
     :return:

@@ -6,7 +6,7 @@ from GC_bioinfo.utils.run_metaplot import run_metaplot, parse_input
 def main(args):
     """
     GC_bioinfo three_prime_metaplot <Regions Filename> <Sequencing Files>
-    More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/three_prime_metaplot.rst
+    More information can be found at https://geoffscollins.github.io/GC_bioinfo/three_prime_metaplot.html
 
     :param args: arguments provided to the program
     :type args: list

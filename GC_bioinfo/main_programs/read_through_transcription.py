@@ -154,7 +154,7 @@ def parse_input(args):
     parser = argparse.ArgumentParser(prog='GC_bioinfo read_through_transcription',
                                      description='Quantify three prime ends around the TES of genes\n' +
                                      "More information can be found at " +
-                                     "https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/read_through_transcription.rst")
+                                     "https://geoffscollins.github.io/GC_bioinfo/read_through_transcription.html")
 
     parser.add_argument('regions_filename', metavar='regions_filename', type=str,
                         help='Bed formatted regions file with an even region length or a region length of one.')
@@ -214,7 +214,7 @@ def main(args):
     """
     read_through_transcription <Regions Filename> <TSR Filename> <Upstream Distance> <Downstream Distance> <Interval Size>
     <Sequencing Files>
-    More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/read_through_transcription.rst
+    More information can be found at https://geoffscollins.github.io/GC_bioinfo/read_through_transcription.html
 
     :param args: arguments provided to the program
     :type args: list

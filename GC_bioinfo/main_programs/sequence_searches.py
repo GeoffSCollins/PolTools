@@ -58,7 +58,7 @@ def parse_input(args):
     parser = argparse.ArgumentParser(prog='GC_bioinfo sequence_searches',
                                      description='Determine if a sequence in present in a region around the max TSS\n' +
                                      'More information can be found at ' +
-                                     'https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/sequence_searches.rst')
+                                     'https://geoffscollins.github.io/GC_bioinfo/sequence_searches.html')
 
     parser.add_argument('regions_filename', metavar='regions_filename', type=str,
                         help='Bed formatted regions file with an even region length or a region length of one.')
@@ -145,7 +145,7 @@ def main(args):
     """
     GC_bioinfo sequence_searches <regions file> <Sequence,startPosition:endPosition>
     Ex. GC_bioinfo sequence_searches genes.bed TATA,-34:-28
-    More information can be found at https://github.com/GeoffSCollins/GC_bioinfo/blob/master/docs/sequence_searches.rst
+    More information can be found at https://geoffscollins.github.io/GC_bioinfo/sequence_searches.html
 
     :param args: list of the sequencing files
     :type args: list

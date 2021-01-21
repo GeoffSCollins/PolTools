@@ -15,11 +15,3 @@ It is primary written in python3, but utilizes R for plotting and C++ for comput
    :glob:
 
    *
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
