@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Gene Body Fold Change Heatmap &mdash; GC_bioinfo 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Gene Body Heatmap" href="gene_body_heatmap.html" />
+    <link rel="prev" title="Gene Body Combined Heatmap" href="gene_body_combined_heatmap.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> GC_bioinfo
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="TES_combined_heatmap.html"><em>TES Combined Heatmap</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="TES_fold_change_heatmap.html"><em>TES Fold Change Heatmap</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="TES_heatmap.html"><em>TES Heatmap</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="base_distribution.html"><em>Base Distribution</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="divergent_pileup_metaplot.html"><em>Divergent Pileup Metaplot</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="five_prime_metaplot.html"><em>Five Prime Metaplot</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="gene_body_combined_heatmap.html"><em>Gene Body Combined Heatmap</em></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><em>Gene Body Fold Change Heatmap</em></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#behavior">Behavior</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gene_body_heatmap.html"><em>Gene Body Heatmap</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="make_regions_file_centered_on_max_tss.html"><em>Make Regions File Centered on Max TSS</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="multicoverage.html"><em>Multicoverage</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="nucleotide_heatmap.html"><em>Nucleotide Heatmap</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pausing_distance_distribution_from_maxTSS.html"><em>Pausing Distance Distribution from Max TSS</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="read_through_transcription.html"><em>Read Through Transcription</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="sequence_from_region_around_max_tss.html"><em>Sequence from Around Max TSS</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="sequence_searches.html"><em>Sequence Searches</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="three_prime_metaplot.html"><em>Three Prime Metaplot</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tps_distance_per_gene.html"><em>TPS Distance Per Gene</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="track_links_from_bw.html"><em>Track Links From Bigwigs</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="truQuant.html"><em>truQuant</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tsrFinder.html"><em>tsrFinder</em></a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GC_bioinfo</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li><em>Gene Body Fold Change Heatmap</em></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/gene_body_fold_change_heatmap.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="gene-body-fold-change-heatmap">
+<h1><em>Gene Body Fold Change Heatmap</em><a class="headerlink" href="#gene-body-fold-change-heatmap" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">gene_body_fold_change_heatmap</span></code> tool generates a red/blue heatmap plotting the log 2 fold change of position and
+quantity of 3’ end sorted by gene length reads from two numerator datasets and two denominator datasets.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This tool requires <a class="reference external" href="https://github.com/arq5x/bedtools2">bedtools</a> to be installed.</p>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p><strong>Usage</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">gene_body_fold_change_heatmap</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">u</span> <span class="n">upstream_distance</span><span class="p">]</span>
+                                              <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">distance_past_tes</span><span class="p">]</span>
+                                              <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">bp_width</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">w</span> <span class="n">width</span><span class="p">]</span>
+                                              <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">height</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">max_log2_fc</span><span class="p">]</span>
+                                              <span class="p">[</span><span class="o">--</span><span class="n">minor_ticks</span> <span class="n">minor_ticks</span><span class="p">]</span>
+                                              <span class="p">[</span><span class="o">--</span><span class="n">major_ticks</span> <span class="n">major_ticks</span><span class="p">]</span>
+                                              <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
+                                              <span class="n">truQuant_output_file</span>
+                                              <span class="n">numerator_correction_factor_one</span>
+                                              <span class="n">numerator_seq_file_one</span>
+                                              <span class="n">numerator_correction_factor_two</span>
+                                              <span class="n">numerator_seq_file_two</span>
+                                              <span class="n">denominator_correction_factor_one</span>
+                                              <span class="n">denominator_seq_file_one</span>
+                                              <span class="n">denominator_correction_factor_two</span>
+                                              <span class="n">denominator_seq_file_two</span>
+                                              <span class="n">output_prefix</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 78%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Required Arguments</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>truQuant Output File</strong></p></td>
+<td><p>File ending in -truQuant_output.txt generated from <a class="reference external" href="truQuant.rst">truQuant</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Numerator Correction Factor One</strong></p></td>
+<td><p>Correction factor applied to the seq file data.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Numerator Sequencing File One</strong></p></td>
+<td><p>Bed formatted file from a sequencing experiment.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Numerator Correction Factor One</strong></p></td>
+<td><p>Correction factor applied to the seq file data.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Numerator Sequencing File One</strong></p></td>
+<td><p>Bed formatted file from a sequencing experiment.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Denominator Correction Factor One</strong></p></td>
+<td><p>Correction factor applied to the seq file data.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Denominator Sequencing File One</strong></p></td>
+<td><p>Bed formatted file from a sequencing experiment.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Denominator Correction Factor One</strong></p></td>
+<td><p>Correction factor applied to the seq file data.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Denominator Sequencing File One</strong></p></td>
+<td><p>Bed formatted file from a sequencing experiment.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Output Prefix</strong></p></td>
+<td><p>Output filename will begin with the output prefix and also contain the run parameters and ends in gene_body_heatmap.tiff.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 85%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Optional Arguments</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>-u, –upstream_distance</strong></p></td>
+<td><p>Distance upstream of the max TSS from <a class="reference external" href="truQuant.rst">truQuant</a> to show on the heatmap. Default is 50,000 bp.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>-d, –distance_past_tes</strong></p></td>
+<td><p>Distance past the TES to show on the heatmap. Default is 50,000 bp.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>-b, –bp_width</strong></p></td>
+<td><p>Total distance shown on the heatmap. Default is 400,000 bp.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>-w, –width</strong></p></td>
+<td><p>Width of the heatmap in pixels. Default is 2,000 px.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>-e, –height</strong></p></td>
+<td><p>Height of the heatmap in pixels. Default is 2,000 px.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>-g, –gamma</strong></p></td>
+<td><p>Gamma correction of the heatmap. Default is 2.2, which is no gamma correction.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>-m, –max_log2_fc</strong></p></td>
+<td><p>Maximum value to consider as black. Default is the max value found. Decreasing this number will make the image darker.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>–minor_ticks</strong></p></td>
+<td><p>Distance in bp between minor tick marks. Default is 10,000 bp.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>–major_ticks</strong></p></td>
+<td><p>Distance in bp between major tick marks. Default is 50,000 bp.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>-t, –threads</strong></p></td>
+<td><p>Maximum number of threads. Default is the number of threads on the system. This program will not use more four threads.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="behavior">
+<h2>Behavior<a class="headerlink" href="#behavior" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">gene_body_fold_change_heatmap</span></code> will create a file starting with the output prefix which contains the run parameters and ends in gene_body_heatmap.tiff.</p>
+<p>For example:</p>
+<img alt="_images/treatment_max_2.0_width_400000bp_gene_body_fold_change_heatmap.png" src="_images/treatment_max_2.0_width_400000bp_gene_body_fold_change_heatmap.png" />
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ head seq_file-truQuant_output.txt
+Gene    Chromosome      Pause Region Left       Pause Region Right      Strand  Total <span class="m">5</span><span class="s1">&#39; Reads  MaxTSS  MaxTSS 5&#39;</span> Reads Weighted Pause Region Center    STDEV of TSSs   Gene Body Left  Gene Body Right Gene Body Distance      seq_file.bed Pause Region   seq_file.bed Gene Body
+NOC2L   chr1    <span class="m">959177</span>  <span class="m">959327</span>  -       <span class="m">194</span>     <span class="m">959255</span>  <span class="m">46</span>      <span class="m">959250</span>  <span class="m">13</span>.306459171023036      <span class="m">944203</span>  <span class="m">959177</span>  <span class="m">14974</span>   <span class="m">194</span>     <span class="m">18</span>
+KLHL17  chr1    <span class="m">960552</span>  <span class="m">960702</span>  +       <span class="m">234</span>     <span class="m">960632</span>  <span class="m">27</span>      <span class="m">960626</span>  <span class="m">25</span>.417791063821863      <span class="m">960702</span>  <span class="m">965719</span>  <span class="m">5017</span>    <span class="m">234</span>     <span class="m">17</span>
+PLEKHN1 chr1    <span class="m">966439</span>  <span class="m">966589</span>  +       <span class="m">25</span>      <span class="m">966521</span>  <span class="m">8</span>       <span class="m">966513</span>  <span class="m">19</span>.47408534437497       <span class="m">966589</span>  <span class="m">975865</span>  <span class="m">9276</span>    <span class="m">25</span>      <span class="m">11</span>
+HES4    chr1    <span class="m">1000013</span> <span class="m">1000163</span> -       <span class="m">239</span>     <span class="m">1000096</span> <span class="m">87</span>      <span class="m">1000086</span> <span class="m">27</span>.14758979723915       <span class="m">998962</span>  <span class="m">1000013</span> <span class="m">1051</span>    <span class="m">239</span>     <span class="m">68</span>
+ISG15   chr1    <span class="m">1000204</span> <span class="m">1000354</span> +       <span class="m">160</span>     <span class="m">1000295</span> <span class="m">12</span>      <span class="m">1000278</span> <span class="m">36</span>.24344768368484       <span class="m">1000354</span> <span class="m">1014540</span> <span class="m">14186</span>   <span class="m">160</span>     <span class="m">111</span>
+AGRN    chr1    <span class="m">1020042</span> <span class="m">1020192</span> +       <span class="m">112</span>     <span class="m">1020119</span> <span class="m">35</span>      <span class="m">1020116</span> <span class="m">25</span>.189637892253575      <span class="m">1020192</span> <span class="m">1056118</span> <span class="m">35926</span>   <span class="m">112</span>     <span class="m">76</span>
+RNF223  chr1    <span class="m">1074208</span> <span class="m">1074358</span> -       <span class="m">32</span>      <span class="m">1074306</span> <span class="m">10</span>      <span class="m">1074284</span> <span class="m">32</span>.567238138964136      <span class="m">1070967</span> <span class="m">1074208</span> <span class="m">3241</span>    <span class="m">32</span>      <span class="m">8</span>
+C1orf159        chr1    <span class="m">1116028</span> <span class="m">1116178</span> -       <span class="m">51</span>      <span class="m">1116106</span> <span class="m">9</span>       <span class="m">1116103</span> <span class="m">19</span>.81136532595448       <span class="m">1081818</span> <span class="m">1116028</span> <span class="m">34210</span>   <span class="m">51</span>      <span class="m">11</span>
+SDF4    chr1    <span class="m">1231907</span> <span class="m">1232057</span> -       <span class="m">1105</span>    <span class="m">1231971</span> <span class="m">321</span>     <span class="m">1231978</span> <span class="m">23</span>.701136922154493      <span class="m">1216908</span> <span class="m">1231907</span> <span class="m">14999</span>   <span class="m">1097</span>    <span class="m">177</span>
+
+$ GC_bioinfo gene_body_fold_change_heatmap seq_file-truQuant_output.txt <span class="m">1</span> flavo.bed <span class="m">1</span> flavo.bed <span class="m">1</span> dmso.bed <span class="m">1</span> dmso.bed treatment -m <span class="m">2</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="gene_body_heatmap.html" class="btn btn-neutral float-right" title="Gene Body Heatmap" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gene_body_combined_heatmap.html" class="btn btn-neutral float-left" title="Gene Body Combined Heatmap" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Geoff Collins.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
