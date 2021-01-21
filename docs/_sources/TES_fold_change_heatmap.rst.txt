@@ -25,7 +25,7 @@ Usage
 ===========================    =========================================================================================================================================================
 Required Arguments             Description
 ===========================    =========================================================================================================================================================
-**truQuant Output File**       File ending in -truQuant_output.txt generated from `truQuant <truQuant.rst>`_
+**truQuant Output File**       File ending in -truQuant_output.txt generated from `truQuant <https://geoffscollins.github.io/GC_bioinfo/truQuant.html>`_
 **Correction Factor**          Correction factor applied to the seq file data.
 **Sequencing File**            Bed formatted file from a sequencing experiment.
 **Output Prefix**              Output filename will begin with the output prefix and also contain the run parameters and ends in gene_body_heatmap.tiff.
@@ -35,7 +35,7 @@ Required Arguments             Description
 ===========================    ===============================================================================================================================================================
 Optional Arguments             Description
 ===========================    ===============================================================================================================================================================
-**-u, --upstream_distance**    Distance upstream of the max TSS from `truQuant <truQuant.rst>`_ to show on the heatmap. Default is 50,000 bp.
+**-u, --upstream_distance**    Distance upstream of the max TSS from `truQuant <https://geoffscollins.github.io/GC_bioinfo/truQuant.html>`_ to show on the heatmap. Default is 50,000 bp.
 **-d, --distance_past_tes**    Distance past the TES to show on the heatmap. Default is 50,000 bp.
 **-b, --bp_width**             Total distance shown on the heatmap. Default is 400,000 bp.
 **-w, --width**                Width of the heatmap in pixels. Default is 2,000 px.

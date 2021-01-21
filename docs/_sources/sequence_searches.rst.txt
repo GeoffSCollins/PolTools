@@ -21,7 +21,7 @@ Usage and option summary
 Required Arguments             Description
 ===========================    =========================================================================================================================================================
 **Regions filename**           Bed formatted file containing all the regions you want to quantify (must be centered on +1 nt). This file can be generated from the
-                               `make_regions_file_centered_on_max_tss program <make_regions_file_centered_on_max_tss.rst>`_
+                               `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html>`_
 **Search**                     Search region and sequence formatted as follows: (Sequence),(-/+)left:(-/+)right. Ex: TATA,-30:-20
 ===========================    =========================================================================================================================================================
 

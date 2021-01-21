@@ -6,8 +6,9 @@
 Welcome to GC_bioinfo's documentation!
 ======================================
 
-GC_bioinfo is a collection of bioinformatic progams analyzing PRO-Seq, PRO-Cap, and similar next generation sequencing experiments analyzing nascent RNAs.
-It is primary written in python3, but utilizes R for plotting and C++ for computationally expensive analyses.
+GC_bioinfo is a collection of bioinformatic programs analyzing PRO-Seq, PRO-Cap, and similar next generation sequencing experiments analyzing nascent RNAs.
+It is primary written in python3, but utilizes R for plotting and C++ for computationally expensive analyses. These
+tools were developed in the `Price Lab <https://price.lab.uiowa.edu>`_
 
 .. toctree::
    :maxdepth: 1

@@ -18,7 +18,7 @@ Usage and option summary
 ===========================    =========================================================================================================================================================
 Required Arguments             Description
 ===========================    =========================================================================================================================================================
-**truQuant output file**       `truQuant <truQuant.rst>`_ output file (not the paused, gene body, or blacklisted regions
+**truQuant output file**       `truQuant <https://geoffscollins.github.io/GC_bioinfo/truQuant.html>`_ output file (not the paused, gene body, or blacklisted regions
                                file!)
 **Region Size**                Integer value of the number of base pairs the region will include
 ===========================    =========================================================================================================================================================

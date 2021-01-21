@@ -22,7 +22,7 @@ Usage
 Required Arguments             Description
 ===========================    =========================================================================================================================================================
 **Max TSS FIle**               Bed formatted file containing the max TSSs you want to use to make the heatmaps. This file can be generated from the
-                               `make_regions_file_centered_on_max_tss program <make_regions_file_centered_on_max_tss.rst>`_ with a region size parameter of 1.
+                               `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html>`_ with a region size parameter of 1.
 **Region width**               Number of base pairs to show on the heatmaps (will go upstream and downstream by width / 2).
 **Heatmap Width**              Number of pixels wide the heatmaps will be.
 **Vertical Average**           Without vertical averaging, the heatmaps will be tall and skinny. To make the image shorter, increasing the vertical average. This will average the pixels

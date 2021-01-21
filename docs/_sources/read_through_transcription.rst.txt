@@ -28,7 +28,7 @@ Usage and option summary
 Required Arguments                         Description
 ===========================    =========================================================================================================================================================
 **Regions Filename**           Bed formatted file containing all the genes to quantify (regions will be determined from the 3' end of each region in this file.
-**TSR Filename**               `tsrFinder <tsrFinder.rst>`_ output file which will be blacklisted. Simply type *no* to not blacklist TSRs.
+**TSR Filename**               `tsrFinder <https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html>`_ output file which will be blacklisted. Simply type *no* to not blacklist TSRs.
 **Upstream Distance**          The number of base pairs to subtract from the left position.
 **Downstream Distance**        The number of base pairs to add from the left position.
 **Interval Distance**          The size of sub-regions to split the regions into.

@@ -23,7 +23,7 @@ Usage
 Required Arguments             Description
 ===========================    =========================================================================================================================================================
 **Regions Filename**           Bed formatted file containing all the regions you want to average the sequences. This file can be obtained by using the
-                               `make_regions_file_centered_on_max_tss program <make_regions_file_centered_on_max_tss.rst>`_
+                               `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html>`_
 ===========================    =========================================================================================================================================================
 
 ==========================================================================

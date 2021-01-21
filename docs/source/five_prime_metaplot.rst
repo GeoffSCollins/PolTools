@@ -21,7 +21,7 @@ Usage and option summary
 ===========================    =========================================================================================================================================================
 Required Arguments                         Description
 ===========================    =========================================================================================================================================================
-**Regions File**               Bed formatted file containing all the regions to quantify (+1 nucleotide centered). These regions can be made from the `make_regions_file_centered_on_max_tss program <make_regions_file_centered_on_max_tss.rst>`_
+**Regions File**               Bed formatted file containing all the regions to quantify (+1 nucleotide centered). These regions can be made from the `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html>`_
 **Sequencing Files**           Bed formatted file from a sequencing experiment.
 ===========================    =========================================================================================================================================================
 
