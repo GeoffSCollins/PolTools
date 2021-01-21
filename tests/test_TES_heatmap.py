@@ -43,6 +43,7 @@ class TestTESHeatmap(unittest.TestCase):
                                                                         bp_width,
                                                                         interval_size)
 
+
         result = []
         with open(incremented_regions_file) as file:
             for line in file:
