@@ -58,7 +58,15 @@ Optional Arguments             Description
 ==========================================================================
 Behavior
 ==========================================================================
-``gene_body_combined_heatmap`` will create a file starting with the output prefix which contains the run parameters and ends in gene_body_heatmap.tiff.
+``gene_body_combined_heatmap`` will create a file starting with the output prefix which contains the run parameters and
+ends in gene_body_heatmap.tiff. First, regions to be quantified are designed from a distance upstream of the max TSS
+to a distance downstream of the TES (default is 50 kb away from each position) for each gene in the truQuant file. Then,
+the `tsrFinder <https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html>`_ run associated with
+`truQuant <https://geoffscollins.github.io/GC_bioinfo/truQuant.html>`_ is used to find regions to blacklist
+(TSRs with at least 30% of the number of 5' ends found in the pause region of the gene). These regions are blacklisted
+in the sequencing files and the 3' ends are quantified in each location of the previously defined regions. The 3' end
+reads are normalized according to the correction factors and the two datasets are added together, generating
+the heatmap.
 
 For example:
 

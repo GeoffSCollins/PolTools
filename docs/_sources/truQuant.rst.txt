@@ -48,7 +48,7 @@ Optional Arguments                         Description
 Behavior
 ==========================================================================
 ``truQuant`` will generate search regions 1000 bp upstream of the 5' end of protein coding genes from GENCODE v32. Then,
-tsrFinder will be run to determine the max TSR in the search region. Inside this TSR, the max TSS will be chosen as the
+`tsrFinder <https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html>`_ will be run to determine the max TSR in the search region. Inside this TSR, the max TSS will be chosen as the
 annotated 5' end. The pause region will be the 150 bp region surrounding the weighted average TSS (avgTSS) and gene body
 will be the end of the pause region to the TES. TSRs in the gene with more than 30% of the reads as the max TSR will be
 blacklisted. 5' ends in the pause regions will be quantified and 3' ends in the gene bodies will be quantified.

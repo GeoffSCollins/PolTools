@@ -51,6 +51,15 @@ Optional Arguments             Description
 Behavior
 ==========================================================================
 ``TES_heatmap`` will create a file starting with the output prefix which contains the run parameters and ends in TES_heatmap.tiff.
+First, regions to be quantified are designed from a distance upstream of the max TSS
+to a distance downstream of the TES (default is 50 kb away from each position) for each gene in the truQuant file. Then,
+the `tsrFinder <https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html>`_ run associated with
+`truQuant <https://geoffscollins.github.io/GC_bioinfo/truQuant.html>`_ is used to find regions to blacklist
+(TSRs with at least 30% of the number of 5' ends found in the pause region of the gene). These regions are blacklisted
+in the sequencing files and the 3' ends are quantified in each location of the previously defined regions. The 3' end
+reads are normalized according to the correction factors. The two numerator datasets are added together and divided by
+the sum of the denominator datasets. The resulting division matrix is subjected to a log2 fold change transformation, to
+generate the heatmap.
 
 For example:
 
@@ -73,10 +82,4 @@ For example:
   C1orf159        chr1    1116028 1116178 -       51      1116106 9       1116103 19.81136532595448       1081818 1116028 34210   51      11
   SDF4    chr1    1231907 1232057 -       1105    1231971 321     1231978 23.701136922154493      1216908 1231907 14999   1097    177
 
-  $ GC_bioinfo TES_fold_change_heatmap seq_file-truQuant_output.txt 1 flavo.bed 1 flavo.bed 1 dmso.bed 1 dmso.bed treatment -m 2 &
-
-
-
-
-
-
+  $ GC_bioinfo TES_fold_change_heatmap seq_file-truQuant_output.txt 1 flavo.bed 1 flavo.bed 1 dmso.bed 1 dmso.bed treatment -m 2

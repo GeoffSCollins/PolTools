@@ -39,7 +39,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="TES Fold Change Heatmap" href="TES_fold_change_heatmap.html" />
-    <link rel="prev" title="Welcome to GC_bioinfo’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Welcome to GC_bioinfo!" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -263,7 +263,15 @@
 </div>
 <div class="section" id="behavior">
 <h2>Behavior<a class="headerlink" href="#behavior" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">TES_heatmap</span></code> will create a file starting with the output prefix which contains the run parameters and ends in TES_heatmap.tiff.</p>
+<p><code class="docutils literal notranslate"><span class="pre">TES_heatmap</span></code> will create a file starting with the output prefix which contains the run parameters and ends in TES_heatmap.tiff.
+First, regions to be quantified are designed from a distance upstream of the max TSS
+to a distance downstream of the TES (default is 50 kb away from each position) for each gene in the truQuant file. Then,
+the <a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html">tsrFinder</a> run associated with
+<a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/truQuant.html">truQuant</a> is used to find regions to blacklist
+(TSRs with at least 30% of the number of 5’ ends found in the pause region of the gene). These regions are blacklisted
+in the sequencing file and the 3’ ends are quantified in each location of the previously defined regions. The 3’ end
+reads are normalized according to the correction factors and the two datasets are added together, generating
+the heatmap.</p>
 <p>For example:</p>
 <img alt="_images/seq_combined_max_3.0_gamma_2.2_width_400000bp_TES_heatmap.png" src="_images/seq_combined_max_3.0_gamma_2.2_width_400000bp_TES_heatmap.png" />
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ head seq_file.bed
@@ -303,7 +311,7 @@ $ GC_bioinfo TES_heatmap seq_file-truQuant_output.txt <span class="m">1</span>.0
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="TES_fold_change_heatmap.html" class="btn btn-neutral float-right" title="TES Fold Change Heatmap" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to GC_bioinfo’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to GC_bioinfo!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
