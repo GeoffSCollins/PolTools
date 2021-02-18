@@ -7,7 +7,7 @@ from GC_bioinfo.main_programs import divergent_pileup_metaplot
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.remove_files import remove_files
 
-from quiter import Quieter
+from quieter import Quieter
 
 
 class TestDivergentPileup(unittest.TestCase):

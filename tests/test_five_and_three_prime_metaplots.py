@@ -7,7 +7,7 @@ from GC_bioinfo.main_programs import five_prime_metaplot, three_prime_metaplot
 from GC_bioinfo.utils.run_metaplot import parse_input
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.remove_files import remove_files
-from quiter import Quieter
+from quieter import Quieter
 
 class TestFiveAndThreeMetaplots(unittest.TestCase):
     """

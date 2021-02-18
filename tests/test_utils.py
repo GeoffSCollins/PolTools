@@ -21,7 +21,7 @@ from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_i
 
 from GC_bioinfo.utils.remove_files import remove_files
 
-from quiter import Quieter
+from quieter import Quieter
 
 
 class TestAddMatrices(unittest.TestCase):

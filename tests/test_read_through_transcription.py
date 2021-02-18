@@ -6,7 +6,7 @@ from GC_bioinfo.main_programs import read_through_transcription
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.remove_files import remove_files
 
-from quiter import Quieter
+from quieter import Quieter
 
 class TestReadThroughTranscription(unittest.TestCase):
     def test_make_incremented_regions(self):

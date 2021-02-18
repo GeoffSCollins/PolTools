@@ -6,7 +6,7 @@ from GC_bioinfo.main_programs.sequence_searches import InvalidSearchException
 
 import io
 
-from quiter import Quieter
+from quieter import Quieter
 
 
 class TestSequenceSearches(unittest.TestCase):

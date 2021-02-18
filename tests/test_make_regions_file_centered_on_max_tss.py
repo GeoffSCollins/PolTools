@@ -4,7 +4,7 @@ from pathlib import Path
 
 from GC_bioinfo.main_programs import make_regions_file_centered_on_max_tss
 
-from quiter import Quieter
+from quieter import Quieter
 
 class TestMakeRegionsFileCenteredOnMaxTSS(unittest.TestCase):
     truQuant_file = str(Path(__file__).parent) + "/test_files/sample-truQuant_output.txt"

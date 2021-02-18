@@ -8,7 +8,7 @@ from GC_bioinfo.main_programs import tps_distance_per_gene
 from GC_bioinfo.utils.remove_files import remove_files
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 
-from quiter import Quieter
+from quieter import Quieter
 
 class TestTPSDistancePerGene(unittest.TestCase):
     def test_arguments(self):

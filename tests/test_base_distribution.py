@@ -8,7 +8,7 @@ from GC_bioinfo.utils.remove_files import remove_files
 
 from GC_bioinfo.main_programs import base_distribution
 
-from quiter import Quieter
+from quieter import Quieter
 
 
 class TestBaseDistribution(unittest.TestCase):

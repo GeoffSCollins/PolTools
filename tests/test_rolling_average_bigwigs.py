@@ -7,7 +7,7 @@ from GC_bioinfo.utils.remove_files import remove_files
 
 from GC_bioinfo.other_programs import rolling_average_bigwigs
 
-from quiter import Quieter
+from quieter import Quieter
 
 
 class TestRollingAverageBigWigs(unittest.TestCase):
