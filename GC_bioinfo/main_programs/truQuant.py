@@ -299,6 +299,9 @@ def get_region_data(region, five_prime_counts_dict):
             max_tss_position = i
             max_tss_counts = height
 
+    # We need to add 1 to the max_tss_counts because the genome browser starts at 1
+    max_tss_position += 1
+
     weighted_pause_region_center = int(left) + (tsr_position_sum / five_prime_sum)
 
     # Round it and make it an integer

@@ -23,7 +23,8 @@ def expand_max_tss(max_tsss, region_size):
     for max_tss in max_tsss:
         gene_name, chromosome, position, strand, five_prime_reads = max_tss
 
-        position = int(position)
+        # We subtract one from the position because the genome browser starts at 1 and bioinformatics programs start at 1
+        position = int(position) - 1
 
         if region_size == 1:
             # Only the maxTSS
