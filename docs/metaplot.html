@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Divergent Pileup Metaplot &mdash; GC_bioinfo 1.0.0 documentation</title>
+  <title>Metaplot &mdash; GC_bioinfo 1.0.0 documentation</title>
   
 
   
@@ -38,8 +38,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Five Prime Metaplot" href="five_prime_metaplot.html" />
-    <link rel="prev" title="Base Distribution" href="base_distribution.html" /> 
+    <link rel="next" title="Multicoverage" href="multicoverage.html" />
+    <link rel="prev" title="Make Regions File Centered on Max TSS" href="make_regions_file_centered_on_max_tss.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,23 +90,21 @@
 <li class="toctree-l1"><a class="reference internal" href="TES_fold_change_heatmap.html"><em>TES Fold Change Heatmap</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="TES_heatmap.html"><em>TES Heatmap</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="base_distribution.html"><em>Base Distribution</em></a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#"><em>Divergent Pileup Metaplot</em></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#usage-and-option-summary">Usage and option summary</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#behavior">Behavior</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="five_prime_metaplot.html"><em>Five Prime Metaplot</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="gene_body_combined_heatmap.html"><em>Gene Body Combined Heatmap</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="gene_body_fold_change_heatmap.html"><em>Gene Body Fold Change Heatmap</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="gene_body_heatmap.html"><em>Gene Body Heatmap</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="make_regions_file_centered_on_max_tss.html"><em>Make Regions File Centered on Max TSS</em></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><em>Metaplot</em></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#usage-and-option-summary">Usage and option summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#behavior">Behavior</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="multicoverage.html"><em>Multicoverage</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="nucleotide_heatmap.html"><em>Nucleotide Heatmap</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="pausing_distance_distribution_from_maxTSS.html"><em>Pausing Distance Distribution from Max TSS</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="read_through_transcription.html"><em>Read Through Transcription</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="sequence_from_region_around_max_tss.html"><em>Sequence from Around Max TSS</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="sequence_searches.html"><em>Sequence Searches</em></a></li>
-<li class="toctree-l1"><a class="reference internal" href="three_prime_metaplot.html"><em>Three Prime Metaplot</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="tps_distance_per_gene.html"><em>TPS Distance Per Gene</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="track_links_from_bw.html"><em>Track Links From Bigwigs</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="truQuant.html"><em>truQuant</em></a></li>
@@ -159,7 +157,7 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li><em>Divergent Pileup Metaplot</em></li>
+      <li><em>Metaplot</em></li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -176,9 +174,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="divergent-pileup-metaplot">
-<h1><em>Divergent Pileup Metaplot</em><a class="headerlink" href="#divergent-pileup-metaplot" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">divergent_pileup_metaplot</span></code> tool computes the coverage of reads data around the center of features provided.</p>
+  <div class="section" id="metaplot">
+<h1><em>Metaplot</em><a class="headerlink" href="#metaplot" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">metaplot</span></code> tool computes the average coverage of 3’ ends of sequencing data around the center of features provided.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This tool requires <a class="reference external" href="https://github.com/arq5x/bedtools2">bedtools</a> to be installed.</p>
@@ -186,9 +184,9 @@
 <div class="section" id="usage-and-option-summary">
 <h2>Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">divergent_pileup_metaplot</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
-                                          <span class="n">regions_file</span> <span class="n">sequencing_files</span>
-                                          <span class="p">[</span><span class="n">sequencing_files</span> <span class="o">...</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">metaplot</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
+                         <span class="n">read</span> <span class="nb">type</span> <span class="n">regions_file</span> <span class="n">sequencing_files</span>
+                         <span class="p">[</span><span class="n">sequencing_files</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
 <table class="docutils align-default">
@@ -202,10 +200,13 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><strong>Regions File</strong></p></td>
+<tr class="row-even"><td><p><strong>Read type</strong></p></td>
+<td><p>Either five, three or whole corresponding to 5’ ends, 3’ ends, or pileup reads.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Regions File</strong></p></td>
 <td><p>Bed formatted file containing all the regions to quantify (+1 nucleotide centered). These regions can be made from the <a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html">make_regions_file_centered_on_max_tss program</a></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Sequencing Files</strong></p></td>
+<tr class="row-even"><td><p><strong>Sequencing Files</strong></p></td>
 <td><p>Bed formatted file from a sequencing experiment.</p></td>
 </tr>
 </tbody>
@@ -232,10 +233,10 @@
 </div>
 <div class="section" id="behavior">
 <h2>Behavior<a class="headerlink" href="#behavior" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">divergent_pileup_metaplot</span></code> will report the position relative to the center of the regions provided and the average
-of the reads at that position.</p>
+<p><code class="docutils literal notranslate"><span class="pre">metaplot</span></code> will report the position relative to the center of the regions provided and the average
+of the [5’, 3’, or pileup] reads at that position.</p>
 <p>For example:</p>
-<img alt="_images/divergent_pileup_metaplot.png" src="_images/divergent_pileup_metaplot.png" />
+<img alt="_images/three_prime_metaplot.png" src="_images/three_prime_metaplot.png" />
 <p></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ head regions_centered_on_max_tss.bed
 chr1    <span class="m">959251</span>  <span class="m">959261</span>  NOC2L   <span class="m">46</span>      -
@@ -261,18 +262,18 @@ chr1    <span class="m">14734</span>   <span class="m">14768</span>   A00876:119
 chr1    <span class="m">14988</span>   <span class="m">15012</span>   A00876:119:HW5F5DRXX:1:2219:16134:32784 <span class="m">255</span>     -
 chr1    <span class="m">18337</span>   <span class="m">18362</span>   A00876:119:HW5F5DRXX:1:2149:32054:31328 <span class="m">255</span>     -
 
-$ GC_bioinfo divergent_pileup_metaplot regions_centered_on_max_tss.bed seq_file.bed
-Position       seq_file.bed sense strand       seq_file.bed divergent strand
--5.0    <span class="m">108</span>.42036215816704      -0.6227827050997783
--4.0    <span class="m">114</span>.89458610495196      -0.6073540280857354
--3.0    <span class="m">125</span>.8349963045085       -0.5766814486326681
--2.0    <span class="m">138</span>.23946784922396      -0.5629157427937915
--1.0    <span class="m">147</span>.7911123429416       -0.5778824833702882
-<span class="m">1</span>.0     <span class="m">268</span>.01856984478934      -0.5244826311899483
-<span class="m">2</span>.0     <span class="m">277</span>.60643015521066      -0.53640059127864
-<span class="m">3</span>.0     <span class="m">289</span>.13239098300073      -0.5285476718403548
-<span class="m">4</span>.0     <span class="m">300</span>.0270694752402       -0.5216186252771619
-<span class="m">5</span>.0     <span class="m">306</span>.0120103473762       -0.5210643015521065
+$ GC_bioinfo three CCNT1_inr.bed control.bed
+Position       seq_file.bed <span class="m">3</span><span class="s1">&#39; sense strand    seq_file.bed 3&#39;</span> divergent strand
+-5.0    <span class="m">0</span>.8859940872135994      -0.01579822616407982
+-4.0    <span class="m">0</span>.6057834441980784      -0.013673318551367332
+-3.0    <span class="m">0</span>.7096267553584626      -0.008961566888396156
+-2.0    <span class="m">1</span>.2311529933481153      -0.013673318551367332
+-1.0    <span class="m">0</span>.5052660753880266      -0.02836289726533629
+<span class="m">1</span>.0     <span class="m">1</span>.432280118255728       -0.00655949741315595
+<span class="m">2</span>.0     <span class="m">0</span>.7416851441241685      -0.01607538802660754
+<span class="m">3</span>.0     <span class="m">0</span>.7222838137472284      -0.012564671101256468
+<span class="m">4</span>.0     <span class="m">1</span>.445861049519586       -0.010809312638580931
+<span class="m">5</span>.0     <span class="m">1</span>.1093865484109386      -0.014689578713968959
 </pre></div>
 </div>
 </div>
@@ -284,8 +285,8 @@ Position       seq_file.bed sense strand       seq_file.bed divergent strand
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="five_prime_metaplot.html" class="btn btn-neutral float-right" title="Five Prime Metaplot" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="base_distribution.html" class="btn btn-neutral float-left" title="Base Distribution" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="multicoverage.html" class="btn btn-neutral float-right" title="Multicoverage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="make_regions_file_centered_on_max_tss.html" class="btn btn-neutral float-left" title="Make Regions File Centered on Max TSS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

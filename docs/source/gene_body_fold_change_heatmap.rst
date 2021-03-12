@@ -1,6 +1,6 @@
-##############################
+###############################
 *Gene Body Fold Change Heatmap*
-##############################
+###############################
 The ``gene_body_fold_change_heatmap`` tool generates a red/blue heatmap plotting the log 2 fold change of position and
 quantity of 3' end sorted by gene length reads from two numerator datasets and two denominator datasets.
 

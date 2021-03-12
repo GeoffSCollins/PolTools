@@ -1,7 +1,7 @@
 ##############################
-*Five Prime Metaplot*
+*Metaplot*
 ##############################
-The ``five_prime_metaplot`` tool computes the average coverage of 5' ends of sequencing data around the center of features provided.
+The ``metaplot`` tool computes the average coverage of 3' ends of sequencing data around the center of features provided.
 
 .. note::
 
@@ -13,14 +13,15 @@ Usage and option summary
 **Usage**:
 ::
 
-  GC_bioinfo five_prime_metaplot [-h] [-t [threads]]
-                                      regions_file sequencing_files
-                                      [sequencing files ...]
+  GC_bioinfo metaplot [-h] [-t [threads]]
+                           read type regions_file sequencing_files
+                           [sequencing_files ...]
 
 
 ===========================    =========================================================================================================================================================
 Required Arguments                         Description
 ===========================    =========================================================================================================================================================
+**Read type**                  Either five, three or whole corresponding to 5' ends, 3' ends, or pileup reads.
 **Regions File**               Bed formatted file containing all the regions to quantify (+1 nucleotide centered). These regions can be made from the `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html>`_
 **Sequencing Files**           Bed formatted file from a sequencing experiment.
 ===========================    =========================================================================================================================================================
@@ -33,16 +34,15 @@ Optional Arguments                         Description
 **Sequencing Files**           Additional sequencing files can be provided.
 ===========================    =========================================================================================================================================================
 
-
 ==========================================================================
 Behavior
 ==========================================================================
-``five_prime_metaplot`` will report the position relative to the center of the regions provided and the average
-of the 5' reads at that position.
+``metaplot`` will report the position relative to the center of the regions provided and the average
+of the [5', 3', or pileup] reads at that position.
 
 For example:
 
-.. image:: images/five_prime_metaplot.png
+.. image:: images/three_prime_metaplot.png
 
 \
 
@@ -72,15 +72,15 @@ For example:
   chr1    14988   15012   A00876:119:HW5F5DRXX:1:2219:16134:32784 255     -
   chr1    18337   18362   A00876:119:HW5F5DRXX:1:2149:32054:31328 255     -
 
-  $ GC_bioinfo five_prime_metaplot regions_centered_on_max_tss.bed seq_file.bed
-  Position        seq_file.bed 5' sense strand    seq_file.bed 5' divergent strand
-  -5.0    6.177753141167775       -0.0291019955654102
-  -4.0    7.360218033998522       -0.039634146341463415
-  -3.0    11.54619364375462       -0.027439024390243903
-  -2.0    13.114098300073909      -0.013396156688839615
-  -1.0    10.78279748706578       -0.059959349593495935
-  1.0     120.73272357723577      -0.0041574279379157425
-  2.0     11.020140428677013      -0.020417590539541758
-  3.0     12.267645971914265      -0.017738359201773836
-  4.0     11.616962305986696      -0.01524390243902439
-  5.0     7.43080192165558        -0.01681448632668145
+  $ GC_bioinfo three CCNT1_inr.bed control.bed
+  Position       seq_file.bed 3' sense strand    seq_file.bed 3' divergent strand
+  -5.0    0.8859940872135994      -0.01579822616407982
+  -4.0    0.6057834441980784      -0.013673318551367332
+  -3.0    0.7096267553584626      -0.008961566888396156
+  -2.0    1.2311529933481153      -0.013673318551367332
+  -1.0    0.5052660753880266      -0.02836289726533629
+  1.0     1.432280118255728       -0.00655949741315595
+  2.0     0.7416851441241685      -0.01607538802660754
+  3.0     0.7222838137472284      -0.012564671101256468
+  4.0     1.445861049519586       -0.010809312638580931
+  5.0     1.1093865484109386      -0.014689578713968959
