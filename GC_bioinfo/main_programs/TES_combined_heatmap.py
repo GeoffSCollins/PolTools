@@ -4,7 +4,7 @@ import os
 import sys
 import argparse
 
-from GC_bioinfo.utils.add_matrices import add_matrices
+from GC_bioinfo.utils.heatmap_utils.add_matrices import add_matrices
 from GC_bioinfo.utils.remove_files import remove_files
 from GC_bioinfo.main_programs.TES_heatmap import get_matrix, make_heatmap
 

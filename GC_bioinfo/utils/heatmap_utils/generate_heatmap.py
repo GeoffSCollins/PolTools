@@ -4,9 +4,9 @@ import sys
 from GC_bioinfo.utils.constants import generate_heatmap_location
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.remove_files import remove_files
-from GC_bioinfo.utils.set_matrix_bounds import set_matrix_bounds
-from GC_bioinfo.utils.get_max_value_from_matrix import get_max_value_from_matrix
-from GC_bioinfo.utils.get_min_value_from_matrix import get_min_value_from_matrix
+from GC_bioinfo.utils.heatmap_utils.set_matrix_bounds import set_matrix_bounds
+from GC_bioinfo.utils.heatmap_utils.get_max_value_from_matrix import get_max_value_from_matrix
+from GC_bioinfo.utils.heatmap_utils.get_min_value_from_matrix import get_min_value_from_matrix
 
 
 class Ticks:
@@ -140,12 +140,15 @@ def generate_heatmap(matrix_filename, color_scheme, output_filename, gamma, min_
         sys.exit(1)
 
     # Set the max and min values
-    if max_value != None and min_value != None:
-        finalized_matrix = set_matrix_bounds(matrix_filename, min_value, max_value)
-    else:
+    if min_value == None:
         min_value = get_min_value_from_matrix(matrix_filename)
+    if max_value == None:
         max_value = get_max_value_from_matrix(matrix_filename)
-        finalized_matrix = set_matrix_bounds(matrix_filename, min_value, max_value)
+
+    finalized_matrix = set_matrix_bounds(matrix_filename, min_value, max_value)
+
+    if min_value < 0 and max_value > 0 and center_value == 'default':
+        center_value = 0
 
     if center_value == "default":
         center_value = (max_value + min_value) / 2

@@ -23,7 +23,7 @@ def average_matrix(filename, num_lines_to_average):
             vals = line.split()
 
             for j, val in enumerate(vals):
-                curr_sums[j] += int(val)
+                curr_sums[j] += float(val)
 
             if (i+1) % num_lines_to_average == 0:
                 # Average and print out

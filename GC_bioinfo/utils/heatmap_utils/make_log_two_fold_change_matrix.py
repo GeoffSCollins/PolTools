@@ -43,15 +43,13 @@ def make_log_two_fold_change_matrix(numerator_filename, denominator_filename):
             if denominator == 0:
                 denominator = 1
 
-            value = numerator / denominator
-
             # Take the log2 of this value
-            log_two_fold_change = math.log2(value)
+            log_two_fold_change = math.log2(numerator / denominator)
 
             fold_change_matrix[row][col] = log_two_fold_change
 
     # Write to a file
-    fold_change_matrix_filename = generate_random_filename()
+    fold_change_matrix_filename = generate_random_filename(".matrix")
     with open(fold_change_matrix_filename, 'w') as file:
         for row in fold_change_matrix:
             str_row = [str(val) for val in row]

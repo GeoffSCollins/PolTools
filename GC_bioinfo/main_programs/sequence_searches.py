@@ -4,11 +4,10 @@ import argparse
 from itertools import product
 from Bio import Seq
 
-from GC_bioinfo.utils.fasta_reader import read_fasta
 from GC_bioinfo.utils.get_region_length import determine_region_length
 from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
 from GC_bioinfo.utils.remove_files import remove_files
-from GC_bioinfo.utils.run_bedtools_getfasta import run_getfasta
+from GC_bioinfo.utils.bedtools_utils.run_bedtools_getfasta import run_getfasta
 from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
 
 
@@ -52,6 +51,25 @@ def clean_sequence_searches(sequence_searches):
         cleaned_sequence_searches.append([sequence, left, right])
 
     return cleaned_sequence_searches
+
+
+def read_fasta(filename):
+    """
+    Returns the sequences from a fasta file.
+
+    :param filename: filename of the fasta file
+    :type filename: str
+    :return: list
+    """
+    sequences = []
+    with open(filename) as file:
+        for i, line in enumerate(file):
+            if i % 2 == 0:
+                pass
+            else:
+                sequences.append(line.rstrip())
+
+    return sequences
 
 
 def parse_input(args):

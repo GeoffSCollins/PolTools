@@ -5,6 +5,7 @@ import io
 from GC_bioinfo.main_programs import sequence_from_region_around_max_tss
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.remove_files import remove_files
+from GC_bioinfo.utils.constants import hg38_chrom_sizes_random_file
 
 from quieter import Quieter
 
@@ -42,7 +43,7 @@ class TestSequenceFromRegionAroundMaxTSS(unittest.TestCase):
                 10
             ]
         ]
-        self.assertEqual(result, (max_tss_file, search))
+        self.assertEqual(result, (False, max_tss_file, search))
 
         remove_files(max_tss_file)
 
@@ -61,7 +62,13 @@ class TestSequenceFromRegionAroundMaxTSS(unittest.TestCase):
             ["+", 5]
         ]
 
-        region_file, gene_names = sequence_from_region_around_max_tss.get_regions_file(max_tss_file, search)
+        chrom_sizes = {}
+        with open(hg38_chrom_sizes_random_file) as file:
+            for line in file:
+                chrom, size = line.split()
+                chrom_sizes[chrom] = int(size)
+
+        region_file, gene_names = sequence_from_region_around_max_tss.get_regions_file(max_tss_file, search, chrom_sizes)
 
         result = []
 

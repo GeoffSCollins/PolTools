@@ -1,21 +1,17 @@
 import unittest.mock
 
-from GC_bioinfo.utils.add_matrices import add_matrices
-from GC_bioinfo.utils.average_matrix import average_matrix
-from GC_bioinfo.utils.fasta_reader import read_fasta, NotFastaFileError
-from GC_bioinfo.utils.generate_blacklist_regions_for_gene_body_heatmap import blacklist_extended_gene_bodies
-from GC_bioinfo.utils.get_metaplot_averages import average_vertically
+from GC_bioinfo.utils.heatmap_utils.add_matrices import add_matrices
+from GC_bioinfo.utils.heatmap_utils.average_matrix import average_matrix
 from GC_bioinfo.utils.get_region_length import determine_region_length
-from GC_bioinfo.utils.make_five_and_three_dict import build_counts_dict
-from GC_bioinfo.utils.make_five_prime_bed_file import make_five_bed_file
+from GC_bioinfo.utils.build_counts_dict import build_counts_dict
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
+from GC_bioinfo.utils.make_read_end_file import make_read_end_file
 from GC_bioinfo.utils.make_transcripts_dict import build_transcripts_dict
-from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
-from GC_bioinfo.utils.run_bedtools_getfasta import run_getfasta
-from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
-from GC_bioinfo.utils.scale_matrix import scale_matrix
-from GC_bioinfo.utils.set_matrix_bounds import set_matrix_bounds
+from GC_bioinfo.utils.bedtools_utils.run_bedtools_coverage import run_coverage
+from GC_bioinfo.utils.bedtools_utils.run_bedtools_getfasta import run_getfasta
+from GC_bioinfo.utils.bedtools_utils.run_bedtools_subtract import run_subtract
+from GC_bioinfo.utils.heatmap_utils.scale_matrix import scale_matrix
+from GC_bioinfo.utils.heatmap_utils.set_matrix_bounds import set_matrix_bounds
 from GC_bioinfo.utils.verify_bed_file import verify_bed_files
 from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
 
@@ -130,67 +126,9 @@ class TestAverageMatrix(unittest.TestCase):
         remove_files(test_mat, result_mat)
 
 
-class TestReadFasta(unittest.TestCase):
-
-    def test_bad_file(self):
-        bad_file = generate_random_filename(extension=".fa")
-
-        with open(bad_file, 'w') as file:
-            file.write("bad file\nnot good")
-
-        with self.assertRaises(NotFastaFileError):
-            read_fasta(bad_file)
-
-        remove_files(bad_file)
-
-    def test_single_sequence(self):
-        single_seq_file = generate_random_filename(extension=".fa")
-
-        with open(single_seq_file, 'w') as file:
-            file.write(">Example_Seq\nATGC")
-
-        returned_seqs = read_fasta(single_seq_file)
-
-        self.assertEqual(returned_seqs, ["ATGC"])
-
-        remove_files(single_seq_file)
-
-    def test_multiple_sequence(self):
-        multiple_seqs_filename = generate_random_filename(extension=".fa")
-
-        with open(multiple_seqs_filename, 'w') as file:
-            file.write(">Example_Seq\nATGC\n>Example_Two\nTTTTTTTT")
-
-        returned_seqs = read_fasta(multiple_seqs_filename)
-
-        self.assertEqual(returned_seqs, ["ATGC", "TTTTTTTT"])
-
-        remove_files(multiple_seqs_filename)
-
-
 class TestBlacklistExtendedGeneBodies(unittest.TestCase):
     # Todo
     pass
-
-
-class TestAverageVertically(unittest.TestCase):
-
-    def test_empty_list(self):
-        empty_list = []
-        self.assertEqual(average_vertically(empty_list), empty_list)
-
-    def test_small_list(self):
-        small_list = [
-            [5, 0, 7],
-            [9, 5, 9],
-            [1, 2, 3],
-            [8, 6, 4],
-            [1, 5, 9]
-        ]
-
-        expected = [4.8, 3.6, 6.4]
-
-        self.assertEqual(average_vertically(small_list), expected)
 
 
 class TestDetermineRegionLength(unittest.TestCase):
@@ -240,7 +178,7 @@ class TestMakeFiveAndThreeDict(unittest.TestCase):
             file.write("Invalid file")
 
         with self.assertRaises(Exception):
-            build_counts_dict(invalid_filename)
+            build_counts_dict(invalid_filename, "five")
 
         remove_files(invalid_filename)
 
@@ -250,9 +188,11 @@ class TestMakeFiveAndThreeDict(unittest.TestCase):
         with open(pos_strand_filename, 'w') as file:
             file.write("chr1    1   11  name    score   +\n")
 
-        five_dict, three_dict = build_counts_dict(pos_strand_filename)
+        five_dict = build_counts_dict(pos_strand_filename, "five")
 
         self.assertEqual(five_dict["chr1"]["+"][1], 1)
+
+        three_dict = build_counts_dict(pos_strand_filename, "three")
         self.assertEqual(three_dict["chr1"]["+"][10], 1)
 
         remove_files(pos_strand_filename)
@@ -267,11 +207,13 @@ class TestMakeFiveAndThreeDict(unittest.TestCase):
             file.write("chr1    100   789  name    score   +\n")
             file.write("chr1    51   789  name    score   +\n")
 
-        five_dict, three_dict = build_counts_dict(pos_strand_filename)
+        five_dict = build_counts_dict(pos_strand_filename, "five")
 
         self.assertEqual(five_dict["chr1"]["+"][1], 3)
         self.assertEqual(five_dict["chr1"]["+"][100], 1)
         self.assertEqual(five_dict["chr1"]["+"][51], 1)
+
+        three_dict = build_counts_dict(pos_strand_filename, "three")
 
         self.assertEqual(three_dict["chr1"]["+"][10], 1)
         self.assertEqual(three_dict["chr1"]["+"][6], 1)
@@ -287,9 +229,11 @@ class TestMakeFiveAndThreeDict(unittest.TestCase):
         with open(neg_strand_filename, 'w') as file:
             file.write("chr1    1   11  name    score   -\n")
 
-        five_dict, three_dict = build_counts_dict(neg_strand_filename)
+        five_dict = build_counts_dict(neg_strand_filename, "five")
 
         self.assertEqual(five_dict["chr1"]["-"][10], 1)
+
+        three_dict = build_counts_dict(neg_strand_filename, "three")
         self.assertEqual(three_dict["chr1"]["-"][1], 1)
 
         remove_files(neg_strand_filename)
@@ -304,12 +248,14 @@ class TestMakeFiveAndThreeDict(unittest.TestCase):
             file.write("chr1    100   789  name    score   -\n")
             file.write("chr1    51   789  name    score   -\n")
 
-        five_dict, three_dict = build_counts_dict(neg_strand_filename)
+        five_dict = build_counts_dict(neg_strand_filename, "five")
 
         self.assertEqual(five_dict["chr1"]["-"][10], 1)
         self.assertEqual(five_dict["chr1"]["-"][6], 1)
         self.assertEqual(five_dict["chr1"]["-"][98], 1)
         self.assertEqual(five_dict["chr1"]["-"][788], 2)
+
+        three_dict = build_counts_dict(neg_strand_filename, "three")
 
         self.assertEqual(three_dict["chr1"]["-"][1], 3)
         self.assertEqual(three_dict["chr1"]["-"][100], 1)
@@ -327,7 +273,7 @@ class TestMakeFivePrimeBedFile(unittest.TestCase):
             file.write("Invalid file")
 
         with self.assertRaises(Exception):
-            make_five_bed_file(invalid_filename)
+            make_read_end_file(invalid_filename, 'five')
 
         remove_files(invalid_filename)
 
@@ -337,7 +283,7 @@ class TestMakeFivePrimeBedFile(unittest.TestCase):
         with open(one_read_filename, 'w') as file:
             file.write("chr1    1   11  name    score   +\n")
 
-        five_prime_file = make_five_bed_file(one_read_filename)
+        five_prime_file = make_read_end_file(one_read_filename, 'five')
 
         with open(five_prime_file) as file:
             results = file.readline().split()
@@ -352,7 +298,7 @@ class TestMakeFivePrimeBedFile(unittest.TestCase):
         with open(one_read_filename, 'w') as file:
             file.write("chr1    1   2  name    score   +\n")
 
-        five_prime_file = make_five_bed_file(one_read_filename)
+        five_prime_file = make_read_end_file(one_read_filename, 'five')
 
         with open(five_prime_file) as file:
             results = file.readline().split()
@@ -367,7 +313,7 @@ class TestMakeFivePrimeBedFile(unittest.TestCase):
         with open(one_read_filename, 'w') as file:
             file.write("chr1    1   11  name    score   -\n")
 
-        five_prime_file = make_five_bed_file(one_read_filename)
+        five_prime_file = make_read_end_file(one_read_filename, 'five')
 
         with open(five_prime_file) as file:
             results = file.readline().split()
@@ -382,7 +328,7 @@ class TestMakeFivePrimeBedFile(unittest.TestCase):
         with open(one_read_filename, 'w') as file:
             file.write("chr1    1   2  name    score   -\n")
 
-        five_prime_file = make_five_bed_file(one_read_filename)
+        five_prime_file = make_read_end_file(one_read_filename, 'five')
 
         with open(five_prime_file) as file:
             results = file.readline().split()
@@ -398,7 +344,7 @@ class TestMakeFivePrimeBedFile(unittest.TestCase):
             file.write("chr1    1   11  name    score   -\n")
             file.write("chr1    21   50  name    score   +\n")
 
-        five_prime_file = make_five_bed_file(filename)
+        five_prime_file = make_read_end_file(filename, 'five')
 
         with open(five_prime_file) as file:
             results = [line.rstrip().split() for line in file.readlines()]
@@ -422,7 +368,7 @@ class TestMakeThreePrimeBedFile(unittest.TestCase):
             file.write("Invalid file")
 
         with self.assertRaises(Exception):
-            make_three_bed_file(invalid_filename)
+            make_read_end_file(invalid_filename, "three")
 
         remove_files(invalid_filename)
 
@@ -432,7 +378,7 @@ class TestMakeThreePrimeBedFile(unittest.TestCase):
         with open(one_read_filename, 'w') as file:
             file.write("chr1    1   11  name    score   +\n")
 
-        three_prime_file = make_three_bed_file(one_read_filename)
+        three_prime_file = make_read_end_file(one_read_filename, "three")
 
         with open(three_prime_file) as file:
             results = file.readline().split()
@@ -447,7 +393,7 @@ class TestMakeThreePrimeBedFile(unittest.TestCase):
         with open(one_read_filename, 'w') as file:
             file.write("chr1    1   11  name    score   -\n")
 
-        three_prime_file = make_three_bed_file(one_read_filename)
+        three_prime_file = make_read_end_file(one_read_filename, "three")
 
         with open(three_prime_file) as file:
             results = file.readline().split()
@@ -463,7 +409,7 @@ class TestMakeThreePrimeBedFile(unittest.TestCase):
             file.write("chr1    1   11  name    score   -\n")
             file.write("chr1    21   50  name    score   +\n")
 
-        three_prime_file = make_three_bed_file(filename)
+        three_prime_file = make_read_end_file(filename, "three")
 
         with open(three_prime_file) as file:
             results = [line.rstrip().split() for line in file.readlines()]

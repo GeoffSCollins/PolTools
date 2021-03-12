@@ -5,12 +5,11 @@ import argparse
 
 from GC_bioinfo.utils.check_dependencies import check_dependencies
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
+from GC_bioinfo.utils.make_read_end_file import make_read_end_file
 from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
 from GC_bioinfo.utils.remove_files import remove_files
-from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
-from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
-from GC_bioinfo.utils.verify_bed_file import verify_bed_files
+from GC_bioinfo.utils.bedtools_utils.run_bedtools_coverage import run_coverage
+from GC_bioinfo.utils.bedtools_utils.run_bedtools_subtract import run_subtract
 
 
 def make_incremented_regions(regions_filename, upstream_distance, downstream_distance, interval_size):
@@ -80,7 +79,7 @@ def blacklist_tsrs(sequencing_files, tsr_file):
 
 def get_coverage_files_helper(filename, region_intervals_file):
     # First makes the three bed file
-    three_prime_end_file = make_three_bed_file(filename)
+    three_prime_end_file = make_read_end_file(filename, 'three')
 
     # Run coverage on the three bed file
     coverage_file = generate_random_filename()

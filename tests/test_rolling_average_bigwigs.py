@@ -1,8 +1,6 @@
 import unittest.mock
 from pathlib import Path
 
-import sys
-
 from GC_bioinfo.utils.remove_files import remove_files
 
 from GC_bioinfo.other_programs import rolling_average_bigwigs

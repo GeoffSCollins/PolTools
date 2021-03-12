@@ -10,13 +10,12 @@ from pathlib import Path
 
 from GC_bioinfo.utils.check_dependencies import check_dependencies
 from GC_bioinfo.utils.constants import rna_blacklist_file, hg38_chrom_sizes_file, annotation_file
-from GC_bioinfo.utils.make_five_and_three_dict import build_counts_dict
-from GC_bioinfo.utils.make_five_prime_bed_file import make_five_bed_file
+from GC_bioinfo.utils.build_counts_dict import build_counts_dict
+from GC_bioinfo.utils.make_read_end_file import make_read_end_file
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
 from GC_bioinfo.utils.remove_files import remove_files
-from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
-from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
+from GC_bioinfo.utils.bedtools_utils.run_bedtools_coverage import run_coverage
+from GC_bioinfo.utils.bedtools_utils.run_bedtools_subtract import run_subtract
 from GC_bioinfo.utils.verify_bed_file import verify_bed_files
 
 
@@ -238,7 +237,7 @@ def make_blacklisted_regions(blacklist_filename, mapped_tsrs, percent_for_blackl
 # ----------------------------------------------     Quantitation     -------------------------------------------------#
 
 def get_counts_in_paused_region(pause_region_filename, blacklisted_sequencing_file):
-    five_bed_filename = make_five_bed_file(blacklisted_sequencing_file)
+    five_bed_filename = make_read_end_file(blacklisted_sequencing_file, 'five')
 
     # Run bedtools coverage on the 5' bed file
     random_filename = run_coverage(pause_region_filename, five_bed_filename)
@@ -261,7 +260,7 @@ def get_counts_in_paused_region(pause_region_filename, blacklisted_sequencing_fi
 
 
 def get_counts_in_gene_bodies(regions_filename, blacklisted_sequencing_file, indv_gene_counts_dict):
-    three_bed_filename = make_three_bed_file(blacklisted_sequencing_file)
+    three_bed_filename = make_read_end_file(blacklisted_sequencing_file, 'three')
 
     random_filename = run_coverage(regions_filename, three_bed_filename)
 
@@ -334,7 +333,7 @@ def gather_data(sequencing_file, blacklist_filename, annotated_dataset, region_f
 
     # Only get the region data from the dataset which was annotated
     if annotated_dataset:
-        five_prime_counts_dict, _ = build_counts_dict(sequencing_file)
+        five_prime_counts_dict = build_counts_dict(sequencing_file, "five")
 
         for gene in truQuant_regions_dict:
             region_data_dict[gene] = get_region_data(truQuant_regions_dict[gene]["Pause"], five_prime_counts_dict)

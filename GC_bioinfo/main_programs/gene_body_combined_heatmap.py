@@ -5,7 +5,7 @@ import sys
 import argparse
 
 from GC_bioinfo.main_programs import gene_body_heatmap
-from GC_bioinfo.utils.add_matrices import add_matrices
+from GC_bioinfo.utils.heatmap_utils.add_matrices import add_matrices
 from GC_bioinfo.utils.remove_files import remove_files
 
 

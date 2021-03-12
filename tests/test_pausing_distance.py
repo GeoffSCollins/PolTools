@@ -25,13 +25,13 @@ class TestPausingDistance(unittest.TestCase):
         max_threads = multiprocessing.cpu_count()
 
         result = pausing.parse_input([regions_file, 'seq_file'])
-        self.assertEqual(result, (regions_file, ['seq_file'], max_threads))
+        self.assertEqual(result, (regions_file, ['seq_file'], 100, max_threads))
 
         # Test the threading option
         result = pausing.parse_input([regions_file, 'seq_file', '-t', '2'])
-        self.assertEqual(result, (regions_file, ['seq_file'], 2))
+        self.assertEqual(result, (regions_file, ['seq_file'], 100, 2))
         result = pausing.parse_input([regions_file, 'seq_file', '--threads', '2'])
-        self.assertEqual(result, (regions_file, ['seq_file'], 2))
+        self.assertEqual(result, (regions_file, ['seq_file'], 100, 2))
 
         remove_files(regions_file)
 

@@ -31,7 +31,7 @@ class TestTruQuant(unittest.TestCase):
         result = truQuant.parse_input([seq_file_for_annotation, '-a', '500', '-b' '0.6', '-r', '10', '-t', '20'])
         self.assertEqual(result, ([seq_file_for_annotation], 500, 0.6, 10, 20))
 
-        result = truQuant.parse_input([seq_file_for_annotation, '-a', '500', '--blacklisting_percent' '0.6', '-r', '10', '-t', '20'])
+        result = truQuant.parse_input([seq_file_for_annotation, '-a', '500', '--blacklist_percent', '0.6', '-r', '10', '-t', '20'])
         self.assertEqual(result, ([seq_file_for_annotation], 500, 0.6, 10, 20))
 
         # Try making the blacklist percent greater than one

@@ -6,15 +6,16 @@ _bioinfo() {
   local cur opts
  	COMPREPLY=()
  	cur="${COMP_WORDS[COMP_CWORD]}"
- 	opts="base_distribution divergent_pileup_metaplot five_prime_metaplot inr_reads make_regions_file_centered_on_max_tss \
- 	pausing_distance_distribution_from_maxTSS read_through_transcription sequence_searches three_prime_metaplot \
+ 	opts="base_distribution metaplot inr_reads make_regions_file_centered_on_max_tss \
+ 	pausing_distance_distribution_from_maxTSS read_through_transcription sequence_searches \
  	tps_distance_per_gene truQuant polyAToPolyN tsrFinder gene_body_combined_heatmap gene_body_fold_change_heatmap \
  	gene_body_heatmap quantify_gene_body_fold_change_heatmap TES_heatmap TES_combined_heatmap TES_fold_change_heatmap \
- 	multicoverage nucleotide_heatmap track_links_from_bw sequence_from_region_around_max_tss"
+ 	multicoverage nucleotide_heatmap track_links_from_bw sequence_from_region_around_max_tss read_end_heatmap \
+ 	read_end_combined_heatmap read_end_fold_change_heatmap"
 
  	if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
- 		COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
- 		return 0
+ 	  COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+ 	  return 0
  	fi
 }
 

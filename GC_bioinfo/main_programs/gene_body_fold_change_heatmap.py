@@ -11,12 +11,12 @@ from PIL import Image
 
 from GC_bioinfo.main_programs import gene_body_combined_heatmap
 from GC_bioinfo.utils.constants import generate_heatmap_location
-from GC_bioinfo.utils.generate_heatmap import generate_heatmap, Ticks, make_ticks_matrix
-from GC_bioinfo.utils.make_log_two_fold_change_matrix import make_log_two_fold_change_matrix
+from GC_bioinfo.utils.heatmap_utils.generate_heatmap import generate_heatmap, Ticks, make_ticks_matrix
+from GC_bioinfo.utils.heatmap_utils.make_log_two_fold_change_matrix import make_log_two_fold_change_matrix
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.nested_multiprocessing_pool import NestedPool
 from GC_bioinfo.utils.remove_files import remove_files
-from GC_bioinfo.utils.set_matrix_bounds import set_matrix_bounds
+from GC_bioinfo.utils.heatmap_utils.set_matrix_bounds import set_matrix_bounds
 
 
 def set_max_fold_change(fold_change_matrix_filename, max_fold_change):

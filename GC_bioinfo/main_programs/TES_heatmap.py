@@ -6,16 +6,16 @@ import argparse
 
 from collections import defaultdict
 
-from GC_bioinfo.utils.average_matrix import average_matrix
+from GC_bioinfo.utils.heatmap_utils.average_matrix import average_matrix
 from GC_bioinfo.utils.constants import rna_blacklist_file
 from GC_bioinfo.utils.generate_blacklist_regions_for_gene_body_heatmap import blacklist_extended_gene_bodies
-from GC_bioinfo.utils.generate_heatmap import generate_heatmap, Ticks
+from GC_bioinfo.utils.heatmap_utils.generate_heatmap import generate_heatmap, Ticks
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
 from GC_bioinfo.utils.remove_files import remove_files
-from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
-from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
-from GC_bioinfo.utils.scale_matrix import scale_matrix
+from GC_bioinfo.utils.bedtools_utils.run_bedtools_coverage import run_coverage
+from GC_bioinfo.utils.bedtools_utils.run_bedtools_subtract import run_subtract
+from GC_bioinfo.utils.heatmap_utils.scale_matrix import scale_matrix
+from GC_bioinfo.utils.make_read_end_file import make_read_end_file
 
 
 def make_incremented_regions(truQuant_output_file, downstream_distance, upstream_distance, bp_width, interval_size):
@@ -38,17 +38,16 @@ def make_incremented_regions(truQuant_output_file, downstream_distance, upstream
             region_left = int(max_tss) - upstream_distance
             region_right = int(gene_body_right) + downstream_distance
 
-            # If the region will go past the image, cut it off at the end of the image
+            # If the region will go past the image, cut it off at the end of the image using the 5' end
             if region_right - region_left > bp_width:
-                region_right = region_left + bp_width
+                region_left = region_right - bp_width
         else:
             region_left = int(gene_body_left) - downstream_distance
             region_right = int(max_tss) + upstream_distance
 
             # If the region will go past the image, cut it off at the end of the image
             if region_right - region_left > bp_width:
-                region_left = region_right - bp_width
-
+                region_right = region_left + bp_width
 
         if region_left < 0:
             # If the region is negative, this is not possible so just don't add it the regions
@@ -86,7 +85,7 @@ def make_incremented_regions(truQuant_output_file, downstream_distance, upstream
 
 def quantify_intervals(sequencing_filename, blacklist_filename, intervals_file):
     # First make the sequencing file 3' ends only
-    three_prime_filename = make_three_bed_file(sequencing_filename)
+    three_prime_filename = make_read_end_file(sequencing_filename, 'three')
 
     # Now blacklist the sequencing file
     blacklisted_sequencing_filename = run_subtract(three_prime_filename, blacklist_filename, rna_blacklist_file)
@@ -109,23 +108,17 @@ def read_coverage_file(coverage_file, width):
             chrom, left, right, gene_name, score, strand, counts, _, _, _ = line.split()
             data[gene_name].append(counts)
 
-
     # Write the dictionary to a file by sorting by gene length
     lines = ["\t".join(data[gene_name]) for gene_name in data]
     num_lines = len(lines)
 
-    sorted_matrix_filename = generate_random_filename()
+    sorted_matrix_filename = generate_random_filename(".sorted.matrix")
 
     with open(sorted_matrix_filename, 'w') as file:
         for line in lines:
             # Need to add 0's to get to the same length
             curr_length = len(line.split())
-
-            if curr_length >= width:
-                line = "\t".join(line.split()[(width):])
-                append_string = ""
-            else:
-                append_string = "\t".join(["0"] * (width - curr_length))
+            append_string = "\t".join(["0"] * (width - curr_length))
 
             file.write(append_string + "\t" + line + "\n")
 

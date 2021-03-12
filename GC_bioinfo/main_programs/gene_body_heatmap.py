@@ -6,16 +6,16 @@ import argparse
 
 from collections import defaultdict
 
-from GC_bioinfo.utils.average_matrix import average_matrix
+from GC_bioinfo.utils.heatmap_utils.average_matrix import average_matrix
 from GC_bioinfo.utils.constants import rna_blacklist_file
 from GC_bioinfo.utils.generate_blacklist_regions_for_gene_body_heatmap import blacklist_extended_gene_bodies
-from GC_bioinfo.utils.generate_heatmap import generate_heatmap, Ticks
+from GC_bioinfo.utils.heatmap_utils.generate_heatmap import generate_heatmap, Ticks
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
+from GC_bioinfo.utils.make_read_end_file import make_read_end_file
 from GC_bioinfo.utils.remove_files import remove_files
-from GC_bioinfo.utils.run_bedtools_coverage import run_coverage
-from GC_bioinfo.utils.run_bedtools_subtract import run_subtract
-from GC_bioinfo.utils.scale_matrix import scale_matrix
+from GC_bioinfo.utils.bedtools_utils.run_bedtools_coverage import run_coverage
+from GC_bioinfo.utils.bedtools_utils.run_bedtools_subtract import run_subtract
+from GC_bioinfo.utils.heatmap_utils.scale_matrix import scale_matrix
 
 
 def make_incremented_regions(regions_filename, downstream_distance, interval_size, upstream_distance):
@@ -67,7 +67,7 @@ def make_incremented_regions(regions_filename, downstream_distance, interval_siz
 
 def quantify_intervals(sequencing_filename, blacklist_filename, intervals_file):
     # First make the sequencing file 3' ends only
-    three_prime_filename = make_three_bed_file(sequencing_filename)
+    three_prime_filename = make_read_end_file(sequencing_filename, 'three')
 
     # Now blacklist the sequencing file
     blacklisted_sequencing_filename = run_subtract(three_prime_filename, blacklist_filename, rna_blacklist_file)

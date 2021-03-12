@@ -2,9 +2,8 @@ import unittest.mock
 import io
 import multiprocessing
 
-from GC_bioinfo.main_programs import five_prime_metaplot, three_prime_metaplot
+from GC_bioinfo.main_programs import metaplot
 
-from GC_bioinfo.utils.run_metaplot import parse_input
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.remove_files import remove_files
 from quieter import Quieter
@@ -18,11 +17,7 @@ class TestFiveAndThreeMetaplots(unittest.TestCase):
         # No arguments throws error
         with self.assertRaises(SystemExit):
             with Quieter():
-                parse_input([], 'five')
-
-        with self.assertRaises(SystemExit):
-            with Quieter():
-                parse_input([], 'three')
+                metaplot.parse_input([])
 
         # Needs a region file and at least one seq file
         regions_file = generate_random_filename()
@@ -34,26 +29,18 @@ class TestFiveAndThreeMetaplots(unittest.TestCase):
         region_length = 2
         max_threads = multiprocessing.cpu_count()
 
-        with self.assertRaises(SystemExit):
-            with Quieter():
-                parse_input([], 'five')
-
-        with self.assertRaises(SystemExit):
-            with Quieter():
-                parse_input([], 'three')
-
         # These will work!!
-        result = parse_input([regions_file, 'seq_file'], 'five')
-        self.assertEqual(result, (regions_file, ['seq_file'], 2, max_threads))
-        result = parse_input([regions_file, 'seq_file'], 'three')
-        self.assertEqual(result, (regions_file, ['seq_file'], 2, max_threads))
+        result = metaplot.parse_input(['five', regions_file, 'seq_file'])
+        self.assertEqual(result, ('five', regions_file, ['seq_file'], 2, max_threads))
+        result = metaplot.parse_input(['three', regions_file, 'seq_file'])
+        self.assertEqual(result, ('three', regions_file, ['seq_file'], 2, max_threads))
 
         # Test the threading is working
-        result = parse_input([regions_file, 'seq_file', '-t', '4'], 'three')
-        self.assertEqual(result, (regions_file, ['seq_file'], 2, 4))
+        result = metaplot.parse_input(['five', regions_file, 'seq_file', '-t', '4'])
+        self.assertEqual(result, ('five', regions_file, ['seq_file'], 2, 4))
 
-        result = parse_input([regions_file, 'seq_file', '--threads', '4'], 'three')
-        self.assertEqual(result, (regions_file, ['seq_file'], 2, 4))
+        result = metaplot.parse_input(['three', regions_file, 'seq_file', '--threads', '4'])
+        self.assertEqual(result, ('three', regions_file, ['seq_file'], 2, 4))
 
         remove_files(regions_file)
 
@@ -72,7 +59,7 @@ class TestFiveAndThreeMetaplots(unittest.TestCase):
                 "\t".join(["chr1", "2", "9", "name", "0", "+"])
             )
 
-        five_prime_metaplot.main([region_filename, seq_filename])
+        metaplot.main(['five', region_filename, seq_filename])
 
         # Get the result from stdout by splitting into a list and making the output floats where possible
         result = [line for line in stdout.getvalue().split("\n") if line]
@@ -115,7 +102,7 @@ class TestFiveAndThreeMetaplots(unittest.TestCase):
                 "\t".join(["chr1", "2", "9", "name", "0", "+"])
             )
 
-        three_prime_metaplot.main([region_filename, seq_filename])
+        metaplot.main(['three', region_filename, seq_filename])
 
         # Get the result from stdout by splitting into a list and making the output floats where possible
         result = [line for line in stdout.getvalue().split("\n") if line]
@@ -158,7 +145,7 @@ class TestFiveAndThreeMetaplots(unittest.TestCase):
                 "\t".join(["chr1", "2", "9", "name", "0", "-"])
             )
 
-        five_prime_metaplot.main([region_filename, seq_filename])
+        metaplot.main(['five', region_filename, seq_filename])
 
         # Get the result from stdout by splitting into a list and making the output floats where possible
         result = [line for line in stdout.getvalue().split("\n") if line]
@@ -201,7 +188,7 @@ class TestFiveAndThreeMetaplots(unittest.TestCase):
                 "\t".join(["chr1", "2", "9", "name", "0", "-"])
             )
 
-        three_prime_metaplot.main([region_filename, seq_filename])
+        metaplot.main(['three', region_filename, seq_filename])
 
         # Get the result from stdout by splitting into a list and making the output floats where possible
         result = [line for line in stdout.getvalue().split("\n") if line]
@@ -250,7 +237,7 @@ class TestFiveAndThreeMetaplots(unittest.TestCase):
                 "\t".join(["chr1", "1", "8", "name", "0", "-"])
             )
 
-        five_prime_metaplot.main([region_filename, seq_filename, seq_filename_two])
+        metaplot.main(['five', region_filename, seq_filename, seq_filename_two])
 
         # Get the result from stdout by splitting into a list and making the output floats where possible
         result = [line for line in stdout.getvalue().split("\n") if line]
@@ -303,7 +290,7 @@ class TestFiveAndThreeMetaplots(unittest.TestCase):
                 "\t".join(["chr1", "1", "8", "name", "0", "-"])
             )
 
-        three_prime_metaplot.main([region_filename, seq_filename, seq_filename_two])
+        metaplot.main(['three', region_filename, seq_filename, seq_filename_two])
 
         # Get the result from stdout by splitting into a list and making the output floats where possible
         result = [line for line in stdout.getvalue().split("\n") if line]
@@ -331,6 +318,93 @@ class TestFiveAndThreeMetaplots(unittest.TestCase):
         ]
 
         remove_files(region_filename, seq_filename, seq_filename_two)
+        self.assertEqual(result, expected)
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_complete_run(self, stdout):
+        reads_filename = generate_random_filename()
+
+        with open(reads_filename, 'w') as file:
+            file.write("chr1\t1\t10\tname\t0\t+\n")
+            file.write("chr1\t10\t20\tname\t0\t-\n")
+
+        regions_filename = generate_random_filename()
+
+        with open(regions_filename, 'w') as file:
+            file.write("chr1\t0\t20\tname\t0\t+\n")
+
+        metaplot.main(['whole', regions_filename, reads_filename])
+
+        output = stdout.getvalue().split("\n")[1:]
+
+        result = []
+
+        for line in output:
+            if line:
+                result.append(
+                    tuple([float(val) for val in line.split()])
+                )
+
+        remove_files(reads_filename, regions_filename)
+
+        position = list(range(-10, 0)) + list(range(1, 11))
+        fw_expected = [0] + [1] * 9 + [0] * 10
+        rv_expected = [0] * 10 + [-1] * 10
+
+        expected = list(zip(position, fw_expected, rv_expected))
+
+        self.assertEqual(result, expected)
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_two_sequencing_files(self, stdout):
+        reads_filename = generate_random_filename()
+        reads_filename_two = generate_random_filename()
+
+        with open(reads_filename, 'w') as file:
+            file.write("chr1\t1\t10\tname\t0\t+\n")
+            file.write("chr1\t10\t20\tname\t0\t-\n")
+
+        with open(reads_filename_two, 'w') as file:
+            file.write("chr1\t1\t10\tname\t0\t-\n")
+            file.write("chr1\t10\t20\tname\t0\t+\n")
+
+        regions_filename = generate_random_filename()
+
+        with open(regions_filename, 'w') as file:
+            file.write("chr1\t0\t20\tname\t0\t+\n")
+
+        metaplot.main(['whole', regions_filename, reads_filename, reads_filename_two])
+
+        output = stdout.getvalue().split("\n")
+        header = output[0].split("\t")
+
+        reads_basename = reads_filename.split("/")[-1]
+        reads_basename_two = reads_filename_two.split("/")[-1]
+
+        expected_header = ["Position", reads_basename + " whole sense strand", reads_basename + " whole divergent strand",
+                           reads_basename_two + " whole sense strand", reads_basename_two + " whole divergent strand"]
+
+        self.assertEqual(header, expected_header)
+
+        result = []
+
+        for line in output[1:]:
+            if line:
+                result.append(
+                    tuple([float(val) for val in line.split()])
+                )
+
+        remove_files(reads_filename, regions_filename, reads_filename_two)
+
+        position = list(range(-10, 0)) + list(range(1, 11))
+        fw_expected = [0] + [1] * 9 + [0] * 10
+        rv_expected = [0] * 10 + [-1] * 10
+
+        fw_expected_two = [0] * 10 + [1] * 10
+        rv_expected_two = [0] + [-1] * 9 + [0] * 10
+
+        expected = list(zip(position, fw_expected, rv_expected, fw_expected_two, rv_expected_two))
+
         self.assertEqual(result, expected)
 
 
