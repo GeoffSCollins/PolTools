@@ -1,4 +1,12 @@
 GC_bioinfo/static/hg38.fa
+GC_bioinfo/static/hg38.fa.fai
 GC_bioinfo/other_programs/
 .idea/
 **/pyc
+*.egg-info/
+*.egg
+__pycache__/
+GC_bioinfo/main_programs/__pycache__/
+GC_bioinfo/utils/__pycache__/
+GC_bioinfo/utils/bedtools_utils/__pycache__/
+GC_bioinfo/utils/heatmap_utils/__pycache__/

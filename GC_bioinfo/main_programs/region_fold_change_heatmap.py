@@ -1,6 +1,9 @@
 import sys
 import argparse
 import multiprocessing
+import os
+
+from PIL import Image
 
 from GC_bioinfo.utils.get_region_length import determine_region_length
 from GC_bioinfo.utils.verify_bed_file import verify_bed_files
@@ -8,26 +11,70 @@ from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_i
 from GC_bioinfo.utils.remove_files import remove_files
 from GC_bioinfo.utils.heatmap_utils.make_log_two_fold_change_matrix import make_log_two_fold_change_matrix
 from GC_bioinfo.utils.nested_multiprocessing_pool import NestedPool
-from GC_bioinfo.main_programs.read_end_combined_heatmap import get_read_end_combined_heatmap
-from GC_bioinfo.utils.heatmap_utils.generate_heatmap import generate_heatmap
+from GC_bioinfo.main_programs.region_combined_heatmap import get_read_end_combined_heatmap
+from GC_bioinfo.utils.heatmap_utils.generate_heatmap import generate_heatmap, Ticks, make_ticks_matrix
+from GC_bioinfo.utils.make_random_filename import generate_random_filename
+from GC_bioinfo.utils.constants import generate_heatmap_location
+
+def make_ticks_image(width, tick_params, tick_width):
+    # Make the tick marks
+    t = Ticks(*tick_params, offset=1, width=tick_width)
+
+    # Ticks matrix with a height of 50 px and a max black value of 1
+    ticks_matrix = make_ticks_matrix(width, 50, 1, t)
+
+    # Write to a file
+    ticks_matrix_filename = generate_random_filename('.matrix')
+    with open(ticks_matrix_filename, 'w') as file:
+        for row in ticks_matrix:
+            file.write("\t".join([str(val) for val in row]) + "\n")
+
+    ticks_image_filename = generate_random_filename(".tiff")
+
+    os.system("/usr/bin/Rscript " + generate_heatmap_location + " " +
+              " ".join([ticks_matrix_filename, "gray", ticks_image_filename, "2.2"]))
+
+    remove_files(ticks_matrix_filename)
+
+    return ticks_image_filename
 
 
-def make_heatmap(log2_matrix, max_log2_fold_change, output_filename):
+def combine_images(ticks_image_filename, only_heatmap_filename, output_filename):
+    ticks_image = Image.open(ticks_image_filename)
+    heatmap_image = Image.open(only_heatmap_filename)
+
+    final_image = Image.new('RGB', (ticks_image.width, ticks_image.height + heatmap_image.height))
+
+    final_image.paste(heatmap_image, (0, 0))
+    final_image.paste(ticks_image, (0, heatmap_image.height))
+
+    final_image.save(output_filename + ".tiff")
+    remove_files(ticks_image_filename, only_heatmap_filename)
+
+
+def make_heatmap(log2_matrix, max_log2_fold_change, tick_parameters, output_filename, px_per_bp):
     # Define gamma as 2.2 even though it won't be used
     gamma = 2.2
-
-    if max_log2_fold_change:
-        min_value = -1 * max_log2_fold_change
-    else:
-        min_value = None
-
+    min_value = -1 * max_log2_fold_change if max_log2_fold_change else None
     max_value = max_log2_fold_change
+    red_blue_image = generate_random_filename('.tiff')
 
-    generate_heatmap(log2_matrix, 'red/blue', output_filename, gamma, min_value, max_value)
+    if tick_parameters != (None, None):
+        # Get the width of the matrix so we can make the ticks
+        with open(log2_matrix) as file:
+            width = len(file.readline().split())
+
+        ticks_image = make_ticks_image(width, tick_parameters, px_per_bp)
+        generate_heatmap(log2_matrix, 'red/blue', red_blue_image, gamma, min_value, max_value)
+        combine_images(ticks_image, red_blue_image, output_filename)
+
+    else:
+        generate_heatmap(log2_matrix, 'red/blue', output_filename, gamma, min_value, max_value)
 
 
 def run_read_end_fold_change_heatmap(args):
-    end, filenames, max_log2_fc, repeat_amounts, numerator_seq_files_data, denominator_seq_files_data, threads = parse_input(args)
+    end, filenames, max_log2_fc, repeat_amounts, numerator_seq_files_data, denominator_seq_files_data, \
+        threads, tick_parameters = parse_input(args)
 
     regions_file, output_prefix = filenames
 
@@ -59,13 +106,11 @@ def run_read_end_fold_change_heatmap(args):
                       "_vertical_averaging_" + str(vertical_averaging) +  "_px_per_bp_" + str(px_per_bp) + ".tiff"
 
     # Make the heatmap
-    make_heatmap(log2_matrix, max_log2_fc, output_filename)
+    make_heatmap(log2_matrix, max_log2_fc, tick_parameters, output_filename, px_per_bp)
     remove_files(log2_matrix)
 
 
 def parse_input(args):
-    # TODO:
-
     def positive_int(num):
         try:
             val = int(num)
@@ -86,7 +131,7 @@ def parse_input(args):
 
         return val
 
-    parser = argparse.ArgumentParser(prog='end_fold_change_heatmap')
+    parser = argparse.ArgumentParser(prog='GC_bioinfo region_fold_change_heatmap')
 
     parser.add_argument('read_type', metavar='read type', type=str, choices=["five", "three", "whole"],
                         help='either five, three, or whole')
@@ -124,6 +169,12 @@ def parse_input(args):
     parser.add_argument('-t', '--threads', dest='threads', metavar='threads', type=positive_int, nargs='?',
                         default=multiprocessing.cpu_count())
 
+    parser.add_argument('--minor_ticks', metavar='minor_ticks', dest='minor_ticks',
+                        type=positive_int, default=None, help='Distance between minor ticks (bp). Default is 10 bp.')
+
+    parser.add_argument('--major_ticks', metavar='major_ticks', dest='major_ticks',
+                        type=positive_int, default=None, help='Distance between major ticks (bp). Default is 100 bp')
+
     args = parser.parse_args(args)
 
     numerator_seq_files_data = ((args.numerator_filename_one, args.numerator_norm_factor_one), (args.numerator_filename_two, args.numerator_norm_factor_two))
@@ -136,7 +187,12 @@ def parse_input(args):
     filenames = args.regions_file, args.output_prefix
     repeat_amounts = args.repeat_amount, args.vertical_averaging
 
-    return args.read_type, filenames, args.max_log2_fc, repeat_amounts, numerator_seq_files_data, denominator_seq_files_data, args.threads
+    if args.minor_ticks != None and args.major_ticks != None:
+        tick_parameters = (args.minor_ticks * args.repeat_amount, args.major_ticks * args.repeat_amount)
+    else:
+        tick_parameters = (None, None)
+
+    return args.read_type, filenames, args.max_log2_fc, repeat_amounts, numerator_seq_files_data, denominator_seq_files_data, args.threads, tick_parameters
 
 
 if __name__ == '__main__':

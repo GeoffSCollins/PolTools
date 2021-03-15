@@ -7,7 +7,7 @@ from GC_bioinfo.utils.verify_bed_file import verify_bed_files
 from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.remove_files import remove_files
-from GC_bioinfo.utils.heatmap_utils.generate_heatmap import generate_heatmap
+from GC_bioinfo.utils.heatmap_utils.generate_heatmap import generate_heatmap, Ticks
 from GC_bioinfo.utils.heatmap_utils.average_matrix import average_matrix
 
 
@@ -65,21 +65,26 @@ def get_heatmap_matrix(regions_filename, seq_file_data, end, repeat_amounts):
     return heatmap_matrix
 
 
-def make_heatmap(matrix_filename, output_prefix, heatmap_parameters):
+def make_heatmap(matrix_filename, output_prefix, heatmap_parameters, tick_parameters):
     max_value, gamma = heatmap_parameters
 
     # Now make the heatmap
     min_value = None
-    output_filename = output_prefix + "_max_" + str(max_value) + ".tiff"
+    output_filename = output_prefix + "_max_" + str(max_value) + "_gamma_" + str(gamma) + "_region_heatmap.tiff"
 
-    generate_heatmap(matrix_filename, 'gray', output_filename, gamma, min_value, max_value)
+    if tick_parameters != (None, None):
+        ticks = Ticks(*tick_parameters, offset=1)
+    else:
+        ticks = None
+
+    generate_heatmap(matrix_filename, 'gray', output_filename, gamma, min_value, max_value, ticks=ticks)
 
 
-def run_read_end_heatmap(end, filenames, seq_file_data, heatmap_parameters, repeat_amounts):
+def run_region_heatmap(end, filenames, seq_file_data, heatmap_parameters, repeat_amounts, tick_parameters):
     regions_filename, output_prefix = filenames
 
     matrix = get_heatmap_matrix(regions_filename, seq_file_data, end, repeat_amounts)
-    make_heatmap(matrix, output_prefix, heatmap_parameters)
+    make_heatmap(matrix, output_prefix, heatmap_parameters, tick_parameters)
     remove_files(matrix)
 
 
@@ -95,8 +100,17 @@ def parse_input(args):
 
         return val
 
+    def positive_int(num):
+        try:
+            val = int(num)
+            if val <= 0:
+                raise Exception("Go to the except")
+        except:
+            raise argparse.ArgumentTypeError(num + " must be positive")
 
-    parser = argparse.ArgumentParser(prog='read_end_heatmap')
+        return val
+
+    parser = argparse.ArgumentParser(prog='GC_bioinfo region_heatmap')
 
     parser.add_argument('read_type', metavar='read type', type=str, choices=["five", "three", "whole"],
                         help='either five, three, or whole')
@@ -118,15 +132,21 @@ def parse_input(args):
 
     parser.add_argument('-r', '--repeat_amount', metavar='repeat_amount', dest='repeat_amount',
                         type=int, default=1,
-                        help='Each base will be shown in this number of pixels. Default is 1')
+                        help='Each base will be shown in this number of pixels. Default is 1 -- no repeating')
 
     parser.add_argument('-v', '--vertical_averaging', metavar='vertical_averaging', dest='vertical_averaging',
                         type=int, default=1,
-                        help='Average this number of rows into one row. Default is 1')
+                        help='Average this number of rows into one row. Default is 1 -- no vertical averaging')
 
     parser.add_argument('-g', '--gamma', metavar='gamma', dest='gamma',
                         type=positive_float, default=2.2,
                         help='Gamma value of the heatmap. Default is 2.2, which is no gamma correction.')
+
+    parser.add_argument('--minor_ticks', metavar='minor_ticks', dest='minor_ticks',
+                        type=positive_int, default=None, help='Distance between minor ticks (bp). Default is 10 bp.')
+
+    parser.add_argument('--major_ticks', metavar='major_ticks', dest='major_ticks',
+                        type=positive_int, default=None, help='Distance between major ticks (bp). Default is 100 bp')
 
     args = parser.parse_args(args)
 
@@ -134,14 +154,19 @@ def parse_input(args):
     region_length = determine_region_length(args.regions_file)
     verify_region_length_is_even(region_length)
 
-    filenames = args.regions_file, args.seq_file, args.output_prefix
+    filenames = args.regions_file, args.output_prefix
     repeat_amounts = args.repeat_amount, args.vertical_averaging
-    heatmap_parameters = args.max_value, args.gamma
+    heatmap_parameters = args.max_black, args.gamma
     seq_file_data = args.seq_file, args.norm_factor
 
-    return args.read_type, filenames, seq_file_data, heatmap_parameters, repeat_amounts
+    if args.minor_ticks != None and args.major_ticks != None:
+        tick_parameters = (args.minor_ticks * args.repeat_amount, args.major_ticks * args.repeat_amount)
+    else:
+        tick_parameters = (None, None)
+
+    return args.read_type, filenames, seq_file_data, heatmap_parameters, repeat_amounts, tick_parameters
 
 
 if __name__ == '__main__':
-    end, filenames, seq_file_data, heatmap_parameters, repeat_amounts = parse_input(sys.argv[1:])
-    run_read_end_heatmap(end, filenames, seq_file_data, heatmap_parameters, repeat_amounts)
+    end, filenames, seq_file_data, heatmap_parameters, repeat_amounts, tick_parameters = parse_input(sys.argv[1:])
+    run_region_heatmap(end, filenames, seq_file_data, heatmap_parameters, repeat_amounts, tick_parameters)

@@ -8,7 +8,7 @@ from GC_bioinfo.utils.get_region_length import determine_region_length
 from GC_bioinfo.utils.heatmap_utils.add_matrices import add_matrices
 from GC_bioinfo.utils.remove_files import remove_files
 
-from GC_bioinfo.main_programs.read_end_heatmap import get_heatmap_matrix, make_heatmap
+from GC_bioinfo.main_programs.region_heatmap import get_heatmap_matrix, make_heatmap
 
 
 def get_read_end_combined_heatmap(regions_filename, seq_files_data, end, repeat_amounts, threads):
@@ -31,7 +31,7 @@ def get_read_end_combined_heatmap(regions_filename, seq_files_data, end, repeat_
 
 
 def run_read_end_combined_heatmap(args):
-    end, filenames, seq_files_data, heatmap_parameters, repeat_amounts, threads = parse_input(args)
+    end, filenames, seq_files_data, heatmap_parameters, repeat_amounts, threads, tick_parameters = parse_input(args)
 
     # Get the matrices for each of the samples
     regions_filename, output_prefix = filenames
@@ -39,7 +39,7 @@ def run_read_end_combined_heatmap(args):
     combined_matrix = get_read_end_combined_heatmap(regions_filename, seq_files_data, end, repeat_amounts, threads)
 
     # Make the heatmap
-    make_heatmap(combined_matrix, output_prefix, heatmap_parameters)
+    make_heatmap(combined_matrix, output_prefix, heatmap_parameters, tick_parameters)
 
 
 def parse_input(args):
@@ -64,7 +64,7 @@ def parse_input(args):
 
         return val
 
-    parser = argparse.ArgumentParser(prog='end_fold_change_heatmap')
+    parser = argparse.ArgumentParser(prog=' GC_bioinfo region_fold_change_heatmap')
 
     parser.add_argument('read_type', metavar='read type', type=str, choices=["five", "three", "whole"],
                         help='either five, three, or whole')
@@ -99,6 +99,12 @@ def parse_input(args):
                         type=positive_float, default=2.2,
                         help='Gamma value of the heatmap. Default is 2.2, which is no gamma correction.')
 
+    parser.add_argument('--minor_ticks', metavar='minor_ticks', dest='minor_ticks',
+                        type=positive_int, default=None, help='Distance between minor ticks (bp). Default is 10 bp.')
+
+    parser.add_argument('--major_ticks', metavar='major_ticks', dest='major_ticks',
+                        type=positive_int, default=None, help='Distance between major ticks (bp). Default is 100 bp')
+
     args = parser.parse_args(args)
 
     verify_bed_files(args.regions_file)
@@ -110,7 +116,12 @@ def parse_input(args):
     repeat_amounts = args.repeat_amount, args.vertical_averaging
     heatmap_parameters = args.max_value, args.gamma
 
-    return args.read_type, filenames, seq_files_data, heatmap_parameters, repeat_amounts, args.threads
+    if args.minor_ticks != None and args.major_ticks != None:
+        tick_parameters = (args.minor_ticks * args.repeat_amount, args.major_ticks * args.repeat_amount)
+    else:
+        tick_parameters = (None, None)
+
+    return args.read_type, filenames, seq_files_data, heatmap_parameters, repeat_amounts, args.threads, tick_parameters
 
 
 if __name__ == '__main__':
