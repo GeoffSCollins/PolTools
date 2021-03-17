@@ -8,8 +8,9 @@ static_path = os.path.join(dir_path, 'GC_bioinfo/static')
 if os.geteuid() != 0:
     raise PermissionError("Install should be as a root user")
 
-os.system("wget -P " + static_path + " http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz")
-os.system("gunzip " + static_path + "hg38.fa.gz -c > " + static_path + "hg38.fa")
+if not os.path.exists(static_path + "hg38.fa"):
+    os.system("wget -P " + static_path + " http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz")
+    os.system("gunzip " + static_path + "hg38.fa.gz -c > " + static_path + "hg38.fa")
 
 # Move and source the tab completion
 sys.stderr.write("Adding tab completion...\n")
