@@ -13,21 +13,27 @@ Usage
 **Usage**:
 ::
 
-  GC_bioinfo TES_heatmap [-h] [-w width] [-e height]
-                              [-d downstream_distance] [-u upstream_distance]
-                              [-b bp_width] [-g gamma] [-m max_black]
-                              [--minor_ticks minor_ticks]
-                              [--major_ticks major_ticks]
-                              truQuant_output_file correction_factor seq_file
-                              output_prefix
+  GC_bioinfo TES_combined_heatmap [-h] [-w width] [-e height]
+                                       [-d downstream_distance]
+                                       [-u upstream_distance] [-b bp_width]
+                                       [-g gamma] [-m max_black]
+                                       [--minor_ticks minor_ticks]
+                                       [--major_ticks major_ticks]
+                                       [-t [threads]]
+                                       truQuant_output_file
+                                       correction_factor_one seq_file_one
+                                       correction_factor_two seq_file_two
+                                       output_prefix
 
 
 ===========================    =========================================================================================================================================================
 Required Arguments             Description
 ===========================    =========================================================================================================================================================
 **truQuant Output File**       File ending in -truQuant_output.txt generated from `truQuant <https://geoffscollins.github.io/GC_bioinfo/truQuant.html>`_
-**Correction Factor**          Correction factor applied to the seq file data.
-**Sequencing File**            Bed formatted file from a sequencing experiment.
+**Correction Factor One**      Correction factor applied to the seq file data.
+**Sequencing File One**        Bed formatted file from a sequencing experiment.
+**Correction Factor Two**      Correction factor applied to the seq file data.
+**Sequencing File Two**        Bed formatted file from a sequencing experiment.
 **Output Prefix**              Output filename will begin with the output prefix and also contain the run parameters and ends in gene_body_heatmap.tiff.
 ===========================    =========================================================================================================================================================
 

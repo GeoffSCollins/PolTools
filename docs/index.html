@@ -175,9 +175,26 @@
   <div class="section" id="welcome-to-gc-bioinfo">
 <h1>Welcome to GC_bioinfo!<a class="headerlink" href="#welcome-to-gc-bioinfo" title="Permalink to this headline">¶</a></h1>
 <p>GC_bioinfo is a collection of bioinformatic programs analyzing PRO-Seq, PRO-Cap, and similar next generation sequencing
-experiments analyzing nascent RNAs.
-It is primary written in python3, but utilizes R for plotting and C++ for computationally expensive analyses. These
+experiments analyzing nascent RNAs.</p>
+<p>It is primary written in python3, but utilizes R for plotting and C++ for computationally expensive analyses. These
 tools were developed in the <a class="reference external" href="https://price.lab.uiowa.edu">Price Lab</a></p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Two options are provided for installation. Both assume you already have R installed. If you do not have R installed, please
+install it as described <a class="reference external" href="https://cran.r-project.org/doc/manuals/r-release/R-admin.html">here</a>.</p>
+<p>1) Install using pip and pypi
+Inside a terminal, run the following commands to install the necessary files</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip3 install GC_bioinfo
+$ GC_bioinfo build
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Install from the github source</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/GeoffSCollins/GC_bioinfo.git
+$ GC_bioinfo build
+</pre></div>
+</div>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Table of Contents</span></p>
 <ul>
@@ -204,6 +221,7 @@ tools were developed in the <a class="reference external" href="https://price.la
 <li class="toctree-l1"><a class="reference internal" href="truQuant.html"><em>truQuant</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="tsrFinder.html"><em>tsrFinder</em></a></li>
 </ul>
+</div>
 </div>
 </div>
 

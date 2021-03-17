@@ -13,23 +13,39 @@ Usage
 **Usage**:
 ::
 
-  GC_bioinfo TES_heatmap [-h] [-w width] [-e height]
-                              [-d downstream_distance] [-u upstream_distance]
-                              [-b bp_width] [-g gamma] [-m max_black]
-                              [--minor_ticks minor_ticks]
-                              [--major_ticks major_ticks]
-                              truQuant_output_file correction_factor seq_file
-                              output_prefix
+  GC_bioinfo TES_fold_change_heatmap [-h] [-w width] [-e height]
+                                          [-d downstream_distance]
+                                          [-u upstream_distance] [-b bp_width]
+                                          [-g gamma] [-m max_log2_fc]
+                                          [--minor_ticks minor_ticks]
+                                          [--major_ticks major_ticks]
+                                          [-t [threads]]
+                                          truQuant_output_file
+                                          numerator_correction_factor_one
+                                          numerator_seq_file_one
+                                          numerator_correction_factor_two
+                                          numerator_seq_file_two
+                                          denominator_correction_factor_one
+                                          denominator_seq_file_one
+                                          denominator_correction_factor_two
+                                          denominator_seq_file_two
+                                          output_prefix
 
 
-===========================    =========================================================================================================================================================
-Required Arguments             Description
-===========================    =========================================================================================================================================================
-**truQuant Output File**       File ending in -truQuant_output.txt generated from `truQuant <https://geoffscollins.github.io/GC_bioinfo/truQuant.html>`_
-**Correction Factor**          Correction factor applied to the seq file data.
-**Sequencing File**            Bed formatted file from a sequencing experiment.
-**Output Prefix**              Output filename will begin with the output prefix and also contain the run parameters and ends in gene_body_heatmap.tiff.
-===========================    =========================================================================================================================================================
+=====================================    =========================================================================================================================================================
+Required Arguments                       Description
+=====================================    =========================================================================================================================================================
+**truQuant Output File**                 File ending in -truQuant_output.txt generated from `truQuant <https://geoffscollins.github.io/GC_bioinfo/truQuant.html>`_
+**Numerator Correction Factor One**      Correction factor applied to the seq file data.
+**Numerator Sequencing File One**        Bed formatted file from a sequencing experiment.
+**Numerator Correction Factor Two**      Correction factor applied to the seq file data.
+**Numerator Sequencing File Two**        Bed formatted file from a sequencing experiment.
+**Denominator Correction Factor One**    Correction factor applied to the seq file data.
+**Denominator Sequencing File One**      Bed formatted file from a sequencing experiment.
+**Denominator Correction Factor Two**    Correction factor applied to the seq file data.
+**Denominator Sequencing File Two**      Bed formatted file from a sequencing experiment.
+**Output Prefix**                        Output filename will begin with the output prefix and also contain the run parameters and ends in gene_body_heatmap.tiff.
+=====================================    =========================================================================================================================================================
 
 
 ===========================    ===============================================================================================================================================================

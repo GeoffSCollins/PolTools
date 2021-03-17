@@ -187,19 +187,29 @@
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">TES_heatmap</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">w</span> <span class="n">width</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">height</span><span class="p">]</span>
-                            <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">downstream_distance</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">u</span> <span class="n">upstream_distance</span><span class="p">]</span>
-                            <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">bp_width</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">gamma</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">max_black</span><span class="p">]</span>
-                            <span class="p">[</span><span class="o">--</span><span class="n">minor_ticks</span> <span class="n">minor_ticks</span><span class="p">]</span>
-                            <span class="p">[</span><span class="o">--</span><span class="n">major_ticks</span> <span class="n">major_ticks</span><span class="p">]</span>
-                            <span class="n">truQuant_output_file</span> <span class="n">correction_factor</span> <span class="n">seq_file</span>
-                            <span class="n">output_prefix</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">TES_fold_change_heatmap</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">w</span> <span class="n">width</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">height</span><span class="p">]</span>
+                                        <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">downstream_distance</span><span class="p">]</span>
+                                        <span class="p">[</span><span class="o">-</span><span class="n">u</span> <span class="n">upstream_distance</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">bp_width</span><span class="p">]</span>
+                                        <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">gamma</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">max_log2_fc</span><span class="p">]</span>
+                                        <span class="p">[</span><span class="o">--</span><span class="n">minor_ticks</span> <span class="n">minor_ticks</span><span class="p">]</span>
+                                        <span class="p">[</span><span class="o">--</span><span class="n">major_ticks</span> <span class="n">major_ticks</span><span class="p">]</span>
+                                        <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
+                                        <span class="n">truQuant_output_file</span>
+                                        <span class="n">numerator_correction_factor_one</span>
+                                        <span class="n">numerator_seq_file_one</span>
+                                        <span class="n">numerator_correction_factor_two</span>
+                                        <span class="n">numerator_seq_file_two</span>
+                                        <span class="n">denominator_correction_factor_one</span>
+                                        <span class="n">denominator_seq_file_one</span>
+                                        <span class="n">denominator_correction_factor_two</span>
+                                        <span class="n">denominator_seq_file_two</span>
+                                        <span class="n">output_prefix</span>
 </pre></div>
 </div>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 15%" />
-<col style="width: 85%" />
+<col style="width: 19%" />
+<col style="width: 81%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Required Arguments</p></th>
@@ -210,10 +220,28 @@
 <tr class="row-even"><td><p><strong>truQuant Output File</strong></p></td>
 <td><p>File ending in -truQuant_output.txt generated from <a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/truQuant.html">truQuant</a></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Correction Factor</strong></p></td>
+<tr class="row-odd"><td><p><strong>Numerator Correction Factor One</strong></p></td>
 <td><p>Correction factor applied to the seq file data.</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Sequencing File</strong></p></td>
+<tr class="row-even"><td><p><strong>Numerator Sequencing File One</strong></p></td>
+<td><p>Bed formatted file from a sequencing experiment.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Numerator Correction Factor Two</strong></p></td>
+<td><p>Correction factor applied to the seq file data.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Numerator Sequencing File Two</strong></p></td>
+<td><p>Bed formatted file from a sequencing experiment.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Denominator Correction Factor One</strong></p></td>
+<td><p>Correction factor applied to the seq file data.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Denominator Sequencing File One</strong></p></td>
+<td><p>Bed formatted file from a sequencing experiment.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Denominator Correction Factor Two</strong></p></td>
+<td><p>Correction factor applied to the seq file data.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Denominator Sequencing File Two</strong></p></td>
 <td><p>Bed formatted file from a sequencing experiment.</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>Output Prefix</strong></p></td>

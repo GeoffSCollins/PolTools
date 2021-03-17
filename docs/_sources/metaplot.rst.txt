@@ -42,6 +42,9 @@ of the [5', 3', or pileup] reads at that position.
 
 For example:
 
+
+.. image:: images/divergent_pileup_metaplot.png
+.. image:: images/five_prime_metaplot.png
 .. image:: images/three_prime_metaplot.png
 
 \
