@@ -55,7 +55,6 @@ Optional Arguments               Description
 **-m, --max_log2_fc**            Maximum value to consider as black. Default is the max value found. Decreasing this number will make the image darker.
 **-r, --repeat_amount**          Number of pixels that should be displayed for each base pair
 **-v, --vertical_averaging**     Number of lines to average vertically.
-**-g, --gamma**                  Gamma correction of the heatmap. Default is 2.2, which is no gamma correction.
 **--minor_ticks**                Distance in bp between minor tick marks. Default is no ticks.
 **--major_ticks**                Distance in bp between major tick marks. Default is no ticks.
 =============================    ===============================================================================================================================================================

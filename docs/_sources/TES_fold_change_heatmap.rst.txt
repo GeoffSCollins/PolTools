@@ -16,7 +16,7 @@ Usage
   GC_bioinfo TES_fold_change_heatmap [-h] [-w width] [-e height]
                                           [-d downstream_distance]
                                           [-u upstream_distance] [-b bp_width]
-                                          [-g gamma] [-m max_log2_fc]
+                                          [-m max_log2_fc]
                                           [--minor_ticks minor_ticks]
                                           [--major_ticks major_ticks]
                                           [-t [threads]]
@@ -56,7 +56,6 @@ Optional Arguments             Description
 **-b, --bp_width**             Total distance shown on the heatmap. Default is 400,000 bp.
 **-w, --width**                Width of the heatmap in pixels. Default is 2,000 px.
 **-e, --height**               Height of the heatmap in pixels. Default is 2,000 px.
-**-g, --gamma**                Gamma correction of the heatmap. Default is 2.2, which is no gamma correction.
 **-m, --max_black**            Maximum value to consider as black. Default is the max value found. Decreasing this number will make the image darker.
 **--minor_ticks**              Distance in bp between minor tick marks. Default is 10,000 bp.
 **--major_ticks**              Distance in bp between major tick marks. Default is 50,000 bp.

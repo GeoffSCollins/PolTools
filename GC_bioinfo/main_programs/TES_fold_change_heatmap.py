@@ -150,9 +150,6 @@ def get_args(args):
                         help='Total number of base pairs shown on the heatmap. This number must be greater than the ' +
                              'upstream distance + distance past TES.')
 
-    parser.add_argument('-g', '--gamma', metavar='gamma', dest='gamma',
-                        type=positive_float, default=2.2, help='Gamma value of the heatmap')
-
     parser.add_argument('-m', '--max_log2_fc', metavar='max_log2_fc', dest='max_log2_fc',
                         type=positive_float, default=None, help='Max log2 fold change of the heatmap')
 
@@ -182,7 +179,6 @@ def get_args(args):
     downstream_distance = args.downstream_distance
     upstream_distance = args.upstream_distance
     bp_width = args.bp_width
-    gamma = args.gamma
     max_log2_fc = args.max_log2_fc
     minor_ticks = args.minor_ticks
     major_ticks = args.major_ticks
@@ -221,7 +217,7 @@ def get_args(args):
     denominator_seq_file_data = [(denominator_sequencing_filename_one, denominator_spike_in_one),
                                (denominator_sequencing_filename_two, denominator_spike_in_two)]
     matrix_params = (upstream_distance, downstream_distance, bp_width, width, height, interval_size)
-    heatmap_params = (bp_width, width, height, gamma, max_log2_fc, interval_size, minor_ticks, major_ticks)
+    heatmap_params = (bp_width, width, height, max_log2_fc, interval_size, minor_ticks, major_ticks)
     filenames = (truQuant_output_file, tsr_file, output_filename_prefix)
 
     return numerator_seq_file_data, denominator_seq_file_data, matrix_params, heatmap_params, filenames, max_threads
@@ -234,7 +230,7 @@ def main(args):
     fold_change_matrix = get_fold_change_matrix(numerator_seq_file_data, denominator_seq_file_data, matrix_params, filenames, max_threads)
 
     # Now plot!
-    bp_width, width, height, gamma, max_log2_fc, interval_size, minor_ticks, major_ticks = heatmap_params
+    bp_width, width, height, max_log2_fc, interval_size, minor_ticks, major_ticks = heatmap_params
     output_prefix = filenames[-1]
 
     output_filename = output_prefix + "_max_" + str(max_log2_fc) +  "_width_" + str(bp_width) + \
@@ -242,8 +238,7 @@ def main(args):
 
     only_heatmap_filename = generate_random_filename(".tiff")
 
-    generate_heatmap(fold_change_matrix, 'red/blue', only_heatmap_filename, gamma, (-1 * max_log2_fc),
-                     max_log2_fc)
+    generate_heatmap(fold_change_matrix, 'red/blue', only_heatmap_filename, 2.2, (-1 * max_log2_fc), max_log2_fc)
 
     tick_params = (minor_ticks, major_ticks)
 
