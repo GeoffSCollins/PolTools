@@ -50,8 +50,8 @@ def _clean():
 
         minutes_old = (current_time - last_modified_time).total_seconds() / 60.0
 
-        # If the file is older than 4 hours old, then delete the file
-        if minutes_old > (4 * 60):
+        # If the file is older than 45 minutes, then delete the file
+        if minutes_old > 45:
             remove_files(file)
 
 
@@ -99,11 +99,9 @@ def main(cli_args):
 if __name__ == '__main__':
     programs_list = ["base_distribution", "inr_reads", "make_regions_file_centered_on_max_tss",
                      "pausing_distance_distribution_from_maxTSS", "read_through_transcription", "sequence_searches",
-                     "tps_distance_per_gene", "truQuant", "multicoverage", "tsrFinder", "gene_body_combined_heatmap",
-                     "gene_body_fold_change_heatmap", "gene_body_heatmap", "quantify_gene_body_fold_change_heatmap",
-                     "TES_heatmap", "TES_combined_heatmap", "TES_fold_change_heatmap",
-                     "nucleotide_heatmap", "track_links_from_bw", "sequence_from_region_around_max_tss",
-                     "read_end_heatmap", "read_end_combined_heatmap", "read_end_fold_change_heatmap",
-                     "metaplot"]
+                     "tps_distance_per_gene", "truQuant", "multicoverage", "tsrFinder", "gene_body_fold_change_heatmap",
+                     "gene_body_heatmap", "quantify_gene_body_fold_change_heatmap", "TES_heatmap",
+                     "TES_fold_change_heatmap", "nucleotide_heatmap", "track_links_from_bw",
+                     "sequence_from_region_around_max_tss", "region_heatmap", "region_fold_change_heatmap", "metaplot"]
 
     main(sys.argv[1:])

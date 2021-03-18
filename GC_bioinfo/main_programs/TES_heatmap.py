@@ -3,6 +3,7 @@ import glob
 import os
 import sys
 import argparse
+import multiprocessing
 
 from collections import defaultdict
 
@@ -16,6 +17,7 @@ from GC_bioinfo.utils.bedtools_utils.run_bedtools_coverage import run_coverage
 from GC_bioinfo.utils.bedtools_utils.run_bedtools_subtract import run_subtract
 from GC_bioinfo.utils.heatmap_utils.scale_matrix import scale_matrix
 from GC_bioinfo.utils.make_read_end_file import make_read_end_file
+from GC_bioinfo.utils.heatmap_utils.add_matrices import add_matrices
 
 
 def make_incremented_regions(truQuant_output_file, downstream_distance, upstream_distance, bp_width, interval_size):
@@ -125,16 +127,9 @@ def read_coverage_file(coverage_file, width):
     return sorted_matrix_filename, num_lines
 
 
-def get_matrix(seq_file_data, matrix_params, filenames):
-    sequencing_filename, spike_in = seq_file_data
-    upstream_distance, downstream_distance, bp_width, width, height, interval_size= matrix_params
-    truQuant_output_file, tsr_file, output_filename_prefix = filenames
-
-    blacklist_regions_file = blacklist_extended_gene_bodies(tsr_file, downstream_distance)
-
-    # Make the intervals file to quantify
-    intervals_filename = make_incremented_regions(truQuant_output_file, downstream_distance, upstream_distance, bp_width, interval_size)
-
+def get_individual_matrix(filenames, dimensions, spike_in):
+    sequencing_filename, blacklist_regions_file, intervals_filename = filenames
+    width, height = dimensions
     # Quantify it
     quantified_regions_filename = quantify_intervals(sequencing_filename, blacklist_regions_file, intervals_filename)
 
@@ -148,9 +143,37 @@ def get_matrix(seq_file_data, matrix_params, filenames):
     # Spike in normalize
     spike_in_matrix = scale_matrix(averaged_matrix_filename, spike_in)
 
-    remove_files(blacklist_regions_file, averaged_matrix_filename, sorted_matrix_filename, quantified_regions_filename, intervals_filename)
+    remove_files(quantified_regions_filename, sorted_matrix_filename, averaged_matrix_filename)
 
     return spike_in_matrix
+
+
+def get_matrix(seq_files_data, matrix_params, filenames, threads):
+    upstream_distance, downstream_distance, bp_width, width, height, interval_size= matrix_params
+    truQuant_output_file, tsr_file, output_filename_prefix = filenames
+
+    blacklist_regions_file = blacklist_extended_gene_bodies(tsr_file, downstream_distance)
+
+    # Make the intervals file to quantify
+    intervals_filename = make_incremented_regions(truQuant_output_file, downstream_distance, upstream_distance, bp_width, interval_size)
+
+    with multiprocessing.Pool(threads) as pool:
+        args = []
+        dimensions = width, height
+
+        for dataset in seq_files_data:
+            seq_filename, spike_in = dataset
+            filenames = [seq_filename, blacklist_regions_file, intervals_filename]
+            args.append(
+                (filenames, dimensions, spike_in)
+            )
+
+        individual_matrices = pool.starmap(get_individual_matrix, args)
+
+    combined_matrix = add_matrices(individual_matrices)
+    remove_files(blacklist_regions_file, intervals_filename)
+
+    return combined_matrix
 
 
 def make_heatmap(matrix, heatmap_params, output_filename_prefix):
@@ -196,11 +219,9 @@ def get_args(args):
     parser.add_argument('truQuant_output_file', metavar='truQuant_output_file', type=str,
                         help='truQuant output file which ends in -truQuant_output.txt')
 
-    parser.add_argument('correction_factor', metavar='correction_factor', type=positive_float,
-                        help='Correction factor for the dataset')
-
-    parser.add_argument('seq_file', metavar='seq_file', type=str,
-                        help='Bed formatted sequencing file')
+    parser.add_argument('-s', '--seq_file', action='append', nargs=2, metavar=('seq_file', 'spike_in'),
+                        required=True, help='Provide the sequencing file with its correction factor. You can supply '
+                                            'more than one sequencing file by adding multiple -s arguments.')
 
     parser.add_argument('output_prefix', metavar='output_prefix', type=str, help='Prefix for the output filename')
 
@@ -232,12 +253,12 @@ def get_args(args):
     parser.add_argument('--major_ticks', metavar='major_ticks', dest='major_ticks',
                         type=positive_int, default=50_000, help='Distance between major ticks (bp). Default is 50,000 bp between minor tick marks.')
 
+    parser.add_argument('-t', '--threads', dest='threads', metavar='threads', type=positive_int, nargs='?',
+                        default=multiprocessing.cpu_count())
 
     args = parser.parse_args(args)
 
     truQuant_output_file = args.truQuant_output_file
-    spike_in = args.correction_factor
-    sequencing_filename = args.seq_file
     output_filename_prefix = args.output_prefix
     width = args.width
     height = args.height
@@ -262,9 +283,17 @@ def get_args(args):
 
     tsr_file = tsr_file[0]
 
-    if not os.path.isfile(sequencing_filename):
-        sys.stderr.write("File " + sequencing_filename + " was not found.\n")
-        sys.exit(1)
+    seq_files_data = []
+
+    for dataset in args.seq_file:
+        seq_file, corr_factor = dataset
+
+        corr_factor = positive_float(corr_factor)
+        seq_files_data.append((seq_file, corr_factor))
+
+        if not os.path.isfile(seq_file):
+            sys.stderr.write("File " + seq_file + " was not found.\n")
+            sys.exit(1)
 
     # If the interval size is not an integer, then we can't use it
     if bp_width % width:
@@ -273,18 +302,17 @@ def get_args(args):
 
     interval_size = int(bp_width / width)
 
-    seq_file_data = (sequencing_filename, spike_in)
     matrix_params = (upstream_distance, downstream_distance, bp_width, width, height, interval_size)
     heatmap_params = (bp_width, width, height, gamma, max_black_value, interval_size, minor_ticks, major_ticks)
     filenames = (truQuant_output_file, tsr_file, output_filename_prefix)
 
-    return seq_file_data, matrix_params, heatmap_params, filenames
+    return seq_files_data, matrix_params, heatmap_params, filenames, args.threads
 
 
 def main(args):
-    seq_file_data, matrix_params, heatmap_params, filenames = get_args(args)
+    seq_files_data, matrix_params, heatmap_params, filenames, threads = get_args(args)
 
-    matrix = get_matrix(seq_file_data, matrix_params, filenames)
+    matrix = get_matrix(seq_files_data, matrix_params, filenames, threads)
 
     output_filename_prefix = filenames[-1]
 

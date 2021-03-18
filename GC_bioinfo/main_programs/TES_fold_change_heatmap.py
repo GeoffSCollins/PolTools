@@ -4,6 +4,8 @@ import sys
 import argparse
 import multiprocessing
 
+from GC_bioinfo.main_programs import TES_heatmap
+
 from GC_bioinfo.utils.constants import generate_heatmap_location
 from GC_bioinfo.utils.heatmap_utils.generate_heatmap import generate_heatmap, Ticks, make_ticks_matrix
 from GC_bioinfo.utils.heatmap_utils.make_log_two_fold_change_matrix import make_log_two_fold_change_matrix
@@ -11,40 +13,31 @@ from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.nested_multiprocessing_pool import NestedPool
 from GC_bioinfo.utils.remove_files import remove_files
 from GC_bioinfo.utils.heatmap_utils.set_matrix_bounds import set_matrix_bounds
-from GC_bioinfo.main_programs.TES_combined_heatmap import get_combined_matrix
 from GC_bioinfo.main_programs.gene_body_fold_change_heatmap import combine_images
 
 
 def get_fold_change_matrix(numerator_seq_files_data, denominator_seq_files_data, matrix_params, filenames, max_threads):
-    # If max threads is 1, we make the pool have 1 thread and each combined heatmap have one thread
-    # If it is 2 or 3, the two combined heatmaps will be made concurrently
-    # 4 or more means run at max speed
-    if max_threads == 1:
-        pool_threads = 1
-        comb_heatmap_threads = 1
-    elif max_threads == 2 or max_threads == 3:
-        pool_threads = 2
-        comb_heatmap_threads = 1
-    else:
-        pool_threads = 2
-        comb_heatmap_threads = 2
+    # We use max_threads / 2 because we will be running two instances of the combined
+    threads_per_heatmap = int(max_threads / 2)
 
-    pool = NestedPool(pool_threads)
+    # Make sure that if the user only wants to run on one thread that it does not default to 0
+    if threads_per_heatmap == 0:
+        threads_per_heatmap = 1
 
-    numerator_args = (numerator_seq_files_data, matrix_params, filenames, comb_heatmap_threads)
-    denominator_args = (denominator_seq_files_data, matrix_params, filenames, comb_heatmap_threads)
+    numerator_args = (numerator_seq_files_data, matrix_params, filenames, threads_per_heatmap)
+    denominator_args = (denominator_seq_files_data, matrix_params, filenames, threads_per_heatmap)
 
-    matrices = pool.starmap(get_combined_matrix, [numerator_args, denominator_args])
+    with NestedPool(max_threads) as pool:
+        numerator_matrix_filename, denominator_matrix_filename = pool.starmap(TES_heatmap.get_matrix,
+                                                                              [numerator_args, denominator_args])
 
-    pool.close()
+    # Make the fold change matrix
+    log_two_fold_change_matrix_filename = make_log_two_fold_change_matrix(numerator_matrix_filename,
+                                                                          denominator_matrix_filename)
 
-    numerator_matrix, denominator_matrix = matrices
+    remove_files(numerator_matrix_filename, denominator_matrix_filename)
 
-    fold_change_matrix = make_log_two_fold_change_matrix(numerator_matrix, denominator_matrix)
-
-    remove_files(numerator_matrix, denominator_matrix)
-
-    return fold_change_matrix
+    return log_two_fold_change_matrix_filename
 
 
 def set_max_fold_change(fold_change_matrix_filename, max_fold_change):
@@ -106,31 +99,13 @@ def get_args(args):
     parser.add_argument('truQuant_output_file', metavar='truQuant_output_file', type=str,
                         help='truQuant output file which ends in -truQuant_output.txt')
 
-    parser.add_argument('numerator_correction_factor_one', metavar='numerator_correction_factor_one', type=positive_float,
-                        help='Correction factor for the first numerator dataset')
+    parser.add_argument('--numerator', nargs=2, action='append', metavar=('seq_file', 'spike_in'),
+                        required=True, help='Provide the sequencing file with its correction factor. You can supply '
+                                            'more than one sequencing file by adding multiple --numerator arguments.')
 
-    parser.add_argument('numerator_seq_file_one', metavar='numerator_seq_file_one', type=str,
-                        help='First numerator bed formatted sequencing file')
-
-    parser.add_argument('numerator_correction_factor_two', metavar='numerator_correction_factor_two', type=positive_float,
-                        help='Correction factor for the second numerator dataset')
-
-    parser.add_argument('numerator_seq_file_two', metavar='numerator_seq_file_two', type=str,
-                        help='Second numerator bed formatted sequencing file')
-
-    parser.add_argument('denominator_correction_factor_one', metavar='denominator_correction_factor_one',
-                        type=positive_float,
-                        help='Correction factor for the first denominator dataset')
-
-    parser.add_argument('denominator_seq_file_one', metavar='denominator_seq_file_one', type=str,
-                        help='First denominator bed formatted sequencing file')
-
-    parser.add_argument('denominator_correction_factor_two', metavar='denominator_correction_factor_two',
-                        type=positive_float,
-                        help='Correction factor for the second denominator dataset')
-
-    parser.add_argument('denominator_seq_file_two', metavar='denominator_seq_file_two', type=str,
-                        help='Second denominator bed formatted sequencing file')
+    parser.add_argument('--denominator', nargs=2, action='append', metavar=('seq_file', 'spike_in'),
+                        required=True, help='Provide the sequencing file with its correction factor. You can supply '
+                                            'more than one sequencing file by adding multiple -denominator arguments.')
 
     parser.add_argument('output_prefix', metavar='output_prefix', type=str, help='Prefix for the output filename')
 
@@ -165,14 +140,7 @@ def get_args(args):
     args = parser.parse_args(args)
 
     truQuant_output_file = args.truQuant_output_file
-    numerator_spike_in_one = args.numerator_correction_factor_one
-    numerator_sequencing_filename_one = args.numerator_seq_file_one
-    numerator_spike_in_two = args.numerator_correction_factor_two
-    numerator_sequencing_filename_two = args.numerator_seq_file_two
-    denominator_spike_in_one = args.denominator_correction_factor_one
-    denominator_sequencing_filename_one = args.denominator_seq_file_one
-    denominator_spike_in_two = args.denominator_correction_factor_two
-    denominator_sequencing_filename_two = args.denominator_seq_file_two
+
     output_filename_prefix = args.output_prefix
     width = args.width
     height = args.height
@@ -197,10 +165,27 @@ def get_args(args):
 
     tsr_file = tsr_file[0]
 
-    for file in [numerator_sequencing_filename_one, numerator_sequencing_filename_two,
-                 denominator_sequencing_filename_one, denominator_sequencing_filename_two]:
-        if not os.path.isfile(file):
-            sys.stderr.write("File " + file + " was not found.\n")
+    numerator_seq_files_data = []
+    denominator_seq_files_data = []
+
+    for dataset in args.numerator:
+        seq_file, corr_factor = dataset
+
+        corr_factor = positive_float(corr_factor)
+        numerator_seq_files_data.append((seq_file, corr_factor))
+
+        if not os.path.isfile(seq_file):
+            sys.stderr.write("File " + seq_file + " was not found.\n")
+            sys.exit(1)
+
+    for dataset in args.denominator:
+        seq_file, corr_factor = dataset
+
+        corr_factor = positive_float(corr_factor)
+        denominator_seq_files_data.append((seq_file, corr_factor))
+
+        if not os.path.isfile(seq_file):
+            sys.stderr.write("File " + seq_file + " was not found.\n")
             sys.exit(1)
 
 
@@ -212,22 +197,18 @@ def get_args(args):
 
     interval_size = int(bp_width / width)
 
-    numerator_seq_file_data = [(numerator_sequencing_filename_one, numerator_spike_in_one),
-                               (numerator_sequencing_filename_two, numerator_spike_in_two)]
-    denominator_seq_file_data = [(denominator_sequencing_filename_one, denominator_spike_in_one),
-                               (denominator_sequencing_filename_two, denominator_spike_in_two)]
     matrix_params = (upstream_distance, downstream_distance, bp_width, width, height, interval_size)
     heatmap_params = (bp_width, width, height, max_log2_fc, interval_size, minor_ticks, major_ticks)
     filenames = (truQuant_output_file, tsr_file, output_filename_prefix)
 
-    return numerator_seq_file_data, denominator_seq_file_data, matrix_params, heatmap_params, filenames, max_threads
+    return numerator_seq_files_data, denominator_seq_files_data, matrix_params, heatmap_params, filenames, max_threads
 
 
 def main(args):
-    numerator_seq_file_data, denominator_seq_file_data, matrix_params, heatmap_params, filenames, max_threads = get_args(args)
+    numerator_seq_files_data, denominator_seq_files_data, matrix_params, heatmap_params, filenames, max_threads = get_args(args)
 
     # Get the fold change matrix
-    fold_change_matrix = get_fold_change_matrix(numerator_seq_file_data, denominator_seq_file_data, matrix_params, filenames, max_threads)
+    fold_change_matrix = get_fold_change_matrix(numerator_seq_files_data, denominator_seq_files_data, matrix_params, filenames, max_threads)
 
     # Now plot!
     bp_width, width, height, max_log2_fc, interval_size, minor_ticks, major_ticks = heatmap_params
@@ -238,7 +219,9 @@ def main(args):
 
     only_heatmap_filename = generate_random_filename(".tiff")
 
-    generate_heatmap(fold_change_matrix, 'red/blue', only_heatmap_filename, 2.2, (-1 * max_log2_fc), max_log2_fc)
+    negative_log2_value = -1 * max_log2_fc if max_log2_fc else None
+
+    generate_heatmap(fold_change_matrix, 'red/blue', only_heatmap_filename, 2.2, negative_log2_value, max_log2_fc)
 
     tick_params = (minor_ticks, major_ticks)
 

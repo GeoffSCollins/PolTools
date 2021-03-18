@@ -3,6 +3,7 @@ import glob
 import os
 import sys
 import argparse
+import multiprocessing
 
 from collections import defaultdict
 
@@ -16,6 +17,7 @@ from GC_bioinfo.utils.remove_files import remove_files
 from GC_bioinfo.utils.bedtools_utils.run_bedtools_coverage import run_coverage
 from GC_bioinfo.utils.bedtools_utils.run_bedtools_subtract import run_subtract
 from GC_bioinfo.utils.heatmap_utils.scale_matrix import scale_matrix
+from GC_bioinfo.utils.heatmap_utils.add_matrices import add_matrices
 
 
 def make_incremented_regions(regions_filename, downstream_distance, interval_size, upstream_distance):
@@ -97,7 +99,7 @@ def read_coverage_file(coverage_file, width):
     lines.sort(key=lambda x: len(x.split()))
     num_lines = len(lines)
 
-    sorted_matrix_filename = generate_random_filename()
+    sorted_matrix_filename = generate_random_filename('.matrix')
 
     with open(sorted_matrix_filename, 'w') as file:
         for line in lines:
@@ -115,24 +117,17 @@ def read_coverage_file(coverage_file, width):
     return sorted_matrix_filename, num_lines
 
 
-def build_matrix(seq_file_data, matrix_params, filenames):
-    sequencing_filename, spike_in = seq_file_data
-    truQuant_output_file, tsr_file, output_filename_prefix = filenames
-    upstream_distance, distance_past_tes, width, height, interval_size = matrix_params
+def build_individual_matrix(filenames, dimensions, spike_in):
+    sequencing_filename, blacklist_regions_file, intervals_filename = filenames
+    width, height = dimensions
 
-    blacklist_regions_file = blacklist_extended_gene_bodies(tsr_file, distance_past_tes)
-
-    # Step 1. Make regions to quantify
-    intervals_filename = make_incremented_regions(truQuant_output_file, distance_past_tes, interval_size,
-                                                  upstream_distance)
-
-    # Step 2. Quantify them
+    # Step 2. Quantify all datasets them
     quantified_regions_filename = quantify_intervals(sequencing_filename, blacklist_regions_file, intervals_filename)
 
     # Step 3. Read the coverage data and add them to a 2d list
     sorted_matrix_filename, num_lines = read_coverage_file(quantified_regions_filename, width)
 
-    remove_files(intervals_filename, quantified_regions_filename, blacklist_regions_file)
+    remove_files(quantified_regions_filename)
 
     # Make the dimensions correct
     num_lines_to_average = int(num_lines / height)
@@ -145,6 +140,38 @@ def build_matrix(seq_file_data, matrix_params, filenames):
     remove_files(averaged_matrix_filename)
 
     return spike_in_normalized_matrix
+
+
+def build_matrix(seq_file_data, matrix_params, filenames, threads):
+    # Need to build a matrix for each sequencing file in seq_file_data
+    truQuant_output_file, tsr_file, output_filename_prefix = filenames
+    upstream_distance, distance_past_tes, width, height, interval_size = matrix_params
+
+    blacklist_regions_file = blacklist_extended_gene_bodies(tsr_file, distance_past_tes)
+
+    # Step 1. Make regions to quantify
+    intervals_filename = make_incremented_regions(truQuant_output_file, distance_past_tes, interval_size,
+                                                  upstream_distance)
+
+    dimensions = width, height
+
+    with multiprocessing.Pool(threads) as pool:
+        args = []
+
+        for dataset in seq_file_data:
+            seq_filename, spike_in = dataset
+            filenames = [seq_filename, blacklist_regions_file, intervals_filename]
+            args.append(
+                (filenames, dimensions, spike_in)
+            )
+
+        individual_matrices = pool.starmap(build_individual_matrix, args)
+
+    combined_matrix = add_matrices(individual_matrices)
+
+    remove_files(individual_matrices, blacklist_regions_file, intervals_filename)
+
+    return combined_matrix
 
 
 def make_heatmap(matrix, heatmap_params, output_filename_prefix):
@@ -190,11 +217,9 @@ def get_args(args):
     parser.add_argument('truQuant_output_file', metavar='truQuant_output_file', type=str,
                         help='truQuant output file which ends in -truQuant_output.txt')
 
-    parser.add_argument('correction_factor', metavar='correction_factor', type=positive_float,
-                        help='Correction factor for the dataset')
-
-    parser.add_argument('seq_file', metavar='seq_file', type=str,
-                        help='Bed formatted sequencing file')
+    parser.add_argument('-s', '--seq_file', action='append', nargs=2, metavar=('seq_file', 'spike_in'),
+                        required=True, help='Provide the sequencing file with its correction factor. You can supply '
+                                            'more than one sequencing file by adding multiple -s arguments.')
 
     parser.add_argument('output_prefix', metavar='output_prefix', type=str, help='Prefix for the output filename')
 
@@ -226,6 +251,9 @@ def get_args(args):
     parser.add_argument('--major_ticks', metavar='major_ticks', dest='major_ticks',
                         type=positive_int, default=50_000, help='Distance between major ticks (bp). Default is 50,000 bp')
 
+    parser.add_argument('-t', '--threads', dest='threads', metavar='threads', type=positive_int, nargs='?',
+                        default=multiprocessing.cpu_count())
+
     args = parser.parse_args(args)
 
     truQuant_output_file = args.truQuant_output_file
@@ -236,8 +264,6 @@ def get_args(args):
     height = args.height
     gamma = args.gamma
     max_black_value = args.max_black
-    spike_in = args.correction_factor
-    sequencing_filename = args.seq_file
     output_filename_prefix = args.output_prefix
     minor_ticks = args.minor_ticks
     major_ticks = args.major_ticks
@@ -253,10 +279,18 @@ def get_args(args):
         sys.exit(1)
 
     tsr_file = tsr_file[0]
+    seq_files_data = []
 
-    if not os.path.isfile(sequencing_filename):
-        sys.stderr.write("File " + sequencing_filename + " was not found.\n")
-        sys.exit(1)
+    # Check if all the sequencing files are there
+    for dataset in args.seq_file:
+        seq_file, corr_factor = dataset
+
+        corr_factor = positive_float(corr_factor)
+        seq_files_data.append((seq_file, corr_factor))
+
+        if not os.path.isfile(seq_file):
+            sys.stderr.write("File " + seq_file + " was not found.\n")
+            sys.exit(1)
 
     if bp_width % width != 0:
         sys.stderr.write("The width (bp) must be evenly divisible by the width (px). Exiting ...")
@@ -268,20 +302,18 @@ def get_args(args):
 
     interval_size = int(bp_width / width)
 
-    seq_file_data = (sequencing_filename, spike_in)
     matrix_params = (upstream_distance, distance_past_tes, width, height, interval_size)
     heatmap_params = (bp_width, width, height, gamma, max_black_value, interval_size, minor_ticks, major_ticks)
     filenames = (truQuant_output_file, tsr_file, output_filename_prefix)
 
-    return seq_file_data, matrix_params, heatmap_params, filenames
+    return seq_files_data, matrix_params, heatmap_params, filenames, args.threads
 
 
 def main(args):
-    seq_file_data, matrix_params, heatmap_params, filenames = get_args(args)
-
+    seq_files_data, matrix_params, heatmap_params, filenames, threads = get_args(args)
     output_filename_prefix = filenames[-1]
 
-    matrix = build_matrix(seq_file_data, matrix_params, filenames)
+    matrix = build_matrix(seq_files_data, matrix_params, filenames, threads)
 
     make_heatmap(matrix, heatmap_params, output_filename_prefix)
 

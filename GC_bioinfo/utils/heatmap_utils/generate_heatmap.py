@@ -10,7 +10,7 @@ from GC_bioinfo.utils.heatmap_utils.get_min_value_from_matrix import get_min_val
 
 
 class Ticks:
-    def __init__(self, minor_tick_mark_interval_size, major_tick_mark_interval_size):
+    def __init__(self, minor_tick_mark_interval_size, major_tick_mark_interval_size, offset=None, width=1):
         """
         :param minor_tick_mark_interval_size: Number of pixels per each minor tick mark
         :type minor_tick_mark_interval_size: float
@@ -30,6 +30,8 @@ class Ticks:
 
         self.minor_tick_mark_interval_size = minor_tick_mark_interval_size
         self.major_tick_mark_interval_size = major_tick_mark_interval_size
+        self.offset = offset
+        self.width = 1
 
     def get_locations(self, matrix_width):
         """
@@ -55,6 +57,26 @@ class Ticks:
             if (i // self.major_tick_mark_interval_size) not in major_seen:
                 major_tick_locations.append(i-1)
                 major_seen.add(i // self.major_tick_mark_interval_size)
+
+        # Add the offset if necessary
+        if self.offset:
+            offset_minor_tick_locations = [val + self.offset for val in minor_tick_locations]
+            offset_major_tick_locations = [val + self.offset for val in major_tick_locations]
+
+            minor_tick_locations = offset_minor_tick_locations
+            major_tick_locations = offset_major_tick_locations
+
+        if self.width != 1:
+            wider_minor_ticks = []
+            wider_major_ticks = []
+
+            for location in minor_tick_locations:
+                for i in range(self.width):
+                    wider_minor_ticks.append(location + i)
+
+            for location in major_tick_locations:
+                for i in range(self.width):
+                    major_tick_locations.append(location + i)
 
         return minor_tick_locations, major_tick_locations
 
@@ -98,7 +120,7 @@ def add_ticks_matrix(old_matrix_filename, ticks):
         matrix.extend(ticks_matrix)
 
     # Now write the new matrix to a file
-    new_matrix_filename = generate_random_filename()
+    new_matrix_filename = generate_random_filename('.matrix')
     with open(new_matrix_filename, 'w') as file:
         for row in matrix:
             output_row = [str(val) for val in row]
@@ -157,7 +179,7 @@ def generate_heatmap(matrix_filename, color_scheme, output_filename, gamma, min_
         new_matrix_filename = add_ticks_matrix(finalized_matrix, ticks)
 
         os.system("/usr/bin/Rscript " + generate_heatmap_location + " " +
-                  " ".join([finalized_matrix, color_scheme, output_filename, str(gamma), str(min_value),
+                  " ".join([new_matrix_filename, color_scheme, output_filename, str(gamma), str(min_value),
                             str(max_value), str(center_value)]))
 
         remove_files(new_matrix_filename)

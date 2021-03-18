@@ -4,6 +4,7 @@ import multiprocessing
 import os
 
 from PIL import Image
+from GC_bioinfo.main_programs import region_heatmap
 
 from GC_bioinfo.utils.get_region_length import determine_region_length
 from GC_bioinfo.utils.verify_bed_file import verify_bed_files
@@ -11,7 +12,6 @@ from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_i
 from GC_bioinfo.utils.remove_files import remove_files
 from GC_bioinfo.utils.heatmap_utils.make_log_two_fold_change_matrix import make_log_two_fold_change_matrix
 from GC_bioinfo.utils.nested_multiprocessing_pool import NestedPool
-from GC_bioinfo.main_programs.region_combined_heatmap import get_read_end_combined_heatmap
 from GC_bioinfo.utils.heatmap_utils.generate_heatmap import generate_heatmap, Ticks, make_ticks_matrix
 from GC_bioinfo.utils.make_random_filename import generate_random_filename
 from GC_bioinfo.utils.constants import generate_heatmap_location
@@ -78,32 +78,29 @@ def run_read_end_fold_change_heatmap(args):
 
     regions_file, output_prefix = filenames
 
-    if threads == 1:
-        pool_threads = 1
-        comb_heatmap_threads = 1
-    elif threads == 2 or threads == 3:
-        pool_threads = 2
-        comb_heatmap_threads = 1
-    else:
-        pool_threads = 2
-        comb_heatmap_threads = 2
+    # We use max_threads / 2 because we will be running two instances of the combined
+    threads_per_heatmap = int(threads / 2)
+
+    # Make sure that if the user only wants to run on one thread that it does not default to 0
+    if threads_per_heatmap == 0:
+        threads_per_heatmap = 1
 
     # Get the numerators and denominators matrix
-    with NestedPool(pool_threads) as pool:
+    with NestedPool(threads) as pool:
         args = [
-            (regions_file, numerator_seq_files_data, end, repeat_amounts, comb_heatmap_threads),
-            (regions_file, denominator_seq_files_data, end, repeat_amounts, comb_heatmap_threads)
+            (regions_file, numerator_seq_files_data, end, repeat_amounts, threads_per_heatmap),
+            (regions_file, denominator_seq_files_data, end, repeat_amounts, threads_per_heatmap)
         ]
 
-        numerator_matrix, denominator_matrix = pool.starmap(get_read_end_combined_heatmap, args)
+        numerator_matrix, denominator_matrix = pool.starmap(region_heatmap.get_matrix, args)
 
     # Do the log2 fold change for them
     log2_matrix = make_log_two_fold_change_matrix(numerator_matrix, denominator_matrix)
     remove_files(numerator_matrix, denominator_matrix)
 
     px_per_bp, vertical_averaging = repeat_amounts
-    output_filename = output_prefix.replace(".tiff", "") + "_max_" + str(max_log2_fc) + \
-                      "_vertical_averaging_" + str(vertical_averaging) +  "_px_per_bp_" + str(px_per_bp) + ".tiff"
+    output_filename = output_prefix.replace(".tiff", "") + "_max_" + str(max_log2_fc) + "_vertical_averaging_" + \
+                      str(vertical_averaging) +  "_px_per_bp_" + str(px_per_bp) + "_region_heatmap.tiff"
 
     # Make the heatmap
     make_heatmap(log2_matrix, max_log2_fc, tick_parameters, output_filename, px_per_bp)
@@ -141,19 +138,13 @@ def parse_input(args):
 
     parser.add_argument('output_prefix', metavar='output_prefix', type=str, help='Prefix for the output filename')
 
-    parser.add_argument('numerator_filename_one', metavar='numerator_filename_one', type=str, help='First sequencing file in the numerator')
-    parser.add_argument('numerator_norm_factor_one', metavar='numerator_norm_factor_one', type=positive_float,
-                        help='Correction factor for the first numerator sequencing file')
-    parser.add_argument('numerator_filename_two', metavar='numerator_filename_two', type=str, help='Second sequencing file in the numerator')
-    parser.add_argument('numerator_norm_factor_two', metavar='numerator_norm_factor_two', type=positive_float,
-                        help='Correction factor for the second numerator sequencing file')
+    parser.add_argument('--numerator', nargs=2, action='append', metavar=('seq_file', 'spike_in'),
+                        required=True, help='Provide the sequencing file with its correction factor. You can supply '
+                                            'more than one sequencing file by adding multiple --numerator arguments.')
 
-    parser.add_argument('denominator_filename_one', metavar='denominator_filename_one', type=str, help='First sequencing file in the denominator')
-    parser.add_argument('denominator_norm_factor_one', metavar='denominator_norm_factor_one', type=positive_float,
-                        help='Correction factor for the first denominator sequencing file')
-    parser.add_argument('denominator_filename_two', metavar='denominator_filename_two', type=str, help='Second sequencing file in the denominator')
-    parser.add_argument('denominator_norm_factor_two', metavar='denominator_norm_factor_two', type=positive_float,
-                        help='Correction factor for the second denominator sequencing file')
+    parser.add_argument('--denominator', nargs=2, action='append', metavar=('seq_file', 'spike_in'),
+                        required=True, help='Provide the sequencing file with its correction factor. You can supply '
+                                            'more than one sequencing file by adding multiple -denominator arguments.')
 
     parser.add_argument('-m', '--max_log2_fc', metavar='max_log2_fc', dest='max_log2_fc',
                         type=positive_float, default=None, help='Max log2 fold change of the heatmap')
@@ -177,15 +168,35 @@ def parse_input(args):
 
     args = parser.parse_args(args)
 
-    numerator_seq_files_data = ((args.numerator_filename_one, args.numerator_norm_factor_one), (args.numerator_filename_two, args.numerator_norm_factor_two))
-    denominator_seq_files_data = ((args.denominator_filename_one, args.denominator_norm_factor_one), (args.denominator_filename_two, args.denominator_norm_factor_two))
-
     verify_bed_files(args.regions_file)
     region_length = determine_region_length(args.regions_file)
     verify_region_length_is_even(region_length)
 
     filenames = args.regions_file, args.output_prefix
     repeat_amounts = args.repeat_amount, args.vertical_averaging
+
+    numerator_seq_files_data = []
+    denominator_seq_files_data = []
+
+    for dataset in args.numerator:
+        seq_file, corr_factor = dataset
+
+        corr_factor = positive_float(corr_factor)
+        numerator_seq_files_data.append((seq_file, corr_factor))
+
+        if not os.path.isfile(seq_file):
+            sys.stderr.write("File " + seq_file + " was not found.\n")
+            sys.exit(1)
+
+    for dataset in args.denominator:
+        seq_file, corr_factor = dataset
+
+        corr_factor = positive_float(corr_factor)
+        denominator_seq_files_data.append((seq_file, corr_factor))
+
+        if not os.path.isfile(seq_file):
+            sys.stderr.write("File " + seq_file + " was not found.\n")
+            sys.exit(1)
 
     if args.minor_ticks != None and args.major_ticks != None:
         tick_parameters = (args.minor_ticks * args.repeat_amount, args.major_ticks * args.repeat_amount)

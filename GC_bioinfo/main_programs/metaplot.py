@@ -150,7 +150,6 @@ def parse_input(args):
 
         return val
 
-    # Todo: fix link
     parser = argparse.ArgumentParser(prog="GC_bioinfo metaplot",
                                      description="Compute the number of 5'/3'/whole prime reads at each position of the given region.\n" +
                                                  "More information can be found at " +

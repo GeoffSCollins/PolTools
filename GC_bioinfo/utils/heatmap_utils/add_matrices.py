@@ -8,6 +8,10 @@ def add_matrices(list_of_matrices):
     width = 0
     height = 0
 
+    if not list_of_matrices:
+        sys.stderr.write("At least one matrix must be provided to add_matrices.\n")
+        sys.exit(1)
+
     for i, matrix_filename in enumerate(list_of_matrices):
         current_matrix = []
         with open(matrix_filename) as file:
@@ -36,7 +40,7 @@ def add_matrices(list_of_matrices):
             for col in range(width):
                 matrix[row][col] += current_matrix[row][col]
 
-    added_matrix_filename = generate_random_filename()
+    added_matrix_filename = generate_random_filename('.matrix')
     with open(added_matrix_filename, 'w') as file:
         for row in matrix:
             string_row = [str(val) for val in row]

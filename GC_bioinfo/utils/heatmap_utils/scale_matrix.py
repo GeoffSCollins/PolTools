@@ -17,7 +17,7 @@ def scale_matrix(original_matrix_filename, scale_factor):
             if line != "":
                 matrix.append([float(val) * scale_factor for val in line.split()])
 
-    normalized_matrix_filename = generate_random_filename()
+    normalized_matrix_filename = generate_random_filename('.matrix')
     with open(normalized_matrix_filename, 'w') as file:
         for row in matrix:
             output_row = [str(val) for val in row]
