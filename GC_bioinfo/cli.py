@@ -74,8 +74,12 @@ def _build():
         response = input("Do you want to schedule the automatic temporary file cleaner to run hourly? (y/n)\n")
 
     if response == 'y':
-        with open("/etc/cron.hourly/GC_bioinfo_clean.sh", 'w') as file:
+        with open("/etc/cron.hourly/GC_bioinfo_clean", 'w') as file:
+            file.write("#!/bin/bash\n")
             file.write("sudo GC_bioinfo clean\n")
+
+        # Add the exectuable flag to the file
+        os.system("chmod +x /etc/cron.hourly/GC_bioinfo_clean")
 
     sys.stderr.write("Finished!\n")
 
