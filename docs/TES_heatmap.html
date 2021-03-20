@@ -207,13 +207,10 @@
 <tr class="row-even"><td><p><strong>truQuant Output File</strong></p></td>
 <td><p>File ending in -truQuant_output.txt generated from <a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/truQuant.html">truQuant</a></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Correction Factor</strong></p></td>
-<td><p>Correction factor applied to the seq file data.</p></td>
+<tr class="row-odd"><td><p><strong>-s seq_file spike_in</strong></p></td>
+<td><p>Sequencing file and its accompanying normalization factor to be used as the numerator of the heatmap. Additional files can be provided with multiple</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Sequencing File</strong></p></td>
-<td><p>Bed formatted file from a sequencing experiment.</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>Output Prefix</strong></p></td>
+<tr class="row-even"><td><p><strong>Output Prefix</strong></p></td>
 <td><p>Output filename will begin with the output prefix and also contain the run parameters and ends in gene_body_heatmap.tiff.</p></td>
 </tr>
 </tbody>
@@ -295,7 +292,7 @@ RNF223  chr1    <span class="m">1074208</span> <span class="m">1074358</span> - 
 C1orf159        chr1    <span class="m">1116028</span> <span class="m">1116178</span> -       <span class="m">51</span>      <span class="m">1116106</span> <span class="m">9</span>       <span class="m">1116103</span> <span class="m">19</span>.81136532595448       <span class="m">1081818</span> <span class="m">1116028</span> <span class="m">34210</span>   <span class="m">51</span>      <span class="m">11</span>
 SDF4    chr1    <span class="m">1231907</span> <span class="m">1232057</span> -       <span class="m">1105</span>    <span class="m">1231971</span> <span class="m">321</span>     <span class="m">1231978</span> <span class="m">23</span>.701136922154493      <span class="m">1216908</span> <span class="m">1231907</span> <span class="m">14999</span>   <span class="m">1097</span>    <span class="m">177</span>
 
-$ GC_bioinfo TES_heatmap seq_file-truQuant_output.txt <span class="m">1</span>.00 seq_file.bed seq -m <span class="m">3</span>
+$ GC_bioinfo TES_heatmap seq_file-truQuant_output.txt -s seq_file.bed <span class="m">1</span>.00 seq -m <span class="m">3</span>
 </pre></div>
 </div>
 </div>

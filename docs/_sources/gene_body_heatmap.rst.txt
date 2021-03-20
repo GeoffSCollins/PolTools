@@ -13,21 +13,20 @@ Usage
 **Usage**:
 ::
 
-  GC_bioinfo gene_body_heatmap [-h] [-u upstream_distance]
+  GC_bioinfo gene_body_heatmap [-h] -s seq_file spike_in
+                                    [-u upstream_distance]
                                     [-d distance_past_tes] [-b bp_width]
                                     [-w width] [-e height] [-g gamma]
                                     [-m max_black] [--minor_ticks minor_ticks]
-                                    [--major_ticks major_ticks]
-                                    truQuant_output_file correction_factor
-                                    seq_file output_prefix
+                                    [--major_ticks major_ticks] [-t [threads]]
+                                    truQuant_output_file output_prefix
 
 
 ===========================    =========================================================================================================================================================
 Required Arguments             Description
 ===========================    =========================================================================================================================================================
 **truQuant Output File**       File ending in -truQuant_output.txt generated from `truQuant <https://geoffscollins.github.io/GC_bioinfo/truQuant.html>`_
-**Correction Factor**          Correction factor applied to the seq file data.
-**Sequencing File**            Bed formatted file from a sequencing experiment.
+**-s seq_file spike_in**       Sequencing file and its accompanying normalization factor to be used as the numerator of the heatmap. Additional files can be provided with multiple
 **Output Prefix**              Output filename will begin with the output prefix and also contain the run parameters and ends in gene_body_heatmap.tiff.
 ===========================    =========================================================================================================================================================
 
@@ -89,4 +88,4 @@ For example:
   C1orf159        chr1    1116028 1116178 -       51      1116106 9       1116103 19.81136532595448       1081818 1116028 34210   51      11
   SDF4    chr1    1231907 1232057 -       1105    1231971 321     1231978 23.701136922154493      1216908 1231907 14999   1097    177
 
-  $ GC_bioinfo gene_body_heatmap seq_file-truQuant_output.txt 1.00 seq_file.bed seq -m 10
+  $ GC_bioinfo gene_body_heatmap seq_file-truQuant_output.txt -s seq_file.bed 1.0 seq -m 10

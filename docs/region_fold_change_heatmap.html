@@ -184,7 +184,9 @@
 <div class="section" id="usage-and-option-summary">
 <h2>Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">region_fold_change_heatmap</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">max_log2_fc</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">region_fold_change_heatmap</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="o">--</span><span class="n">numerator</span> <span class="n">seq_file</span>
+                                           <span class="n">spike_in</span> <span class="o">--</span><span class="n">denominator</span> <span class="n">seq_file</span>
+                                           <span class="n">spike_in</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">max_log2_fc</span><span class="p">]</span>
                                            <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="n">repeat_amount</span><span class="p">]</span>
                                            <span class="p">[</span><span class="o">-</span><span class="n">v</span> <span class="n">vertical_averaging</span><span class="p">]</span>
                                            <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
@@ -192,14 +194,6 @@
                                            <span class="p">[</span><span class="o">--</span><span class="n">major_ticks</span> <span class="n">major_ticks</span><span class="p">]</span>
                                            <span class="n">read</span> <span class="nb">type</span> <span class="n">regions_file</span>
                                            <span class="n">output_prefix</span>
-                                           <span class="n">numerator_filename_one</span>
-                                           <span class="n">numerator_norm_factor_one</span>
-                                           <span class="n">numerator_filename_two</span>
-                                           <span class="n">numerator_norm_factor_two</span>
-                                           <span class="n">denominator_filename_one</span>
-                                           <span class="n">denominator_norm_factor_one</span>
-                                           <span class="n">denominator_filename_two</span>
-                                           <span class="n">denominator_norm_factor_two</span>
 </pre></div>
 </div>
 <table class="docutils align-default">
@@ -219,29 +213,13 @@
 <tr class="row-odd"><td><p><strong>Regions File</strong></p></td>
 <td><p>Bed formatted file containing regions of the same width.</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Numerator Sequencing File One</strong></p></td>
-<td><p>Bed formatted file from a sequencing experiment.</p></td>
+<tr class="row-even"><td><p><strong>–numerator seq_file spike_in</strong></p></td>
+<td><p>Sequencing file and its accompanying normalization factor to be used as the numerator of the heatmap. Additional files can be provided with multiple
+–numerator arguments</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Numerator Norm Factor One</strong></p></td>
-<td><p>Correction factor applied to the seq file data.</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>Numerator Sequencing File Two</strong></p></td>
-<td><p>Bed formatted file from a sequencing experiment.</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>Numerator Norm Factor Two</strong></p></td>
-<td><p>Correction factor applied to the seq file data.</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>Denominator Sequencing File One</strong></p></td>
-<td><p>Bed formatted file from a sequencing experiment.</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>Denominator Norm Factor One</strong></p></td>
-<td><p>Correction factor applied to the seq file data.</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>Denominator Sequencing File Two</strong></p></td>
-<td><p>Bed formatted file from a sequencing experiment.</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>Denominator Norm Factor Two</strong></p></td>
-<td><p>Correction factor applied to the seq file data.</p></td>
+<tr class="row-odd"><td><p><strong>–denominator seq_file spike_in</strong></p></td>
+<td><p>Sequencing file and its accompanying normalization factor to be used as the denominator of the heatmap. Additional files can be provided with multiple
+–denominator arguments</p></td>
 </tr>
 <tr class="row-even"><td><p><strong>Output Prefix</strong></p></td>
 <td><p>Output filename will begin with the output prefix and also contain the run parameters and ends in region_heatmap.tiff.</p></td>
@@ -305,8 +283,8 @@ chr1    <span class="m">14734</span>   <span class="m">14768</span>   A00876:119
 chr1    <span class="m">14988</span>   <span class="m">15012</span>   A00876:119:HW5F5DRXX:1:2219:16134:32784 <span class="m">255</span>     -
 chr1    <span class="m">18337</span>   <span class="m">18362</span>   A00876:119:HW5F5DRXX:1:2149:32054:31328 <span class="m">255</span>     -
 
-$ GC_bioinfo region_heatmap five regions_centered_on_max_tss.bed numerator_seq_file_one.bed <span class="m">1</span> numerator_seq_file_two.bed <span class="m">1</span>.15 <span class="se">\</span>
-  denominator_seq_file_one.bed <span class="m">0</span>.95 denominator_seq_file_two.bed <span class="m">1</span>.02 five_heatmap -r <span class="m">20</span> -m <span class="m">10</span> --minor_ticks <span class="m">10</span> --major_ticks <span class="m">50</span>
+$ GC_bioinfo region_heatmap five regions_centered_on_max_tss.bed --numerator numerator_seq_file_one.bed <span class="m">1</span> <span class="se">\</span>
+  --denominator denominator_seq_file_one.bed <span class="m">0</span>.95 five_heatmap -r <span class="m">20</span> -m <span class="m">10</span> --minor_ticks <span class="m">10</span> --major_ticks <span class="m">50</span>
 </pre></div>
 </div>
 </div>

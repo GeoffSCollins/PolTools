@@ -14,7 +14,9 @@ Usage and option summary
 **Usage**:
 ::
 
-  GC_bioinfo region_fold_change_heatmap [-h] [-m max_log2_fc]
+  GC_bioinfo region_fold_change_heatmap [-h] --numerator seq_file
+                                             spike_in --denominator seq_file
+                                             spike_in [-m max_log2_fc]
                                              [-r repeat_amount]
                                              [-v vertical_averaging]
                                              [-t [threads]]
@@ -22,29 +24,16 @@ Usage and option summary
                                              [--major_ticks major_ticks]
                                              read type regions_file
                                              output_prefix
-                                             numerator_filename_one
-                                             numerator_norm_factor_one
-                                             numerator_filename_two
-                                             numerator_norm_factor_two
-                                             denominator_filename_one
-                                             denominator_norm_factor_one
-                                             denominator_filename_two
-                                             denominator_norm_factor_two
-
 
 ====================================    =========================================================================================================================================================
 Required Arguments                      Description
 ====================================    =========================================================================================================================================================
 **Read Type**                           Either five, three, or whole corresponding to 5', 3', or pileup reads.
 **Regions File**                        Bed formatted file containing regions of the same width.
-**Numerator Sequencing File One**       Bed formatted file from a sequencing experiment.
-**Numerator Norm Factor One**           Correction factor applied to the seq file data.
-**Numerator Sequencing File Two**       Bed formatted file from a sequencing experiment.
-**Numerator Norm Factor Two**           Correction factor applied to the seq file data.
-**Denominator Sequencing File One**     Bed formatted file from a sequencing experiment.
-**Denominator Norm Factor One**         Correction factor applied to the seq file data.
-**Denominator Sequencing File Two**     Bed formatted file from a sequencing experiment.
-**Denominator Norm Factor Two**         Correction factor applied to the seq file data.
+**--numerator seq_file spike_in**       Sequencing file and its accompanying normalization factor to be used as the numerator of the heatmap. Additional files can be provided with multiple
+                                        --numerator arguments
+**--denominator seq_file spike_in**     Sequencing file and its accompanying normalization factor to be used as the denominator of the heatmap. Additional files can be provided with multiple
+                                        --denominator arguments
 **Output Prefix**                       Output filename will begin with the output prefix and also contain the run parameters and ends in region_heatmap.tiff.
 ====================================    =========================================================================================================================================================
 
@@ -93,5 +82,5 @@ For example:
   chr1    14988   15012   A00876:119:HW5F5DRXX:1:2219:16134:32784 255     -
   chr1    18337   18362   A00876:119:HW5F5DRXX:1:2149:32054:31328 255     -
 
-  $ GC_bioinfo region_heatmap five regions_centered_on_max_tss.bed numerator_seq_file_one.bed 1 numerator_seq_file_two.bed 1.15 \
-    denominator_seq_file_one.bed 0.95 denominator_seq_file_two.bed 1.02 five_heatmap -r 20 -m 10 --minor_ticks 10 --major_ticks 50
+  $ GC_bioinfo region_heatmap five regions_centered_on_max_tss.bed --numerator numerator_seq_file_one.bed 1 \
+    --denominator denominator_seq_file_one.bed 0.95 five_heatmap -r 20 -m 10 --minor_ticks 10 --major_ticks 50
