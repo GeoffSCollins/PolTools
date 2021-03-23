@@ -186,11 +186,14 @@ non RNA Polymerase II transcripts.</p>
 <div class="section" id="usage-and-option-summary">
 <h2>Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">truQuant</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="p">[</span><span class="n">annotation_extension</span><span class="p">]]</span>
-              <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="p">[</span><span class="n">blacklisting_percent</span><span class="p">]]</span>
-              <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="p">[</span><span class="n">pause_region_radius</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
-              <span class="n">sequencing_file_for_annotation</span>
-              <span class="p">[</span><span class="n">sequencing_files</span> <span class="p">[</span><span class="n">sequencing_files</span> <span class="o">...</span><span class="p">]]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">truQuant</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="p">[</span><span class="n">annotation_extension</span><span class="p">]]</span>
+                         <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="p">[</span><span class="n">blacklisting_percent</span><span class="p">]]</span>
+                         <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="p">[</span><span class="n">pause_region_radius</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
+                         <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="p">[</span><span class="n">min_seq_depth</span><span class="p">]]</span>
+                         <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="p">[</span><span class="n">min_avg_transcript_length</span><span class="p">]]</span>
+                         <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="p">[</span><span class="n">max_fragment_length</span><span class="p">]]</span>
+                         <span class="n">sequencing_file_for_annotation</span>
+                         <span class="p">[</span><span class="n">sequencing_files</span> <span class="p">[</span><span class="n">sequencing_files</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
 <table class="docutils align-default">
@@ -211,8 +214,8 @@ non RNA Polymerase II transcripts.</p>
 </table>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 17%" />
-<col style="width: 83%" />
+<col style="width: 19%" />
+<col style="width: 81%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Optional Arguments</p></th>
@@ -237,6 +240,16 @@ for finding TSRs and a one thread for each sequencing file (these two processes 
 <tr class="row-even"><td><p><strong>Sequencing Files</strong></p></td>
 <td><p>Additional sequencing files can be provided to be quantified using the generated annotation. The files will be blacklisted then quantified using the
 number of 5’ end reads in the pause region and the number of 3’ end reads in the gene body.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>-d, –min_seq_depth</strong></p></td>
+<td><p>The minimum number of 5’ reads to be considered as a TSR in <a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html">tsrFinder</a></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>-m, –min_avg_transcript_length</strong></p></td>
+<td><p>The minimum average transcript length will eliminate TSRs from sequencing artifacts in
+<a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html">tsrFinder</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>-l, –max_fragment_length</strong></p></td>
+<td><p>The maximum transcript length for a read to be included in <a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html">tsrFinder</a></p></td>
 </tr>
 </tbody>
 </table>

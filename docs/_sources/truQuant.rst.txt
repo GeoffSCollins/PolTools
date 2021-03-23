@@ -15,11 +15,14 @@ Usage and option summary
 **Usage**:
 ::
 
-  truQuant [-h] [-a [annotation_extension]]
-                [-b [blacklisting_percent]]
-                [-r [pause_region_radius]] [-t [threads]]
-                sequencing_file_for_annotation
-                [sequencing_files [sequencing_files ...]]
+  GC_bioinfo truQuant [-h] [-a [annotation_extension]]
+                           [-b [blacklisting_percent]]
+                           [-r [pause_region_radius]] [-t [threads]]
+                           [-d [min_seq_depth]]
+                           [-m [min_avg_transcript_length]]
+                           [-l [max_fragment_length]]
+                           sequencing_file_for_annotation
+                           [sequencing_files [sequencing_files ...]]
 
 
 ==================================   =========================================================================================================================================================
@@ -30,18 +33,22 @@ Required Arguments                         Description
 
 
 
-===============================    =========================================================================================================================================================
+=====================================    =========================================================================================================================================================
 Optional Arguments                         Description
-===============================    =========================================================================================================================================================
-**-a, --annotation_extension**     Distance of base pairs to extend the 5' end of all genes upstream. Default is 1000.
-**-b, --blacklisting_percent**     Percentage (number between 0 and 1) of reads in the pause region that is necessary to blacklist a TSR in the gene body. For example, a pause region with
-                                   100 reads and a blacklist percentage of 0.3 means a TSR in the gene body needs at least 30 reads to be blacklisted. Default is 0.3.
-**-r, --pause_region_radius**      Base pair amount to go upstream and downstream centered on the avgTSS. The pause region will be of size 2 * pause region radius. Default is 75.
-**-t, --threads**                  Maximum number of threads to run truQuant. Default is the max available on the system. Please note that truQuant will use a maximum of 46 threads
-                                   for finding TSRs and a one thread for each sequencing file (these two processes do not happen at the same time).
-**Sequencing Files**               Additional sequencing files can be provided to be quantified using the generated annotation. The files will be blacklisted then quantified using the
-                                   number of 5' end reads in the pause region and the number of 3' end reads in the gene body.
-===============================    =========================================================================================================================================================
+=====================================    =========================================================================================================================================================
+**-a, --annotation_extension**           Distance of base pairs to extend the 5' end of all genes upstream. Default is 1000.
+**-b, --blacklisting_percent**           Percentage (number between 0 and 1) of reads in the pause region that is necessary to blacklist a TSR in the gene body. For example, a pause region with
+                                         100 reads and a blacklist percentage of 0.3 means a TSR in the gene body needs at least 30 reads to be blacklisted. Default is 0.3.
+**-r, --pause_region_radius**            Base pair amount to go upstream and downstream centered on the avgTSS. The pause region will be of size 2 * pause region radius. Default is 75.
+**-t, --threads**                        Maximum number of threads to run truQuant. Default is the max available on the system. Please note that truQuant will use a maximum of 46 threads
+                                         for finding TSRs and a one thread for each sequencing file (these two processes do not happen at the same time).
+**Sequencing Files**                     Additional sequencing files can be provided to be quantified using the generated annotation. The files will be blacklisted then quantified using the
+                                         number of 5' end reads in the pause region and the number of 3' end reads in the gene body.
+**-d, --min_seq_depth**                  The minimum number of 5' reads to be considered as a TSR in `tsrFinder <https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html>`_
+**-m, --min_avg_transcript_length**      The minimum average transcript length will eliminate TSRs from sequencing artifacts in
+                                         `tsrFinder <https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html>`_
+**-l, --max_fragment_length**            The maximum transcript length for a read to be included in `tsrFinder <https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html>`_
+=====================================    =========================================================================================================================================================
 
 
 ==========================================================================

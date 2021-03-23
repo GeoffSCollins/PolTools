@@ -252,7 +252,9 @@
 </div>
 <div class="section" id="behavior">
 <h2>Behavior<a class="headerlink" href="#behavior" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">region_heatmap</span></code> will generate a heatmap of</p>
+<p><code class="docutils literal notranslate"><span class="pre">region_heatmap</span></code> will generate a heatmap of the number of [5’/3’/pileup] reads within the regions
+from the given bed formatted regions file. When multiple numerator (or denominator) sequencing files are provided, they
+will be added together.</p>
 <p>For example:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ head regions_centered_on_max_tss.bed
 chr1    <span class="m">959251</span>  <span class="m">959261</span>  NOC2L   <span class="m">46</span>      -

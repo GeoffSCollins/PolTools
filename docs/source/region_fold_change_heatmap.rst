@@ -51,7 +51,9 @@ Optional Arguments               Description
 ==========================================================================
 Behavior
 ==========================================================================
-``region_fold_change_heatmap`` will generate a heatmap of
+``region_fold_change_heatmap`` will generate a heatmap of the number of [5'/3'/pileup] reads within the regions
+from the given bed formatted regions file. When multiple numerator (or denominator) sequencing files are provided, they
+will be added together.
 
 For example:
 

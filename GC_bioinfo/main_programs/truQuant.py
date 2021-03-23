@@ -389,12 +389,19 @@ def output_data(output_filename, region_data_dict, gene_counts_dict, truQuant_re
             output_writer.writerow(output_list)
 
 
-def run_tsrFinder(first_seq_file, max_threads):
+def run_tsrFinder(first_seq_file, max_threads, tsrFinder_parameters):
+    tsrFinder_param_string = " ".join([str(val) for val in tsrFinder_parameters])
+    tsrFinder_filename_string = "_" + tsrFinder_param_string.replace(" ", "_") + "-TSR.tab"
+
     blacklisted_first_sequencing_file = first_seq_file.replace(".bed", "-blacklisted.bed")
 
-    tsr_file = blacklisted_first_sequencing_file.replace(".bed", "_150_20_30_600-TSR.tab")
+    tsr_file = blacklisted_first_sequencing_file.replace(".bed", tsrFinder_filename_string)
     run_subtract(first_seq_file, rna_blacklist_file, output_filename=blacklisted_first_sequencing_file)
-    os.system("GC_bioinfo tsrFinder " + blacklisted_first_sequencing_file + " 150 20 30 600 " + hg38_chrom_sizes_file + " -t " + str(max_threads))
+
+    os.system("GC_bioinfo tsrFinder " + blacklisted_first_sequencing_file + " " + tsrFinder_param_string + " " +
+              hg38_chrom_sizes_file + " -t " + str(max_threads)
+    )
+
     return tsr_file
 
 
@@ -431,12 +438,12 @@ def get_counts(sequencing_files, blacklist_filename, output_region_filenames, tr
     return region_data_dict, gene_counts_dict
 
 
-def run_truQuant(annotation_extension, percent_for_blacklisting, sequencing_files, pause_region_radius, max_threads):
+def run_truQuant(annotation_extension, percent_for_blacklisting, sequencing_files, pause_region_radius, tsrFinder_parameters, max_threads):
 
     output_directory = str(Path(sequencing_files[0]).parent) + "/"
 
     # Run tsrFinder then define the required files
-    tsr_file = run_tsrFinder(sequencing_files[0], max_threads)
+    tsr_file = run_tsrFinder(sequencing_files[0], max_threads, tsrFinder_parameters)
     tsr_basename = os.path.basename(tsr_file)
 
     paused_region_filename = output_directory + tsr_basename.replace('-TSR.tab', '-paused_regions.bed')
@@ -501,6 +508,12 @@ def parse_input(args):
     parser.add_argument('seq_files', metavar='sequencing_files', nargs='*', type=str,
                         help='Bed formatted files from the sequencing experiment')
 
+    parser.add_argument('-d', '--min_seq_depth', dest='min_seq_depth', metavar='min_seq_depth', type=positive_int, nargs='?', default=20)
+    parser.add_argument('-m', '--min_avg_transcript_length', dest='min_avg_transcript_length',
+                        metavar='min_avg_transcript_length', type=positive_int, nargs='?', default=30)
+    parser.add_argument('-l', '--max_fragment_length', dest='max_fragment_length', metavar='max_fragment_length',
+                        type=positive_int, nargs='?', default=600)
+
     args = parser.parse_args(args)
 
     seq_files = [args.seq_file_for_annotation] + args.seq_files
@@ -509,9 +522,12 @@ def parse_input(args):
     pause_region_radius = args.pause_region_radius
     max_threads = args.threads
 
+    # The window size must be 150 bp
+    tsrFinder_parameters = 150, args.min_seq_depth, args.min_avg_transcript_length, args.max_fragment_length
+
     verify_bed_files(seq_files)
 
-    return seq_files, annotation_extension, percent_for_blacklisting, pause_region_radius, max_threads
+    return seq_files, annotation_extension, percent_for_blacklisting, pause_region_radius, tsrFinder_parameters, max_threads
 
 
 def main(args):
@@ -525,9 +541,9 @@ def main(args):
     """
     check_dependencies("bedtools")
 
-    sequencing_files, annotation_extension, percent_for_blacklisting, pause_region_radius, max_threads = parse_input(args)
+    sequencing_files, annotation_extension, percent_for_blacklisting, pause_region_radius, tsrFinder_parameters, max_threads = parse_input(args)
 
-    run_truQuant(annotation_extension, percent_for_blacklisting, sequencing_files, pause_region_radius, max_threads)
+    run_truQuant(annotation_extension, percent_for_blacklisting, sequencing_files, pause_region_radius, tsrFinder_parameters, max_threads)
 
 
 if __name__ == "__main__":

@@ -3,7 +3,6 @@ import sys
 import argparse
 
 from GC_bioinfo.utils.make_read_end_file import make_read_end_file
-from GC_bioinfo.utils.make_three_prime_bed_file import make_three_bed_file
 from GC_bioinfo.utils.print_tab_delimited import print_tab_delimited
 from GC_bioinfo.utils.remove_files import remove_files
 from GC_bioinfo.utils.bedtools_utils.run_bedtools_coverage import run_coverage
@@ -32,15 +31,11 @@ def output_data(data):
 
 
 def gather_data(read_type, seq_file, regions_file):
-    if read_type == "five":
-        modified_seq_filename = make_read_end_file(seq_file)
-        need_to_remove_modified_seq_filename = True
 
-    if read_type == "three":
-        modified_seq_filename = make_three_bed_file(seq_file)
+    if read_type in ['five', 'three']:
+        modified_seq_filename = make_read_end_file(seq_file, read_type)
         need_to_remove_modified_seq_filename = True
-
-    if read_type == "whole":
+    else:
         modified_seq_filename = seq_file
         need_to_remove_modified_seq_filename = False
 
