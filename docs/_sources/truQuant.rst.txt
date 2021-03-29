@@ -15,7 +15,7 @@ Usage and option summary
 **Usage**:
 ::
 
-  GC_bioinfo truQuant [-h] [-a [annotation_extension]]
+  PolTools truQuant [-h] [-a [annotation_extension]]
                            [-b [blacklisting_percent]]
                            [-r [pause_region_radius]] [-t [threads]]
                            [-d [min_seq_depth]]
@@ -44,10 +44,10 @@ Optional Arguments                         Description
                                          for finding TSRs and a one thread for each sequencing file (these two processes do not happen at the same time).
 **Sequencing Files**                     Additional sequencing files can be provided to be quantified using the generated annotation. The files will be blacklisted then quantified using the
                                          number of 5' end reads in the pause region and the number of 3' end reads in the gene body.
-**-d, --min_seq_depth**                  The minimum number of 5' reads to be considered as a TSR in `tsrFinder <https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html>`_
+**-d, --min_seq_depth**                  The minimum number of 5' reads to be considered as a TSR in `tsrFinder <https://geoffscollins.github.io/PolTools/tsrFinder.html>`_
 **-m, --min_avg_transcript_length**      The minimum average transcript length will eliminate TSRs from sequencing artifacts in
-                                         `tsrFinder <https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html>`_
-**-l, --max_fragment_length**            The maximum transcript length for a read to be included in `tsrFinder <https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html>`_
+                                         `tsrFinder <https://geoffscollins.github.io/PolTools/tsrFinder.html>`_
+**-l, --max_fragment_length**            The maximum transcript length for a read to be included in `tsrFinder <https://geoffscollins.github.io/PolTools/tsrFinder.html>`_
 =====================================    =========================================================================================================================================================
 
 
@@ -55,7 +55,7 @@ Optional Arguments                         Description
 Behavior
 ==========================================================================
 ``truQuant`` will generate search regions 1000 bp upstream of the 5' end of protein coding genes from GENCODE v32. Then,
-`tsrFinder <https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html>`_ will be run to determine the max TSR in the search region. Inside this TSR, the max TSS will be chosen as the
+`tsrFinder <https://geoffscollins.github.io/PolTools/tsrFinder.html>`_ will be run to determine the max TSR in the search region. Inside this TSR, the max TSS will be chosen as the
 annotated 5' end. The pause region will be the 150 bp region surrounding the weighted average TSS (avgTSS) and gene body
 will be the end of the pause region to the TES. TSRs in the gene with more than 30% of the reads as the max TSR will be
 blacklisted. 5' ends in the pause regions will be quantified and 3' ends in the gene bodies will be quantified.
@@ -73,7 +73,7 @@ For example:
   chr1    13435   13477   A00876:119:HW5F5DRXX:1:2273:15781:19241 255     -
   chr1    13739   13772   A00876:119:HW5F5DRXX:1:2256:29966:10520 255     -
 
-  $ GC_bioinfo truQuant seq_file.bed
+  $ PolTools truQuant seq_file.bed
   $ head -n 1 control-truQuant_output.txt
   Gene    Chromosome      Pause Region Left       Pause Region Right      Strand  Total 5' Reads  MaxTSS  MaxTSS 5' Reads Weighted Pause Region Center    STDEV of TSSs   Gene Body Left  Gene Body Right Gene Body Distance      seq_file.bed Pause Region   seq_file.bed Gene Body
   NOC2L   chr1    959177  959327  -       194     959255  46      959250  13.306459171023036      944203  959177  14974   194     18

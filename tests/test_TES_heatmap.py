@@ -1,9 +1,9 @@
 import unittest.mock
 
-from GC_bioinfo.main_programs import TES_heatmap, TES_combined_heatmap, TES_fold_change_heatmap
+from PolTools.main_programs import TES_heatmap, TES_combined_heatmap, TES_fold_change_heatmap
 
-from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.remove_files import remove_files
+from PolTools.utils.make_random_filename import generate_random_filename
+from PolTools.utils.remove_files import remove_files
 from quieter import Quieter
 
 

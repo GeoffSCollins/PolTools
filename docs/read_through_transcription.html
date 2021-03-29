@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Read Through Transcription &mdash; GC_bioinfo 1.0.0 documentation</title>
+  <title>Read Through Transcription &mdash; PolTools 1.0.0 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> GC_bioinfo
+            <a href="index.html" class="icon icon-home"> PolTools
           
 
           
@@ -124,7 +124,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">GC_bioinfo</a>
+          <a href="index.html">PolTools</a>
         
       </nav>
 
@@ -186,7 +186,7 @@ file from truQuant.</p>
 <div class="section" id="usage-and-option-summary">
 <h2>Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">read_through_transcription</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PolTools</span> <span class="n">read_through_transcription</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
                                            <span class="n">regions_filename</span> <span class="n">tsr_file</span>
                                            <span class="n">upstream_distance</span>
                                            <span class="n">downstream_distance</span> <span class="n">interval_size</span>
@@ -209,7 +209,7 @@ file from truQuant.</p>
 <td><p>Bed formatted file containing all the genes to quantify (regions will be determined from the 3’ end of each region in this file.</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>TSR Filename</strong></p></td>
-<td><p><a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html">tsrFinder</a> output file which will be blacklisted. Simply type <em>no</em> to not blacklist TSRs.</p></td>
+<td><p><a class="reference external" href="https://geoffscollins.github.io/PolTools/tsrFinder.html">tsrFinder</a> output file which will be blacklisted. Simply type <em>no</em> to not blacklist TSRs.</p></td>
 </tr>
 <tr class="row-even"><td><p><strong>Upstream Distance</strong></p></td>
 <td><p>The number of base pairs to subtract from the left position.</p></td>
@@ -269,7 +269,7 @@ chr1    <span class="m">14734</span>   <span class="m">14768</span>   A00876:119
 chr1    <span class="m">14988</span>   <span class="m">15012</span>   A00876:119:HW5F5DRXX:1:2219:16134:32784 <span class="m">255</span>     -
 chr1    <span class="m">18337</span>   <span class="m">18362</span>   A00876:119:HW5F5DRXX:1:2149:32054:31328 <span class="m">255</span>     -
 
-$ GC_bioinfo read_through_transcription seq_file-blacklisted_150_20_30_600-gene_body_regions.bed <span class="se">\</span>
+$ PolTools read_through_transcription seq_file-blacklisted_150_20_30_600-gene_body_regions.bed <span class="se">\</span>
   seq_file-blacklisted_150_20_30_600-TSR.tab <span class="m">1000</span> <span class="m">1000</span> <span class="m">100</span> seq_file.bed <span class="p">&amp;</span>
 Position       seq_file.bed
 -1000   <span class="m">1924</span>

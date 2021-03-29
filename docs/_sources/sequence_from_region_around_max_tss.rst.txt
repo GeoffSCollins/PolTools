@@ -13,14 +13,14 @@ Usage
 **Usage**:
 ::
 
-  GC_bioinfo sequence_from_region_around_max_tss [-h] max_tss_file left right
+  PolTools sequence_from_region_around_max_tss [-h] max_tss_file left right
 
 
 ===========================    =========================================================================================================================================================
 Required Arguments             Description
 ===========================    =========================================================================================================================================================
 **Max TSS FIle**               Bed formatted file containing the max TSSs you want to use to make the heatmaps. This file can be generated from the
-                               `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html>`_ with a region size parameter of 1.
+                               `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/PolTools/make_regions_file_centered_on_max_tss.html>`_ with a region size parameter of 1.
 **Left**                       Left part of the region to get the sequence.
 **Right**                      Right part of the region to get the sequence.
 ===========================    =========================================================================================================================================================
@@ -47,7 +47,7 @@ For example:
   chr1    1231971 1231972 SDF4    321     -
   chr1    1232242 1232243 B3GALT6 174     +
 
-  $ GC_bioinfo sequence_from_region_around_max_tss tQ_max_tss.bed -5 5 > output.tmp
+  $ PolTools sequence_from_region_around_max_tss tQ_max_tss.bed -5 5 > output.tmp
   $ head output.tmp
   >NOC2L
   TGCACGCTTC

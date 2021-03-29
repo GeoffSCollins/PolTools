@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'GC_bioinfo'
+project = 'PolTools'
 copyright = '2021, Geoff Collins'
 author = 'Geoff Collins'
 

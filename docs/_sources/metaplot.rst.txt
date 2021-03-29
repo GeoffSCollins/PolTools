@@ -13,7 +13,7 @@ Usage and option summary
 **Usage**:
 ::
 
-  GC_bioinfo metaplot [-h] [-t [threads]]
+  PolTools metaplot [-h] [-t [threads]]
                            read type regions_file sequencing_files
                            [sequencing_files ...]
 
@@ -22,7 +22,7 @@ Usage and option summary
 Required Arguments                         Description
 ===========================    =========================================================================================================================================================
 **Read type**                  Either five, three or whole corresponding to 5' ends, 3' ends, or pileup reads.
-**Regions File**               Bed formatted file containing all the regions to quantify (+1 nucleotide centered). These regions can be made from the `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html>`_
+**Regions File**               Bed formatted file containing all the regions to quantify (+1 nucleotide centered). These regions can be made from the `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/PolTools/make_regions_file_centered_on_max_tss.html>`_
 **Sequencing Files**           Bed formatted file from a sequencing experiment.
 ===========================    =========================================================================================================================================================
 
@@ -75,7 +75,7 @@ For example:
   chr1    14988   15012   A00876:119:HW5F5DRXX:1:2219:16134:32784 255     -
   chr1    18337   18362   A00876:119:HW5F5DRXX:1:2149:32054:31328 255     -
 
-  $ GC_bioinfo three CCNT1_inr.bed control.bed
+  $ PolTools three CCNT1_inr.bed control.bed
   Position       seq_file.bed 3' sense strand    seq_file.bed 3' divergent strand
   -5.0    0.8859940872135994      -0.01579822616407982
   -4.0    0.6057834441980784      -0.013673318551367332

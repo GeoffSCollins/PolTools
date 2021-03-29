@@ -7,7 +7,7 @@ The ``sequence_searches`` tool is used determine if a sequence is present in a c
 .. note::
 
   This tool requires `bedtools <https://github.com/arq5x/bedtools2>`_ to be installed and hg38.fa to be downloaded to
-  ~/GC_bioinfo/static. This can be done by running the commands at the bottom of this page.
+  ~/PolTools/static. This can be done by running the commands at the bottom of this page.
 
 ===============================
 Usage and option summary
@@ -15,13 +15,13 @@ Usage and option summary
 **Usage**:
 ::
 
-  GC_bioinfo GC_bioinfo sequence_searches [-h] regions_filename search [search ...]
+  PolTools PolTools sequence_searches [-h] regions_filename search [search ...]
 
 ===========================    =========================================================================================================================================================
 Required Arguments             Description
 ===========================    =========================================================================================================================================================
 **Regions filename**           Bed formatted file containing all the regions you want to quantify (must be centered on +1 nt). This file can be generated from the
-                               `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html>`_
+                               `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/PolTools/make_regions_file_centered_on_max_tss.html>`_
 **Search**                     Search region and sequence formatted as follows: (Sequence),(-/+)left:(-/+)right. Ex: TATA,-30:-20
 ===========================    =========================================================================================================================================================
 
@@ -45,7 +45,7 @@ For example:
   $ head POLR2A_inr.bed
   chr17   7484355 7484375 POLR2A  0       +
 
-  $ GC_bioinfo sequence_searches POLR2A_inr.bed GCTGC,-3:3
+  $ PolTools sequence_searches POLR2A_inr.bed GCTGC,-3:3
   Chromosome      Left    Right   Gene    Score   Strand  GCTGC
   chr17   7484355 7484375 POLR2A  0       +       True
 

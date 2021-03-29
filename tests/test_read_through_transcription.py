@@ -2,9 +2,9 @@ import unittest.mock
 
 import multiprocessing
 
-from GC_bioinfo.main_programs import read_through_transcription
-from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.remove_files import remove_files
+from PolTools.main_programs import read_through_transcription
+from PolTools.utils.make_random_filename import generate_random_filename
+from PolTools.utils.remove_files import remove_files
 
 from quieter import Quieter
 

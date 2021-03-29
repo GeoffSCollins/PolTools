@@ -14,7 +14,7 @@ Usage and option summary
 **Usage**:
 ::
 
-  GC_bioinfo region_fold_change_heatmap [-h] --numerator seq_file
+  PolTools region_fold_change_heatmap [-h] --numerator seq_file
                                              spike_in --denominator seq_file
                                              spike_in [-m max_log2_fc]
                                              [-r repeat_amount]
@@ -84,5 +84,5 @@ For example:
   chr1    14988   15012   A00876:119:HW5F5DRXX:1:2219:16134:32784 255     -
   chr1    18337   18362   A00876:119:HW5F5DRXX:1:2149:32054:31328 255     -
 
-  $ GC_bioinfo region_heatmap five regions_centered_on_max_tss.bed --numerator numerator_seq_file_one.bed 1 \
+  $ PolTools region_heatmap five regions_centered_on_max_tss.bed --numerator numerator_seq_file_one.bed 1 \
     --denominator denominator_seq_file_one.bed 0.95 five_heatmap -r 20 -m 10 --minor_ticks 10 --major_ticks 50

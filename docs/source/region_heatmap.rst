@@ -14,7 +14,7 @@ Usage and option summary
 **Usage**:
 ::
 
-  GC_bioinfo region_heatmap [-h] [-m max_black] [-r repeat_amount]
+  PolTools region_heatmap [-h] [-m max_black] [-r repeat_amount]
                                  [-v vertical_averaging] [-g gamma]
                                  read type regions_file sequencing_file
                                  norm_factor output_prefix
@@ -77,5 +77,5 @@ For example:
   chr1    14988   15012   A00876:119:HW5F5DRXX:1:2219:16134:32784 255     -
   chr1    18337   18362   A00876:119:HW5F5DRXX:1:2149:32054:31328 255     -
 
-  $ GC_bioinfo region_heatmap five regions_centered_on_max_tss.bed seq_file.bed 1 five_heatmap -r 20 -m 10\
+  $ PolTools region_heatmap five regions_centered_on_max_tss.bed seq_file.bed 1 five_heatmap -r 20 -m 10\
     --minor_ticks 10 --major_ticks 50

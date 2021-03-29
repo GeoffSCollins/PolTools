@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Welcome to GC_bioinfo! &mdash; GC_bioinfo 1.0.0 documentation</title>
+  <title>Welcome to PolTools! &mdash; PolTools 1.0.0 documentation</title>
   
 
   
@@ -52,7 +52,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> GC_bioinfo
+            <a href="#" class="icon icon-home"> PolTools
           
 
           
@@ -119,7 +119,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">GC_bioinfo</a>
+          <a href="#">PolTools</a>
         
       </nav>
 
@@ -152,7 +152,7 @@
     
       <li><a href="#" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Welcome to GC_bioinfo!</li>
+      <li>Welcome to PolTools!</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -169,27 +169,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="welcome-to-gc-bioinfo">
-<h1>Welcome to GC_bioinfo!<a class="headerlink" href="#welcome-to-gc-bioinfo" title="Permalink to this headline">¶</a></h1>
-<p>GC_bioinfo is a collection of bioinformatic programs analyzing PRO-Seq, PRO-Cap, and similar next generation sequencing
+  <div class="section" id="welcome-to-poltools">
+<h1>Welcome to PolTools!<a class="headerlink" href="#welcome-to-poltools" title="Permalink to this headline">¶</a></h1>
+<p>PolTools is a collection of bioinformatic programs analyzing PRO-Seq, PRO-Cap, and similar next generation sequencing
 experiments analyzing nascent RNAs.</p>
 <p>It is primary written in python3, but utilizes R for plotting and C++ for computationally expensive analyses. These
 tools were developed in the <a class="reference external" href="https://price.lab.uiowa.edu">Price Lab</a></p>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>Two options are provided for installation. Both assume you already have R installed. If you do not have R installed, please
-install it as described <a class="reference external" href="https://cran.r-project.org/doc/manuals/r-release/R-admin.html">here</a>.</p>
+<p>Two options are provided for installation. Both assume you already have R and bedtools installed. If you do not have R installed, please
+install it as described <a class="reference external" href="https://cran.r-project.org/doc/manuals/r-release/R-admin.html">here</a>. If you do not have
+bedtools installed, please install it as described <a class="reference external" href="https://bedtools.readthedocs.io/en/latest/content/installation.html">in the documentation</a></p>
 <p>1) Install using pip and pypi
 Inside a terminal, run the following commands to install the necessary files</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip3 install GC_bioinfo
-$ GC_bioinfo build
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip3 install PolTools
+$ <span class="nb">source</span> /etc/bash_completion.d/PolTools-completion.bash
+$ PolTools build
 </pre></div>
 </div>
 <ol class="arabic simple" start="2">
 <li><p>Install from the github source</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/GeoffSCollins/GC_bioinfo.git
-$ GC_bioinfo build
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/GeoffSCollins/PolTools.git
+$ sudo python3 PolTools/setup.py install
+$ <span class="nb">source</span> /etc/bash_completion.d/PolTools-completion.bash
+$ PolTools build
 </pre></div>
 </div>
 <div class="toctree-wrapper compound">

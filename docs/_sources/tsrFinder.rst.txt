@@ -11,7 +11,7 @@ Usage
 **Usage**:
 ::
 
-  GC_bioinfo tsrFinder [-h] [-t [threads]]
+  PolTools tsrFinder [-h] [-t [threads]]
                             seq_file window_size min_seq_depth
                             min_avg_transcript_length max_fragment_size
                             chrom_size_file
@@ -26,7 +26,7 @@ Required Arguments                  Description
 **Min avg Transcript Length**       The minimum average transcript length will eliminate TSRs from sequencing artifacts.
 **Max fragment size**               The maximum transcript length for a read to be included in tsrFinder analysis.
 **Chrom size file**                 A file containing the chromosome sizes. This can be optained using `fetchChromSizes <http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/>`_
-                                    The hg38 chromsome size file can be found in the GC_bioinfo static directory.
+                                    The hg38 chromsome size file can be found in the PolTools static directory.
 ================================    =========================================================================================================================================================
 
 
@@ -73,7 +73,7 @@ For example:
   chr8    145138636
   chr9    138394717
 
-  $ GC_bioinfo tsrFinder seq_file.bed 20 20 30 600 hg38.chrom.sizes
+  $ PolTools tsrFinder seq_file.bed 20 20 30 600 hg38.chrom.sizes
   $ head seq_file_20_20_30_600-TSR.tab
   chr1    629421  629441  738     20      +       629431  629432  4       629431
   chr1    629490  629510  2263    64      +       629494  629495  14      629500

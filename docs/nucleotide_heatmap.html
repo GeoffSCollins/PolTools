@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Nucleotide Heatmap &mdash; GC_bioinfo 1.0.0 documentation</title>
+  <title>Nucleotide Heatmap &mdash; PolTools 1.0.0 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> GC_bioinfo
+            <a href="index.html" class="icon icon-home"> PolTools
           
 
           
@@ -124,7 +124,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">GC_bioinfo</a>
+          <a href="index.html">PolTools</a>
         
       </nav>
 
@@ -184,7 +184,7 @@
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">nucleotide_heatmap</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PolTools</span> <span class="n">nucleotide_heatmap</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
                               <span class="n">max_tss_file</span> <span class="n">region_width</span> <span class="n">heatmap_width</span>
                               <span class="n">vertical_average</span>
 </pre></div>
@@ -202,7 +202,7 @@
 <tbody>
 <tr class="row-even"><td><p><strong>Max TSS FIle</strong></p></td>
 <td><p>Bed formatted file containing the max TSSs you want to use to make the heatmaps. This file can be generated from the
-<a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html">make_regions_file_centered_on_max_tss program</a> with a region size parameter of 1.</p></td>
+<a class="reference external" href="https://geoffscollins.github.io/PolTools/make_regions_file_centered_on_max_tss.html">make_regions_file_centered_on_max_tss program</a> with a region size parameter of 1.</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>Region width</strong></p></td>
 <td><p>Number of base pairs to show on the heatmaps (will go upstream and downstream by width / 2).</p></td>
@@ -235,7 +235,7 @@ chr1    <span class="m">1116106</span> <span class="m">1116107</span> C1orf159  
 chr1    <span class="m">1231971</span> <span class="m">1231972</span> SDF4    <span class="m">321</span>     -
 chr1    <span class="m">1232242</span> <span class="m">1232243</span> B3GALT6 <span class="m">174</span>     +
 
-$ GC_bioinfo nucleotide_heatmap tQ_max_tss.bed <span class="m">100</span> <span class="m">2000</span> <span class="m">2</span>
+$ PolTools nucleotide_heatmap tQ_max_tss.bed <span class="m">100</span> <span class="m">2000</span> <span class="m">2</span>
 </pre></div>
 </div>
 </div>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>TES Heatmap &mdash; GC_bioinfo 1.0.0 documentation</title>
+  <title>TES Heatmap &mdash; PolTools 1.0.0 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> GC_bioinfo
+            <a href="index.html" class="icon icon-home"> PolTools
           
 
           
@@ -124,7 +124,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">GC_bioinfo</a>
+          <a href="index.html">PolTools</a>
         
       </nav>
 
@@ -184,7 +184,7 @@
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">TES_heatmap</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">w</span> <span class="n">width</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">height</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PolTools</span> <span class="n">TES_heatmap</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">w</span> <span class="n">width</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">height</span><span class="p">]</span>
                             <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">downstream_distance</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">u</span> <span class="n">upstream_distance</span><span class="p">]</span>
                             <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">bp_width</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">gamma</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">max_black</span><span class="p">]</span>
                             <span class="p">[</span><span class="o">--</span><span class="n">minor_ticks</span> <span class="n">minor_ticks</span><span class="p">]</span>
@@ -205,7 +205,7 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p><strong>truQuant Output File</strong></p></td>
-<td><p>File ending in -truQuant_output.txt generated from <a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/truQuant.html">truQuant</a></p></td>
+<td><p>File ending in -truQuant_output.txt generated from <a class="reference external" href="https://geoffscollins.github.io/PolTools/truQuant.html">truQuant</a></p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>-s seq_file spike_in</strong></p></td>
 <td><p>Sequencing file and its accompanying normalization factor to be used as the numerator of the heatmap. Additional files can be provided with multiple</p></td>
@@ -227,7 +227,7 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p><strong>-u, –upstream_distance</strong></p></td>
-<td><p>Distance upstream of the max TSS from <a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/truQuant.html">truQuant</a> to show on the heatmap. Default is 50,000 bp.</p></td>
+<td><p>Distance upstream of the max TSS from <a class="reference external" href="https://geoffscollins.github.io/PolTools/truQuant.html">truQuant</a> to show on the heatmap. Default is 50,000 bp.</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>-d, –distance_past_tes</strong></p></td>
 <td><p>Distance past the TES to show on the heatmap. Default is 50,000 bp.</p></td>
@@ -261,8 +261,8 @@
 <p><code class="docutils literal notranslate"><span class="pre">TES_heatmap</span></code> will create a file starting with the output prefix which contains the run parameters and ends in TES_heatmap.tiff.
 First, regions to be quantified are designed from a distance upstream of the max TSS
 to a distance downstream of the TES (default is 50 kb away from each position) for each gene in the truQuant file. Then,
-the <a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html">tsrFinder</a> run associated with
-<a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/truQuant.html">truQuant</a> is used to find regions to blacklist
+the <a class="reference external" href="https://geoffscollins.github.io/PolTools/tsrFinder.html">tsrFinder</a> run associated with
+<a class="reference external" href="https://geoffscollins.github.io/PolTools/truQuant.html">truQuant</a> is used to find regions to blacklist
 (TSRs with at least 30% of the number of 5’ ends found in the pause region of the gene). These regions are blacklisted
 in the sequencing file and the 3’ ends are quantified in each location of the previously defined regions. The 3’ end
 reads are normalized according to the correction factor generating the heatmap.</p>
@@ -292,7 +292,7 @@ RNF223  chr1    <span class="m">1074208</span> <span class="m">1074358</span> - 
 C1orf159        chr1    <span class="m">1116028</span> <span class="m">1116178</span> -       <span class="m">51</span>      <span class="m">1116106</span> <span class="m">9</span>       <span class="m">1116103</span> <span class="m">19</span>.81136532595448       <span class="m">1081818</span> <span class="m">1116028</span> <span class="m">34210</span>   <span class="m">51</span>      <span class="m">11</span>
 SDF4    chr1    <span class="m">1231907</span> <span class="m">1232057</span> -       <span class="m">1105</span>    <span class="m">1231971</span> <span class="m">321</span>     <span class="m">1231978</span> <span class="m">23</span>.701136922154493      <span class="m">1216908</span> <span class="m">1231907</span> <span class="m">14999</span>   <span class="m">1097</span>    <span class="m">177</span>
 
-$ GC_bioinfo TES_heatmap seq_file-truQuant_output.txt -s seq_file.bed <span class="m">1</span>.00 seq -m <span class="m">3</span>
+$ PolTools TES_heatmap seq_file-truQuant_output.txt -s seq_file.bed <span class="m">1</span>.00 seq -m <span class="m">3</span>
 </pre></div>
 </div>
 </div>

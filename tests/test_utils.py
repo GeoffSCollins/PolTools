@@ -1,21 +1,21 @@
 import unittest.mock
 
-from GC_bioinfo.utils.heatmap_utils.add_matrices import add_matrices
-from GC_bioinfo.utils.heatmap_utils.average_matrix import average_matrix
-from GC_bioinfo.utils.get_region_length import determine_region_length
-from GC_bioinfo.utils.build_counts_dict import build_counts_dict
-from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.make_read_end_file import make_read_end_file
-from GC_bioinfo.utils.make_transcripts_dict import build_transcripts_dict
-from GC_bioinfo.utils.bedtools_utils.run_bedtools_coverage import run_coverage
-from GC_bioinfo.utils.bedtools_utils.run_bedtools_getfasta import run_getfasta
-from GC_bioinfo.utils.bedtools_utils.run_bedtools_subtract import run_subtract
-from GC_bioinfo.utils.heatmap_utils.scale_matrix import scale_matrix
-from GC_bioinfo.utils.heatmap_utils.set_matrix_bounds import set_matrix_bounds
-from GC_bioinfo.utils.verify_bed_file import verify_bed_files
-from GC_bioinfo.utils.verify_region_length_is_even import verify_region_length_is_even
+from PolTools.utils.heatmap_utils.add_matrices import add_matrices
+from PolTools.utils.heatmap_utils.average_matrix import average_matrix
+from PolTools.utils.get_region_length import determine_region_length
+from PolTools.utils.build_counts_dict import build_counts_dict
+from PolTools.utils.make_random_filename import generate_random_filename
+from PolTools.utils.make_read_end_file import make_read_end_file
+from PolTools.utils.make_transcripts_dict import build_transcripts_dict
+from PolTools.utils.bedtools_utils.run_bedtools_coverage import run_coverage
+from PolTools.utils.bedtools_utils.run_bedtools_getfasta import run_getfasta
+from PolTools.utils.bedtools_utils.run_bedtools_subtract import run_subtract
+from PolTools.utils.heatmap_utils.scale_matrix import scale_matrix
+from PolTools.utils.heatmap_utils.set_matrix_bounds import set_matrix_bounds
+from PolTools.utils.verify_bed_file import verify_bed_files
+from PolTools.utils.verify_region_length_is_even import verify_region_length_is_even
 
-from GC_bioinfo.utils.remove_files import remove_files
+from PolTools.utils.remove_files import remove_files
 
 from quieter import Quieter
 

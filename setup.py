@@ -4,20 +4,32 @@ from setuptools import setup, find_packages
 from setuptools.command.install import install
 from pathlib import Path
 
-from GC_bioinfo.utils.constants import tsr_finder_location
+from PolTools.utils.constants import tsr_finder_location
 
 class CustomInstall(install):
     def run(self):
         # Copy and source the tab completion
-        dir_path = Path(__file__).absolute()
-        completion_file = os.path.join(dir_path, 'GC_bioinfo-completion.bash')
+        dir_path = Path(__file__).parent.absolute()
+        completion_file = os.path.join(dir_path, 'PolTools-completion.bash')
 
-        os.system('cp ' + completion_file + ' /etc/bash_completion.d/GC_bioinfo-completion.bash')
-        os.system('source /etc/bash_completion.d/GC_bioinfo-completion.bash')
+        os.system('cp ' + completion_file + ' /etc/bash_completion.d/PolTools-completion.bash')
 
-        # Move GC_bioinfo.py to /usr/bin
-        bin_file = os.path.join(dir_path, 'GC_bioinfo.py')
-        os.system('cp ' + bin_file + ' /usr/bin')
+        # Write a PolTools file in /usr/bin
+        cli_location =  str(os.path.join(dir_path, 'PolTools/cli.py'))
+        with open("/usr/bin/PolTools", 'w') as file:
+            file.write(
+                "#!/usr/bin/python3\n" +
+                "import os\n" +
+                "import sys\n\n\n" +
+
+
+                "if __name__ == '__main__':\n" +
+                "\tos.system(\n" +
+                """\t\t"python3 """ + cli_location + """ " + ' '.join(sys.argv[1:])\n""" +
+                "\t)\n"
+            )
+
+        os.system('chmod +x /usr/bin/PolTools')
 
         # Compile the tsrFinder file
         os.system('g++ ' + tsr_finder_location + '.cpp -o ' + tsr_finder_location)
@@ -25,14 +37,14 @@ class CustomInstall(install):
 
 setup(
     cmdclass={'install': CustomInstall},
-    name='GC_bioinfo',
+    name='PolTools',
     author='Geoff Collins',
     version='1.0',
     packages=find_packages(),
-    url='https://geoffscollins.github.io/GC_bioinfo/index.html',
+    url='https://geoffscollins.github.io/PolTools/index.html',
     python_requires='>=3.5',
     project_urls= {
-        'Documentation': 'https://geoffscollins.github.io/GC_bioinfo/index.html',
-        'Source Code': 'https://github.com/GeoffSCollins/GC_bioinfo'
+        'Documentation': 'https://geoffscollins.github.io/PolTools/index.html',
+        'Source Code': 'https://github.com/GeoffSCollins/PolTools'
     }
 )

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Track Links From Bigwigs &mdash; GC_bioinfo 1.0.0 documentation</title>
+  <title>Track Links From Bigwigs &mdash; PolTools 1.0.0 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> GC_bioinfo
+            <a href="index.html" class="icon icon-home"> PolTools
           
 
           
@@ -124,7 +124,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">GC_bioinfo</a>
+          <a href="index.html">PolTools</a>
         
       </nav>
 
@@ -180,7 +180,7 @@
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">track_links_from_bw</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">bigwig_files</span> <span class="p">[</span><span class="n">bigwig_files</span> <span class="o">...</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PolTools</span> <span class="n">track_links_from_bw</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">bigwig_files</span> <span class="p">[</span><span class="n">bigwig_files</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
 <table class="docutils align-default">
@@ -205,7 +205,7 @@
 <p><code class="docutils literal notranslate"><span class="pre">track_links_from_bw</span></code> will print the UCSC genome browser links for the supplied bigwig files. Once these links are in a file,
 open the file in a text editor to replace the &lt;server&gt; text with the server you are hosting the data.</p>
 <p>For example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ GC_bioinfo track_links_from_bw seq_file-FW.bw seq_file-RV.bw
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ PolTools track_links_from_bw seq_file-FW.bw seq_file-RV.bw
 track <span class="nv">type</span><span class="o">=</span>bigWig <span class="nv">visibility</span><span class="o">=</span>full <span class="nv">name</span><span class="o">=</span><span class="s1">&#39;seq file FW&#39;</span> <span class="nv">autoScale</span><span class="o">=</span>on <span class="nv">alwaysZero</span><span class="o">=</span>on <span class="nv">windowingFunction</span><span class="o">=</span>maximum <span class="nv">negateValues</span><span class="o">=</span>off <span class="nv">color</span><span class="o">=</span><span class="m">0</span>,0,0 <span class="nv">altColor</span><span class="o">=</span><span class="m">0</span>,0,0 <span class="nv">bigDataUrl</span><span class="o">=</span>&lt;server&gt;/seq_file-FW.bw
 track <span class="nv">type</span><span class="o">=</span>bigWig <span class="nv">visibility</span><span class="o">=</span>full <span class="nv">name</span><span class="o">=</span><span class="s1">&#39;seq file RV&#39;</span> <span class="nv">autoScale</span><span class="o">=</span>on <span class="nv">alwaysZero</span><span class="o">=</span>on <span class="nv">windowingFunction</span><span class="o">=</span>maximum <span class="nv">negateValues</span><span class="o">=</span>on <span class="nv">color</span><span class="o">=</span><span class="m">0</span>,0,0 <span class="nv">altColor</span><span class="o">=</span><span class="m">0</span>,0,0 <span class="nv">bigDataUrl</span><span class="o">=</span>&lt;server&gt;/seq_file-RV.bw
 </pre></div>

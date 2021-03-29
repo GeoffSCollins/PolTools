@@ -14,7 +14,7 @@ Usage
 **Usage**:
 ::
 
-  GC_bioinfo gene_body_fold_change_heatmap [-h] --numerator seq_file
+  PolTools gene_body_fold_change_heatmap [-h] --numerator seq_file
                                                 spike_in --denominator
                                                 seq_file spike_in
                                                 [-u upstream_distance]
@@ -30,7 +30,7 @@ Usage
 ===========================================    =========================================================================================================================================================
 Required Arguments                             Description
 ===========================================    =========================================================================================================================================================
-**truQuant Output File**                       File ending in -truQuant_output.txt generated from `truQuant <https://geoffscollins.github.io/GC_bioinfo/truQuant.html>`_
+**truQuant Output File**                       File ending in -truQuant_output.txt generated from `truQuant <https://geoffscollins.github.io/PolTools/truQuant.html>`_
 **--numerator seq_file spike_in**              Sequencing file and its accompanying normalization factor to be used as the numerator of the heatmap. Additional files can be provided with multiple
                                                --numerator arguments
 **--denominator seq_file spike_in**            Sequencing file and its accompanying normalization factor to be used as the denominator of the heatmap. Additional files can be provided with multiple
@@ -42,7 +42,7 @@ Required Arguments                             Description
 ===========================    ===============================================================================================================================================================
 Optional Arguments             Description
 ===========================    ===============================================================================================================================================================
-**-u, --upstream_distance**    Distance upstream of the max TSS from `truQuant <https://geoffscollins.github.io/GC_bioinfo/truQuant.html>`_ to show on the heatmap. Default is 50,000 bp.
+**-u, --upstream_distance**    Distance upstream of the max TSS from `truQuant <https://geoffscollins.github.io/PolTools/truQuant.html>`_ to show on the heatmap. Default is 50,000 bp.
 **-d, --distance_past_tes**    Distance past the TES to show on the heatmap. Default is 50,000 bp.
 **-b, --bp_width**             Total distance shown on the heatmap. Default is 400,000 bp.
 **-w, --width**                Width of the heatmap in pixels. Default is 2,000 px.
@@ -60,8 +60,8 @@ Behavior
 ``gene_body_fold_change_heatmap`` will create a file starting with the output prefix which contains the run parameters and ends in fold_change_heatmap.tiff.
 First, regions to be quantified are designed from a distance upstream of the max TSS
 to a distance downstream of the TES (default is 50 kb away from each position) for each gene in the truQuant file. Then,
-the `tsrFinder <https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html>`_ run associated with
-`truQuant <https://geoffscollins.github.io/GC_bioinfo/truQuant.html>`_ is used to find regions to blacklist
+the `tsrFinder <https://geoffscollins.github.io/PolTools/tsrFinder.html>`_ run associated with
+`truQuant <https://geoffscollins.github.io/PolTools/truQuant.html>`_ is used to find regions to blacklist
 (TSRs with at least 30% of the number of 5' ends found in the pause region of the gene). These regions are blacklisted
 in the sequencing files and the 3' ends are quantified in each location of the previously defined regions. The 3' end
 reads are normalized according to the correction factors. The two numerator datasets are added together and divided by
@@ -86,4 +86,4 @@ For example:
   C1orf159        chr1    1116028 1116178 -       51      1116106 9       1116103 19.81136532595448       1081818 1116028 34210   51      11
   SDF4    chr1    1231907 1232057 -       1105    1231971 321     1231978 23.701136922154493      1216908 1231907 14999   1097    177
 
-  $ GC_bioinfo gene_body_fold_change_heatmap seq_file-truQuant_output.txt --numerator flavo.bed 1 --denominator dmso.bed 1 -m 2
+  $ PolTools gene_body_fold_change_heatmap seq_file-truQuant_output.txt --numerator flavo.bed 1 --denominator dmso.bed 1 -m 2

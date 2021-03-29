@@ -3,10 +3,10 @@ from pathlib import Path
 
 import io
 
-from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.remove_files import remove_files
+from PolTools.utils.make_random_filename import generate_random_filename
+from PolTools.utils.remove_files import remove_files
 
-from GC_bioinfo.main_programs import base_distribution
+from PolTools.main_programs import base_distribution
 
 from quieter import Quieter
 

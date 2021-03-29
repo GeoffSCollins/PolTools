@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Metaplot &mdash; GC_bioinfo 1.0.0 documentation</title>
+  <title>Metaplot &mdash; PolTools 1.0.0 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> GC_bioinfo
+            <a href="index.html" class="icon icon-home"> PolTools
           
 
           
@@ -124,7 +124,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">GC_bioinfo</a>
+          <a href="index.html">PolTools</a>
         
       </nav>
 
@@ -176,7 +176,7 @@
             
   <div class="section" id="metaplot">
 <h1><em>Metaplot</em><a class="headerlink" href="#metaplot" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">metaplot</span></code> tool computes the average coverage of 3’ ends of sequencing data around the center of features provided.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">metaplot</span></code> tool computes the average coverage of [5’/3’/pileup] reads of sequencing data around the center of features provided.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This tool requires <a class="reference external" href="https://github.com/arq5x/bedtools2">bedtools</a> to be installed.</p>
@@ -184,7 +184,7 @@
 <div class="section" id="usage-and-option-summary">
 <h2>Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">metaplot</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PolTools</span> <span class="n">metaplot</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
                          <span class="n">read</span> <span class="nb">type</span> <span class="n">regions_file</span> <span class="n">sequencing_files</span>
                          <span class="p">[</span><span class="n">sequencing_files</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
@@ -204,7 +204,7 @@
 <td><p>Either five, three or whole corresponding to 5’ ends, 3’ ends, or pileup reads.</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>Regions File</strong></p></td>
-<td><p>Bed formatted file containing all the regions to quantify (+1 nucleotide centered). These regions can be made from the <a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html">make_regions_file_centered_on_max_tss program</a></p></td>
+<td><p>Bed formatted file containing all the regions to quantify (+1 nucleotide centered). These regions can be made from the <a class="reference external" href="https://geoffscollins.github.io/PolTools/make_regions_file_centered_on_max_tss.html">make_regions_file_centered_on_max_tss program</a></p></td>
 </tr>
 <tr class="row-even"><td><p><strong>Sequencing Files</strong></p></td>
 <td><p>Bed formatted file from a sequencing experiment.</p></td>
@@ -264,7 +264,7 @@ chr1    <span class="m">14734</span>   <span class="m">14768</span>   A00876:119
 chr1    <span class="m">14988</span>   <span class="m">15012</span>   A00876:119:HW5F5DRXX:1:2219:16134:32784 <span class="m">255</span>     -
 chr1    <span class="m">18337</span>   <span class="m">18362</span>   A00876:119:HW5F5DRXX:1:2149:32054:31328 <span class="m">255</span>     -
 
-$ GC_bioinfo three CCNT1_inr.bed control.bed
+$ PolTools three CCNT1_inr.bed control.bed
 Position       seq_file.bed <span class="m">3</span><span class="s1">&#39; sense strand    seq_file.bed 3&#39;</span> divergent strand
 -5.0    <span class="m">0</span>.8859940872135994      -0.01579822616407982
 -4.0    <span class="m">0</span>.6057834441980784      -0.013673318551367332

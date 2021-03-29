@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>tsrFinder &mdash; GC_bioinfo 1.0.0 documentation</title>
+  <title>tsrFinder &mdash; PolTools 1.0.0 documentation</title>
   
 
   
@@ -52,7 +52,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> GC_bioinfo
+            <a href="index.html" class="icon icon-home"> PolTools
           
 
           
@@ -123,7 +123,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">GC_bioinfo</a>
+          <a href="index.html">PolTools</a>
         
       </nav>
 
@@ -181,7 +181,7 @@ This tsrFinder is a much quicker version (with few output modifications) of the 
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">tsrFinder</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PolTools</span> <span class="n">tsrFinder</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
                           <span class="n">seq_file</span> <span class="n">window_size</span> <span class="n">min_seq_depth</span>
                           <span class="n">min_avg_transcript_length</span> <span class="n">max_fragment_size</span>
                           <span class="n">chrom_size_file</span>
@@ -215,7 +215,7 @@ This tsrFinder is a much quicker version (with few output modifications) of the 
 </tr>
 <tr class="row-odd"><td><p><strong>Chrom size file</strong></p></td>
 <td><p>A file containing the chromosome sizes. This can be optained using <a class="reference external" href="http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/">fetchChromSizes</a>
-The hg38 chromsome size file can be found in the GC_bioinfo static directory.</p></td>
+The hg38 chromsome size file can be found in the PolTools static directory.</p></td>
 </tr>
 </tbody>
 </table>
@@ -267,7 +267,7 @@ chrX    <span class="m">156040895</span>
 chr8    <span class="m">145138636</span>
 chr9    <span class="m">138394717</span>
 
-$ GC_bioinfo tsrFinder seq_file.bed <span class="m">20</span> <span class="m">20</span> <span class="m">30</span> <span class="m">600</span> hg38.chrom.sizes
+$ PolTools tsrFinder seq_file.bed <span class="m">20</span> <span class="m">20</span> <span class="m">30</span> <span class="m">600</span> hg38.chrom.sizes
 $ head seq_file_20_20_30_600-TSR.tab
 chr1    <span class="m">629421</span>  <span class="m">629441</span>  <span class="m">738</span>     <span class="m">20</span>      +       <span class="m">629431</span>  <span class="m">629432</span>  <span class="m">4</span>       <span class="m">629431</span>
 chr1    <span class="m">629490</span>  <span class="m">629510</span>  <span class="m">2263</span>    <span class="m">64</span>      +       <span class="m">629494</span>  <span class="m">629495</span>  <span class="m">14</span>      <span class="m">629500</span>

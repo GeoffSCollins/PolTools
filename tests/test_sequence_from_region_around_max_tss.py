@@ -2,10 +2,10 @@ import unittest.mock
 
 import io
 
-from GC_bioinfo.main_programs import sequence_from_region_around_max_tss
-from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.remove_files import remove_files
-from GC_bioinfo.utils.constants import hg38_chrom_sizes_random_file
+from PolTools.main_programs import sequence_from_region_around_max_tss
+from PolTools.utils.make_random_filename import generate_random_filename
+from PolTools.utils.remove_files import remove_files
+from PolTools.utils.constants import hg38_chrom_sizes_random_file
 
 from quieter import Quieter
 

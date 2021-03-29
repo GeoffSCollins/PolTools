@@ -2,7 +2,7 @@ import unittest.mock
 import io
 from pathlib import Path
 
-from GC_bioinfo.main_programs import make_regions_file_centered_on_max_tss
+from PolTools.main_programs import make_regions_file_centered_on_max_tss
 
 from quieter import Quieter
 

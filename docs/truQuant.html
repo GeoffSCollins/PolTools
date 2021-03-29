@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>truQuant &mdash; GC_bioinfo 1.0.0 documentation</title>
+  <title>truQuant &mdash; PolTools 1.0.0 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> GC_bioinfo
+            <a href="index.html" class="icon icon-home"> PolTools
           
 
           
@@ -124,7 +124,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">GC_bioinfo</a>
+          <a href="index.html">PolTools</a>
         
       </nav>
 
@@ -186,7 +186,7 @@ non RNA Polymerase II transcripts.</p>
 <div class="section" id="usage-and-option-summary">
 <h2>Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">truQuant</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="p">[</span><span class="n">annotation_extension</span><span class="p">]]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PolTools</span> <span class="n">truQuant</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="p">[</span><span class="n">annotation_extension</span><span class="p">]]</span>
                          <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="p">[</span><span class="n">blacklisting_percent</span><span class="p">]]</span>
                          <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="p">[</span><span class="n">pause_region_radius</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
                          <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="p">[</span><span class="n">min_seq_depth</span><span class="p">]]</span>
@@ -242,14 +242,14 @@ for finding TSRs and a one thread for each sequencing file (these two processes 
 number of 5’ end reads in the pause region and the number of 3’ end reads in the gene body.</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>-d, –min_seq_depth</strong></p></td>
-<td><p>The minimum number of 5’ reads to be considered as a TSR in <a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html">tsrFinder</a></p></td>
+<td><p>The minimum number of 5’ reads to be considered as a TSR in <a class="reference external" href="https://geoffscollins.github.io/PolTools/tsrFinder.html">tsrFinder</a></p></td>
 </tr>
 <tr class="row-even"><td><p><strong>-m, –min_avg_transcript_length</strong></p></td>
 <td><p>The minimum average transcript length will eliminate TSRs from sequencing artifacts in
-<a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html">tsrFinder</a></p></td>
+<a class="reference external" href="https://geoffscollins.github.io/PolTools/tsrFinder.html">tsrFinder</a></p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>-l, –max_fragment_length</strong></p></td>
-<td><p>The maximum transcript length for a read to be included in <a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html">tsrFinder</a></p></td>
+<td><p>The maximum transcript length for a read to be included in <a class="reference external" href="https://geoffscollins.github.io/PolTools/tsrFinder.html">tsrFinder</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -257,7 +257,7 @@ number of 5’ end reads in the pause region and the number of 3’ end reads in
 <div class="section" id="behavior">
 <h2>Behavior<a class="headerlink" href="#behavior" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">truQuant</span></code> will generate search regions 1000 bp upstream of the 5’ end of protein coding genes from GENCODE v32. Then,
-<a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html">tsrFinder</a> will be run to determine the max TSR in the search region. Inside this TSR, the max TSS will be chosen as the
+<a class="reference external" href="https://geoffscollins.github.io/PolTools/tsrFinder.html">tsrFinder</a> will be run to determine the max TSR in the search region. Inside this TSR, the max TSS will be chosen as the
 annotated 5’ end. The pause region will be the 150 bp region surrounding the weighted average TSS (avgTSS) and gene body
 will be the end of the pause region to the TES. TSRs in the gene with more than 30% of the reads as the max TSR will be
 blacklisted. 5’ ends in the pause regions will be quantified and 3’ ends in the gene bodies will be quantified.</p>
@@ -270,7 +270,7 @@ chr1    <span class="m">13356</span>   <span class="m">13423</span>   A00876:119
 chr1    <span class="m">13435</span>   <span class="m">13477</span>   A00876:119:HW5F5DRXX:1:2273:15781:19241 <span class="m">255</span>     -
 chr1    <span class="m">13739</span>   <span class="m">13772</span>   A00876:119:HW5F5DRXX:1:2256:29966:10520 <span class="m">255</span>     -
 
-$ GC_bioinfo truQuant seq_file.bed
+$ PolTools truQuant seq_file.bed
 $ head -n <span class="m">1</span> control-truQuant_output.txt
 Gene    Chromosome      Pause Region Left       Pause Region Right      Strand  Total <span class="m">5</span><span class="s1">&#39; Reads  MaxTSS  MaxTSS 5&#39;</span> Reads Weighted Pause Region Center    STDEV of TSSs   Gene Body Left  Gene Body Right Gene Body Distance      seq_file.bed Pause Region   seq_file.bed Gene Body
 NOC2L   chr1    <span class="m">959177</span>  <span class="m">959327</span>  -       <span class="m">194</span>     <span class="m">959255</span>  <span class="m">46</span>      <span class="m">959250</span>  <span class="m">13</span>.306459171023036      <span class="m">944203</span>  <span class="m">959177</span>  <span class="m">14974</span>   <span class="m">194</span>     <span class="m">18</span>

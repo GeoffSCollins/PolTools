@@ -3,9 +3,9 @@ import multiprocessing
 
 import unittest.mock
 
-import GC_bioinfo.main_programs.pausing_distance_distribution_from_maxTSS as pausing
-from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.remove_files import remove_files
+import PolTools.main_programs.pausing_distance_distribution_from_maxTSS as pausing
+from PolTools.utils.make_random_filename import generate_random_filename
+from PolTools.utils.remove_files import remove_files
 
 from quieter import Quieter
 

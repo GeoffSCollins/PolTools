@@ -10,7 +10,7 @@ Usage and option summary
 **Usage**:
 ::
 
-  GC_bioinfo make_regions_file_centered_on_max_tss [-h]
+  PolTools make_regions_file_centered_on_max_tss [-h]
                                                    truQuant_file
                                                    region_size
 
@@ -18,7 +18,7 @@ Usage and option summary
 ===========================    =========================================================================================================================================================
 Required Arguments             Description
 ===========================    =========================================================================================================================================================
-**truQuant output file**       `truQuant <https://geoffscollins.github.io/GC_bioinfo/truQuant.html>`_ output file (not the paused, gene body, or blacklisted regions
+**truQuant output file**       `truQuant <https://geoffscollins.github.io/PolTools/truQuant.html>`_ output file (not the paused, gene body, or blacklisted regions
                                file!)
 **Region Size**                Integer value of the number of base pairs the region will include
 ===========================    =========================================================================================================================================================
@@ -47,7 +47,7 @@ For example:
   C1orf159        chr1    1116028 1116178 -       51      1116106 9       1116103 19.81136532595448       1081818 1116028 34210   51      11
   SDF4    chr1    1231907 1232057 -       1105    1231971 321     1231978 23.701136922154493      1216908 1231907 14999   1097    177
 
-  $ GC_bioinfo make_regions_file_centered_on_max_tss seq_file-truQuant_output.txt 1 > tQ_max_tss.bed
+  $ PolTools make_regions_file_centered_on_max_tss seq_file-truQuant_output.txt 1 > tQ_max_tss.bed
 
   $ head tQ_max_tss.bed
   chr1    959255  959256  NOC2L   46      -

@@ -1,8 +1,8 @@
 import unittest.mock
 from pathlib import Path
 
-from GC_bioinfo.main_programs import sequence_searches
-from GC_bioinfo.main_programs.sequence_searches import InvalidSearchException
+from PolTools.main_programs import sequence_searches
+from PolTools.main_programs.sequence_searches import InvalidSearchException
 
 import io
 

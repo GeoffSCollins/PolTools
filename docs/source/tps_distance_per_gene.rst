@@ -13,7 +13,7 @@ Usage
 **Usage**:
 ::
 
-  GC_bioinfo tps_distance_per_gene [-h] [-t [threads]]
+  PolTools tps_distance_per_gene [-h] [-t [threads]]
                                         regions_filename sequencing_files
                                         [sequencing_files ...]
 
@@ -22,7 +22,7 @@ Usage
 Required Arguments             Description
 ===========================    =========================================================================================================================================================
 **Regions filename**           Bed formatted file containing all the regions you want to quantify (must be centered on +1 nt). This file can be generated from the
-                               `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html>`_
+                               `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/PolTools/make_regions_file_centered_on_max_tss.html>`_
 **Sequencing Files**           Bed formatted file from a sequencing experiment.
 ===========================    =========================================================================================================================================================
 
@@ -68,7 +68,7 @@ For example:
   chr1    1231967 1231977 SDF4    321     -
   chr1    1232237 1232247 B3GALT6 174     +
 
-  $ GC_bioinfo tps_distance_per_gene regions_centered_on_max_tss.bed seq_file.bed > seq_file_tps_distance_per_gene.txt
+  $ PolTools tps_distance_per_gene regions_centered_on_max_tss.bed seq_file.bed > seq_file_tps_distance_per_gene.txt
   $ head seq_file_tps_distance_per_gene.txt
   Gene    seq_file.bed
   NOC2L   32

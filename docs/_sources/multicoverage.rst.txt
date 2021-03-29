@@ -13,7 +13,7 @@ Usage
 **Usage**:
 ::
 
-  GC_bioinfo multicoverage [-h] [-t [threads]]
+  PolTools multicoverage [-h] [-t [threads]]
                                 read type regions_filename sequencing_files
                                 [sequencing_files ...]
 
@@ -69,7 +69,7 @@ For example:
   chr1    1231967 1231977 SDF4    321     -
   chr1    1232237 1232247 B3GALT6 174     +
 
-  $ GC_bioinfo multicoverage five regions_centered_on_max_tss.bed seq_file.bed > output.tmp
+  $ PolTools multicoverage five regions_centered_on_max_tss.bed seq_file.bed > output.tmp
   $ head output.tmp
   Chromosome      Left    Right   Name    Strand  seq_file.bed
   chr1    959251  959261  NOC2L   -       73

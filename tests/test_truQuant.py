@@ -2,10 +2,10 @@ import multiprocessing
 
 import unittest.mock
 
-import GC_bioinfo.main_programs.truQuant as truQuant
+import PolTools.main_programs.truQuant as truQuant
 
-from GC_bioinfo.utils.make_random_filename import generate_random_filename
-from GC_bioinfo.utils.remove_files import remove_files
+from PolTools.utils.make_random_filename import generate_random_filename
+from PolTools.utils.remove_files import remove_files
 
 from quieter import Quieter
 

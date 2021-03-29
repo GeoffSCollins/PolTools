@@ -9,7 +9,7 @@ Usage
 **Usage**:
 ::
 
-  GC_bioinfo track_links_from_bw [-h] bigwig_files [bigwig_files ...]
+  PolTools track_links_from_bw [-h] bigwig_files [bigwig_files ...]
 
 
 ===========================    =========================================================================================================================================================
@@ -30,6 +30,6 @@ For example:
 
 .. code-block:: bash
 
-  $ GC_bioinfo track_links_from_bw seq_file-FW.bw seq_file-RV.bw
+  $ PolTools track_links_from_bw seq_file-FW.bw seq_file-RV.bw
   track type=bigWig visibility=full name='seq file FW' autoScale=on alwaysZero=on windowingFunction=maximum negateValues=off color=0,0,0 altColor=0,0,0 bigDataUrl=<server>/seq_file-FW.bw
   track type=bigWig visibility=full name='seq file RV' autoScale=on alwaysZero=on windowingFunction=maximum negateValues=on color=0,0,0 altColor=0,0,0 bigDataUrl=<server>/seq_file-RV.bw

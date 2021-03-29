@@ -1,9 +1,9 @@
 import unittest.mock
 from pathlib import Path
 
-from GC_bioinfo.utils.remove_files import remove_files
+from PolTools.utils.remove_files import remove_files
 
-from GC_bioinfo.other_programs import rolling_average_bigwigs
+from PolTools.other_programs import rolling_average_bigwigs
 
 from quieter import Quieter
 

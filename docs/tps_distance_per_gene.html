@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>TPS Distance Per Gene &mdash; GC_bioinfo 1.0.0 documentation</title>
+  <title>TPS Distance Per Gene &mdash; PolTools 1.0.0 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> GC_bioinfo
+            <a href="index.html" class="icon icon-home"> PolTools
           
 
           
@@ -124,7 +124,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">GC_bioinfo</a>
+          <a href="index.html">PolTools</a>
         
       </nav>
 
@@ -184,7 +184,7 @@
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">tps_distance_per_gene</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PolTools</span> <span class="n">tps_distance_per_gene</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">threads</span><span class="p">]]</span>
                                       <span class="n">regions_filename</span> <span class="n">sequencing_files</span>
                                       <span class="p">[</span><span class="n">sequencing_files</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
@@ -202,7 +202,7 @@
 <tbody>
 <tr class="row-even"><td><p><strong>Regions filename</strong></p></td>
 <td><p>Bed formatted file containing all the regions you want to quantify (must be centered on +1 nt). This file can be generated from the
-<a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html">make_regions_file_centered_on_max_tss program</a></p></td>
+<a class="reference external" href="https://geoffscollins.github.io/PolTools/make_regions_file_centered_on_max_tss.html">make_regions_file_centered_on_max_tss program</a></p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>Sequencing Files</strong></p></td>
 <td><p>Bed formatted file from a sequencing experiment.</p></td>
@@ -257,7 +257,7 @@ chr1    <span class="m">1116102</span> <span class="m">1116112</span> C1orf159  
 chr1    <span class="m">1231967</span> <span class="m">1231977</span> SDF4    <span class="m">321</span>     -
 chr1    <span class="m">1232237</span> <span class="m">1232247</span> B3GALT6 <span class="m">174</span>     +
 
-$ GC_bioinfo tps_distance_per_gene regions_centered_on_max_tss.bed seq_file.bed &gt; seq_file_tps_distance_per_gene.txt
+$ PolTools tps_distance_per_gene regions_centered_on_max_tss.bed seq_file.bed &gt; seq_file_tps_distance_per_gene.txt
 $ head seq_file_tps_distance_per_gene.txt
 Gene    seq_file.bed
 NOC2L   <span class="m">32</span>

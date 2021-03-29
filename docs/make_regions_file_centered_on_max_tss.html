@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Make Regions File Centered on Max TSS &mdash; GC_bioinfo 1.0.0 documentation</title>
+  <title>Make Regions File Centered on Max TSS &mdash; PolTools 1.0.0 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> GC_bioinfo
+            <a href="index.html" class="icon icon-home"> PolTools
           
 
           
@@ -124,7 +124,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">GC_bioinfo</a>
+          <a href="index.html">PolTools</a>
         
       </nav>
 
@@ -180,7 +180,7 @@
 <div class="section" id="usage-and-option-summary">
 <h2>Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GC_bioinfo</span> <span class="n">make_regions_file_centered_on_max_tss</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PolTools</span> <span class="n">make_regions_file_centered_on_max_tss</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
                                                  <span class="n">truQuant_file</span>
                                                  <span class="n">region_size</span>
 </pre></div>
@@ -197,7 +197,7 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p><strong>truQuant output file</strong></p></td>
-<td><p><a class="reference external" href="https://geoffscollins.github.io/GC_bioinfo/truQuant.html">truQuant</a> output file (not the paused, gene body, or blacklisted regions
+<td><p><a class="reference external" href="https://geoffscollins.github.io/PolTools/truQuant.html">truQuant</a> output file (not the paused, gene body, or blacklisted regions
 file!)</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>Region Size</strong></p></td>
@@ -224,7 +224,7 @@ RNF223  chr1    <span class="m">1074208</span> <span class="m">1074358</span> - 
 C1orf159        chr1    <span class="m">1116028</span> <span class="m">1116178</span> -       <span class="m">51</span>      <span class="m">1116106</span> <span class="m">9</span>       <span class="m">1116103</span> <span class="m">19</span>.81136532595448       <span class="m">1081818</span> <span class="m">1116028</span> <span class="m">34210</span>   <span class="m">51</span>      <span class="m">11</span>
 SDF4    chr1    <span class="m">1231907</span> <span class="m">1232057</span> -       <span class="m">1105</span>    <span class="m">1231971</span> <span class="m">321</span>     <span class="m">1231978</span> <span class="m">23</span>.701136922154493      <span class="m">1216908</span> <span class="m">1231907</span> <span class="m">14999</span>   <span class="m">1097</span>    <span class="m">177</span>
 
-$ GC_bioinfo make_regions_file_centered_on_max_tss seq_file-truQuant_output.txt <span class="m">1</span> &gt; tQ_max_tss.bed
+$ PolTools make_regions_file_centered_on_max_tss seq_file-truQuant_output.txt <span class="m">1</span> &gt; tQ_max_tss.bed
 
 $ head tQ_max_tss.bed
 chr1    <span class="m">959255</span>  <span class="m">959256</span>  NOC2L   <span class="m">46</span>      -

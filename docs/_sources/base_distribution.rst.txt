@@ -7,7 +7,7 @@ The ``base_distribution`` tool computes the average base composition at each pos
 .. note::
 
     This tool requires `bedtools <https://github.com/arq5x/bedtools2>`_ to be installed and hg38.fa to be downloaded to
-    ~/GC_bioinfo/static. This can be done by running the commands at the bottom of this page.
+    ~/PolTools/static. This can be done by running the commands at the bottom of this page.
 
 
 ===============================
@@ -16,14 +16,14 @@ Usage
 **Usage**:
 ::
 
-  GC_bioinfo base_distribution [-h] regions_file
+  PolTools base_distribution [-h] regions_file
 
 
 ===========================    =========================================================================================================================================================
 Required Arguments             Description
 ===========================    =========================================================================================================================================================
 **Regions Filename**           Bed formatted file containing all the regions you want to average the sequences. This file can be obtained by using the
-                               `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/GC_bioinfo/make_regions_file_centered_on_max_tss.html>`_
+                               `make_regions_file_centered_on_max_tss program <https://geoffscollins.github.io/PolTools/make_regions_file_centered_on_max_tss.html>`_
 ===========================    =========================================================================================================================================================
 
 ==========================================================================
@@ -49,7 +49,7 @@ For example:
   chr1    1231967 1231977 SDF4    321     -
   chr1    1232237 1232247 B3GALT6 174     +
 
-  $ GC_bioinfo base_distribution regions_centered_on_max_tss.bed
+  $ PolTools base_distribution regions_centered_on_max_tss.bed
   Position        A       T       G       C
   -5.0    0.14846637102734664     0.1808019216555802      0.3518107908351811      0.3189209164818921
   -4.0    0.15973762010347375     0.13470066518847007     0.2900960827790096      0.41546563192904656

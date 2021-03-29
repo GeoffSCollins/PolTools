@@ -16,7 +16,7 @@ Usage and option summary
 **Usage**:
 ::
 
-  GC_bioinfo read_through_transcription [-h] [-t [threads]]
+  PolTools read_through_transcription [-h] [-t [threads]]
                                              regions_filename tsr_file
                                              upstream_distance
                                              downstream_distance interval_size
@@ -28,7 +28,7 @@ Usage and option summary
 Required Arguments                         Description
 ===========================    =========================================================================================================================================================
 **Regions Filename**           Bed formatted file containing all the genes to quantify (regions will be determined from the 3' end of each region in this file.
-**TSR Filename**               `tsrFinder <https://geoffscollins.github.io/GC_bioinfo/tsrFinder.html>`_ output file which will be blacklisted. Simply type *no* to not blacklist TSRs.
+**TSR Filename**               `tsrFinder <https://geoffscollins.github.io/PolTools/tsrFinder.html>`_ output file which will be blacklisted. Simply type *no* to not blacklist TSRs.
 **Upstream Distance**          The number of base pairs to subtract from the left position.
 **Downstream Distance**        The number of base pairs to add from the left position.
 **Interval Distance**          The size of sub-regions to split the regions into.
@@ -86,7 +86,7 @@ For example:
   chr1    14988   15012   A00876:119:HW5F5DRXX:1:2219:16134:32784 255     -
   chr1    18337   18362   A00876:119:HW5F5DRXX:1:2149:32054:31328 255     -
 
-  $ GC_bioinfo read_through_transcription seq_file-blacklisted_150_20_30_600-gene_body_regions.bed \
+  $ PolTools read_through_transcription seq_file-blacklisted_150_20_30_600-gene_body_regions.bed \
     seq_file-blacklisted_150_20_30_600-TSR.tab 1000 1000 100 seq_file.bed &
   Position       seq_file.bed
   -1000   1924
