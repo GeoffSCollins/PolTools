@@ -46,7 +46,7 @@ def build_counts_dict(sequencing_filename, read_type):
                     }
 
                 for position in range(left, right):
-                    counts_dict[chromosome]["+"][position] += 1
+                    counts_dict[chromosome]["+"][position] += int(counts)
 
         with open(rv_bedgraph) as file:
             for line in file:
@@ -61,7 +61,7 @@ def build_counts_dict(sequencing_filename, read_type):
                     }
 
                 for position in range(left, right):
-                    counts_dict[chromosome]["-"][position] += 1
+                    counts_dict[chromosome]["-"][position] += int(counts)
 
         remove_files(fw_bedgraph, rv_bedgraph)
 

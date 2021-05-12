@@ -4,7 +4,7 @@ from PolTools.utils.make_random_filename import generate_random_filename
 from PolTools.utils.verify_bed_file import verify_bed_files
 
 
-def run_subtract(sequencing_file, *subtracted_regions, output_filename=''):
+def run_subtract(sequencing_file, *subtracted_regions, output_filename='', strand_specific=True):
     """
     Runs strand specific bedtools subtract to remove regions from a sequencing file.
 
@@ -23,11 +23,21 @@ def run_subtract(sequencing_file, *subtracted_regions, output_filename=''):
     verify_bed_files(sequencing_file, list(subtracted_regions))
 
     if len(subtracted_regions) == 1:
-        os.system(
-            "bedtools subtract -nonamecheck -s -A -a " + sequencing_file + " -b " + subtracted_regions[0] + " > " + output_filename)
+        if strand_specific:
+            os.system(
+                "bedtools subtract -nonamecheck -s -A -a " + sequencing_file + " -b " + subtracted_regions[0] + " > " + output_filename
+            )
+        else:
+            os.system(
+                "bedtools subtract -nonamecheck -A -a " + sequencing_file + " -b " + subtracted_regions[
+                    0] + " > " + output_filename
+            )
 
     else:
-        command = "bedtools subtract -nonamecheck -s -A -a " + sequencing_file
+        if strand_specific:
+            command = "bedtools subtract -nonamecheck -s -A -a " + sequencing_file
+        else:
+            command = "bedtools subtract -nonamecheck -A -a " + sequencing_file
 
         for region_filename in subtracted_regions[:-1]:
             command += " -b " + region_filename + " | bedtools subtract -nonamecheck -s -A -a stdin -b "

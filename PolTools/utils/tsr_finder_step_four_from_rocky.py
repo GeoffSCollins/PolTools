@@ -34,6 +34,7 @@ def run_step_four(step_three_file, window_size, chromosome_sizes, output_filenam
                 append_last = False
                 break
 
+
             for l in LIST[1:]:
                 if len(range(max(int(l[1]), int(MAX[1])), min(int(l[2]), int(MAX[2])))) > 0 and int(l[4]) > int(MAX[4]):
                     MAX = l
@@ -49,7 +50,10 @@ def run_step_four(step_three_file, window_size, chromosome_sizes, output_filenam
             LIST = [sl[1] for sl in LIST]
 
         if append_last:
-            TSR.append(MAX)
+            try:
+                TSR.append(MAX)
+            except UnboundLocalError:
+                pass
 
         TSR = set(['\t'.join(ts).strip() for ts in TSR])
         TSR = [[int(srrt.strip().split('\t')[1]), srrt.strip()] for srrt in list(TSR)]

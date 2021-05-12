@@ -6,8 +6,7 @@ The ``sequence_searches`` tool is used determine if a sequence is present in a c
 
 .. note::
 
-  This tool requires `bedtools <https://github.com/arq5x/bedtools2>`_ to be installed and hg38.fa to be downloaded to
-  ~/PolTools/static. This can be done by running the commands at the bottom of this page.
+  This tool requires `bedtools <https://github.com/arq5x/bedtools2>`_ to be installed.
 
 ===============================
 Usage and option summary
@@ -48,15 +47,3 @@ For example:
   $ PolTools sequence_searches POLR2A_inr.bed GCTGC,-3:3
   Chromosome      Left    Right   Gene    Score   Strand  GCTGC
   chr17   7484355 7484375 POLR2A  0       +       True
-
-===============================
-Download hg38.fa
-===============================
-**Download hg38.fa**:
-To download the hg38.fa (fasta file for the whole genome), run the following commands in the static directory:
-
-.. code-block:: bash
-
-  wget http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
-  gunzip hg38.fa.gz
-

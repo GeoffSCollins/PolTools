@@ -325,7 +325,7 @@ def gather_data(sequencing_file, blacklist_filename, annotated_dataset, region_f
     # We need to blacklist the data before running the program
     blacklisted_sequencing_filename = generate_random_filename()
 
-    run_subtract(sequencing_file, rna_blacklist_file, blacklist_filename,
+    run_subtract(sequencing_file, rna_blacklist_file, blacklist_filename, strand_specific=False,
                  output_filename=blacklisted_sequencing_filename)
 
     indv_gene_counts_dict = get_counts_in_paused_region(paused_region_filename, blacklisted_sequencing_filename)
@@ -396,7 +396,7 @@ def run_tsrFinder(first_seq_file, max_threads, tsrFinder_parameters):
     blacklisted_first_sequencing_file = first_seq_file.replace(".bed", "-blacklisted.bed")
 
     tsr_file = blacklisted_first_sequencing_file.replace(".bed", tsrFinder_filename_string)
-    run_subtract(first_seq_file, rna_blacklist_file, output_filename=blacklisted_first_sequencing_file)
+    run_subtract(first_seq_file, rna_blacklist_file, strand_specific=False, output_filename=blacklisted_first_sequencing_file)
 
     os.system("PolTools tsrFinder " + blacklisted_first_sequencing_file + " " + tsrFinder_param_string + " " +
               hg38_chrom_sizes_file + " -t " + str(max_threads)

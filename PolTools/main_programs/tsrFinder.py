@@ -56,6 +56,10 @@ if not os.path.isfile(chrom_size_file):
     sys.stderr.write(chrom_size_file + " was not found. Exiting ...\n")
     sys.exit(1)
 
+if not bed_file.endswith(".bed"):
+    sys.stderr.write("The sequencing file must end in .bed. Exiting ...\n")
+    sys.exit(1)
+
 chromosome_sizes = defaultdict(int)
 
 with open(chrom_size_file) as file:
@@ -64,7 +68,6 @@ with open(chrom_size_file) as file:
         chromosome_sizes[chromosome] = int(size)
 
 # Step 1. Split the bed file into files by chromosome and strands
-
 fw_filename = bed_file.replace(".bed", "-FW.bed")
 rv_filename = bed_file.replace(".bed", "-RV.bed")
 
@@ -118,11 +121,8 @@ def run_tsrFinderGC(filename):
 
     run_step_four(step_three_filename, window_size, chromosome_sizes, step_four_filename)
 
-pool = Pool(max_threads)
-
-pool.map(run_tsrFinderGC, (filename for filename in chromosome_files))
-
-pool.close()
+with Pool(max_threads) as pool:
+    pool.map(run_tsrFinderGC, (filename for filename in chromosome_files))
 
 # # Step 3: Combine the output files and delete intermediate files
 os.system("cat " + " ".join(output_files) + " > " + output_filename)

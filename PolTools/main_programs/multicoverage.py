@@ -7,8 +7,6 @@ from PolTools.utils.print_tab_delimited import print_tab_delimited
 from PolTools.utils.remove_files import remove_files
 from PolTools.utils.bedtools_utils.run_bedtools_coverage import run_coverage
 
-tsrs_dict = {}
-
 
 def organize_counts(coverage_file, seq_file):
     ret_dict = {}
@@ -24,10 +22,11 @@ def organize_counts(coverage_file, seq_file):
 
 def output_data(data):
     # Print the header first
-    print_tab_delimited(["Chromosome", "Left", "Right", "Name", "Strand"] + [tup[0].split("/")[-1] for tup in data])
+    filenames = [filename.split("/")[-1] for filename, _ in data]
+    print_tab_delimited(["Chromosome", "Left", "Right", "Name", "Strand"] + filenames)
 
-    for tsr in data[0][1]:
-        print_tab_delimited(list(tsr) + [tup[1][tsr] for tup in data])
+    for _, tsr in data[0][1]:
+        print_tab_delimited(list(tsr) + [file_data[tsr] for _, file_data in data])
 
 
 def gather_data(read_type, seq_file, regions_file):
@@ -92,9 +91,9 @@ def parse_args(args):
 def main(args):
     read_type, regions_file, sequencing_files, max_threads = parse_args(args)
 
-    pool = multiprocessing.Pool(processes=max_threads)
-    data = pool.starmap(gather_data, [(read_type, seq_file, regions_file) for seq_file in sequencing_files])
-    pool.close()
+    with multiprocessing.Pool(processes=max_threads) as pool:
+        data = pool.starmap(gather_data, [(read_type, seq_file, regions_file) for seq_file in sequencing_files])
+
     output_data(data)
 
 
