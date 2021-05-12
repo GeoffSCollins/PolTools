@@ -29,7 +29,7 @@ setup(
     cmdclass={'install': CustomInstall},
     name='PolTools',
     author='Geoff Collins',
-    version='1.0',
+    version='1.0.2',
     packages=find_packages(exclude=('tests', 'PolTools/other_programs')),
     url='https://geoffscollins.github.io/PolTools/index.html',
     python_requires='>=3.5',
