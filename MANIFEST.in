@@ -1,0 +1,3 @@
+include PolTools/static/*
+include PolTools/utils/heatmap_utils/generate_heatmap.R
+include PolTools/utils/tsrFinder*
