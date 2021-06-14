@@ -42,5 +42,9 @@ setup(
         'console_scripts': [
             'PolTools = PolTools.cli:main'
         ]
+    },
+    # Include all files in the project
+    project_data={
+        "": ["*"]
     }
 )

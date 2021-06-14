@@ -45,6 +45,16 @@ def build_counts_dict(sequencing_filename, read_type):
                         "-": defaultdict(int)
                     }
 
+                try:
+                    if 'e' in counts:
+                        base, exponent = counts.split("e")
+                        base, exponent = float(base), int(exponent)
+
+                        counts = base * (10 ** exponent)
+
+                except:
+                    pass
+
                 for position in range(left, right):
                     counts_dict[chromosome]["+"][position] += int(counts)
 
@@ -59,6 +69,16 @@ def build_counts_dict(sequencing_filename, read_type):
                         "+": defaultdict(int),
                         "-": defaultdict(int)
                     }
+
+                try:
+                    if 'e' in counts:
+                        base, exponent = counts.split("e")
+                        base, exponent = float(base), int(exponent)
+
+                        counts = base * (10 ** exponent)
+
+                except:
+                    pass
 
                 for position in range(left, right):
                     counts_dict[chromosome]["-"][position] += int(counts)
