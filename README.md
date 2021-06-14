@@ -1,3 +1,5 @@
+[![Upload Python Package](https://github.com/GeoffSCollins/PolTools/actions/workflows/python-publish.yml/badge.svg)](https://github.com/GeoffSCollins/PolTools/actions/workflows/python-publish.yml)
+
 # PolTools
 
 ![PolTools](https://user-images.githubusercontent.com/39243170/114208060-addfdf80-9922-11eb-82a7-9227af808d82.png)
