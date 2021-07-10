@@ -26,13 +26,13 @@ class TestTruQuant(unittest.TestCase):
         max_threads = multiprocessing.cpu_count()
 
         result = truQuant.parse_input([seq_file_for_annotation])
-        self.assertEqual(result, ([seq_file_for_annotation], 1000, 0.3, 75, max_threads))
+        self.assertEqual(result, ([seq_file_for_annotation], 1000, 0.3, 75, (150, 20, 30, 600), max_threads))
 
         result = truQuant.parse_input([seq_file_for_annotation, '-a', '500', '-b' '0.6', '-r', '10', '-t', '20'])
-        self.assertEqual(result, ([seq_file_for_annotation], 500, 0.6, 10, 20))
+        self.assertEqual(result, ([seq_file_for_annotation], 500, 0.6, 10, (150, 20, 30, 600), 20))
 
         result = truQuant.parse_input([seq_file_for_annotation, '-a', '500', '--blacklist_percent', '0.6', '-r', '10', '-t', '20'])
-        self.assertEqual(result, ([seq_file_for_annotation], 500, 0.6, 10, 20))
+        self.assertEqual(result, ([seq_file_for_annotation], 500, 0.6, 10, (150, 20, 30, 600), 20))
 
         # Try making the blacklist percent greater than one
         with self.assertRaises(SystemExit):

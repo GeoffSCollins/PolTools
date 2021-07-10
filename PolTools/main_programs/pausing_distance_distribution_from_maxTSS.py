@@ -31,7 +31,7 @@ def get_pausing_distances_helper(transcripts_dict, regions_filename, max_transcr
                     transcript_length = abs(five_prime_position - three_prime_end) + 1
 
                     if transcript_length <= max_transcript_length:
-                        all_pause_distances[transcript_length] += 1
+                        all_pause_distances[transcript_length] += transcripts_dict[chromosome][strand][five_prime_position][three_prime_end]
 
     return all_pause_distances
 

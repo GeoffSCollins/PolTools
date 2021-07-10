@@ -445,7 +445,7 @@ class TestMakeTranscriptsDict(unittest.TestCase):
 
         result = build_transcripts_dict(one_read_filename)
 
-        self.assertEqual(result["chr1"]["+"][1], [10])
+        self.assertEqual(result["chr1"]["+"][1][10], 1)
 
         remove_files(one_read_filename)
 
@@ -457,7 +457,7 @@ class TestMakeTranscriptsDict(unittest.TestCase):
 
         result = build_transcripts_dict(one_read_filename)
 
-        self.assertEqual(result["chr1"]["-"][10], [1])
+        self.assertEqual(result["chr1"]["-"][10][1], 1)
 
         remove_files(one_read_filename)
 
@@ -470,8 +470,8 @@ class TestMakeTranscriptsDict(unittest.TestCase):
 
         result = build_transcripts_dict(filename)
 
-        self.assertEqual(result["chr1"]["-"][10], [1])
-        self.assertEqual(result["chr1"]["+"][21], [49])
+        self.assertEqual(result["chr1"]["-"][10][1], 1)
+        self.assertEqual(result["chr1"]["+"][21][49], 1)
 
         remove_files(filename)
 

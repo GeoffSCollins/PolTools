@@ -1,6 +1,6 @@
 import unittest.mock
 
-from PolTools.main_programs import TES_heatmap, TES_combined_heatmap, TES_fold_change_heatmap
+from PolTools.main_programs import TES_heatmap, TES_fold_change_heatmap
 
 from PolTools.utils.make_random_filename import generate_random_filename
 from PolTools.utils.remove_files import remove_files
@@ -17,8 +17,6 @@ class TestTESHeatmap(unittest.TestCase):
 
     def test_make_incremented_regions(self):
         return
-
-        self.maxDiff = None
 
         truQuant_output_file = generate_random_filename('-truQuant_output.txt')
 
@@ -74,14 +72,6 @@ class TestTESHeatmap(unittest.TestCase):
 
     def test_build_matrix(self):
         pass
-
-
-class TestCombineTESHeatmap(unittest.TestCase):
-    def test_invalid_number_of_arguments(self):
-        # Should print the usage
-        with self.assertRaises(SystemExit):
-            with Quieter():
-                TES_combined_heatmap.main([])
 
 
 class TestTESFoldChangeHeatmap(unittest.TestCase):

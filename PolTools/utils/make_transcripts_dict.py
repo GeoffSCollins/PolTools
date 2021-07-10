@@ -19,17 +19,27 @@ def build_transcripts_dict(sequencing_filename):
             right = int(right) - 1
 
             if chromosome not in transcripts_dict:
-                transcripts_dict[chromosome] = {"+": {}, "-": {}}
+                transcripts_dict[chromosome] = {
+                    "+": {},
+                    "-": {}
+                }
 
             if strand == "+":
                 if left not in transcripts_dict[chromosome]["+"]:
-                    transcripts_dict[chromosome]["+"][left] = []
+                    transcripts_dict[chromosome]["+"][left] = {}
 
-                transcripts_dict[chromosome][strand][left].append(right)
+                if right not in transcripts_dict[chromosome]["+"][left]:
+                    transcripts_dict[chromosome]["+"][left][right] = 0
+
+                transcripts_dict[chromosome][strand][left][right] += 1
+
             else:
                 if right not in transcripts_dict[chromosome]["-"]:
                     transcripts_dict[chromosome]["-"][right] = []
 
-                transcripts_dict[chromosome][strand][right].append(left)
+                if left not in transcripts_dict[chromosome]["-"][right]:
+                    transcripts_dict[chromosome]["-"][right][left] = 0
+
+                transcripts_dict[chromosome][strand][right][left] += 1
 
     return transcripts_dict

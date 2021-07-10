@@ -19,7 +19,7 @@ class TestMakeRegionsFileCenteredOnMaxTSS(unittest.TestCase):
                 make_regions_file_centered_on_max_tss.parse_args(['truQuant_file'])
 
         result = make_regions_file_centered_on_max_tss.parse_args(['truQuant_file', '10'])
-        self.assertEqual(result, ('truQuant_file', 10))
+        self.assertEqual(result, ('truQuant_file', 10, False))
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_get_max_tss(self, stdout):
@@ -29,8 +29,8 @@ class TestMakeRegionsFileCenteredOnMaxTSS(unittest.TestCase):
         result = [line.split() for line in result_lines if line]
 
         expected = [
-            ["chr1", "925739", "925740", "SAMD11", "86", "+"],
-            ["chr1", "959255", "959256", "NOC2L", "241", "-"]
+            ["chr1", "925738", "925739", "SAMD11", "86", "+"],
+            ["chr1", "959254", "959255", "NOC2L", "241", "-"]
         ]
 
         self.assertEqual(result, expected)
@@ -43,8 +43,8 @@ class TestMakeRegionsFileCenteredOnMaxTSS(unittest.TestCase):
         result = [line.split() for line in result_lines if line]
 
         expected = [
-            ["chr1", "925729", "925749", "SAMD11", "86", "+"],
-            ["chr1", "959246", "959266", "NOC2L", "241", "-"]
+            ["chr1", "925728", "925748", "SAMD11", "86", "+"],
+            ["chr1", "959245", "959265", "NOC2L", "241", "-"]
         ]
 
         self.assertEqual(result, expected)

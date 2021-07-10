@@ -23,8 +23,8 @@ def get_pausing_distances_helper(region_filename, transcripts_dict, region_lengt
 
             # Get all of the transcript lengths at this position
             if five_prime_position in transcripts_dict[chromosome][strand]:
-                most_common_pausing_position = most_common(transcripts_dict[chromosome][strand][five_prime_position])
-                most_common_pausing_distance = abs(five_prime_position - most_common_pausing_position)
+                curr_dict = transcripts_dict[chromosome][strand][five_prime_position]
+                most_common_pausing_distance = max(curr_dict, key=curr_dict.get)
 
                 # If the strand is positive, we add 1 because the transcripts dict is inclusive
                 if strand == "+":
