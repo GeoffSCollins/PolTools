@@ -1,8 +1,8 @@
 def build_transcripts_dict(sequencing_filename):
     """
     Builds a dictionary containing all of the transcripts from the given file. Can be accessed like so:
-    transcripts_dict[chromosome]["+"][five_prime_position], to get a list of the connected 3' ends
-    (inclusive unlike the genome browser)
+    transcripts_dict[chromosome]["+"][five_prime_position], to get a dictionary of the connected 3' ends and their amounts
+    (3' ends are inclusive unlike the genome browser)
 
     :param sequencing_filename: filename of the sequencing data collected
     :type sequencing_filename: str
@@ -35,7 +35,7 @@ def build_transcripts_dict(sequencing_filename):
 
             else:
                 if right not in transcripts_dict[chromosome]["-"]:
-                    transcripts_dict[chromosome]["-"][right] = []
+                    transcripts_dict[chromosome]["-"][right] = {}
 
                 if left not in transcripts_dict[chromosome]["-"][right]:
                     transcripts_dict[chromosome]["-"][right][left] = 0

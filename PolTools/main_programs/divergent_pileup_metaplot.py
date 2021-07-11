@@ -144,11 +144,9 @@ def run_divergent_pileup_plots(regions_filename, sequencing_files_list, region_l
 
     split_seq_filenames = [(split_bed_file(filename), filename) for filename in sequencing_files_list]
 
-    pool = multiprocessing.Pool(processes=max_threads)
-    averages = pool.starmap(get_pileups, [(region_files, rev_region_files, seq_files, region_length, filename)
+    with multiprocessing.Pool(processes=max_threads) as pool:
+        averages = pool.starmap(get_pileups, [(region_files, rev_region_files, seq_files, region_length, filename)
                                           for (seq_files, filename) in split_seq_filenames])
-
-    pool.close()
 
     split_seq_filenames_to_delete = [tup[0] for tup in split_seq_filenames]
 

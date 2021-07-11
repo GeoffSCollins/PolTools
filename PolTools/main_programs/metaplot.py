@@ -125,9 +125,9 @@ def output_metaplot_data(averages, region_length, prime_name):
 
 
 def run_metaplot(regions_filename, sequencing_files_list, region_length, read_type, max_threads):
-    pool = multiprocessing.Pool(processes=max_threads)
-    averages = pool.starmap(get_primes_data, [(regions_filename, sequencing_file, region_length, read_type)
-                                              for sequencing_file in sequencing_files_list])
+    with multiprocessing.Pool(processes=max_threads) as pool:
+        averages = pool.starmap(get_primes_data, [(regions_filename, sequencing_file, region_length, read_type)
+                                                  for sequencing_file in sequencing_files_list])
 
     if read_type == "five":
         output_prefix = "5'"

@@ -91,9 +91,9 @@ def get_coverage_files_helper(filename, region_intervals_file):
 
 def get_coverage_files(blacklisted_filenames, region_intervals_file, max_threads):
     # Go through all of the blacklisted sequencing files and make 3' end files
-    pool = multiprocessing.Pool(processes=max_threads)
-    coverage_files = pool.starmap(get_coverage_files_helper, [(filename, region_intervals_file) for filename in blacklisted_filenames])
-    pool.close()
+    with multiprocessing.Pool(processes=max_threads) as pool:
+        coverage_files = pool.starmap(get_coverage_files_helper, [(filename, region_intervals_file) for filename in blacklisted_filenames])
+
     return coverage_files
 
 

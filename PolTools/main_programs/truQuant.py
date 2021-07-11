@@ -424,14 +424,12 @@ def build_annotation(tsr_file, search_regions_dict, output_region_filenames, ann
 
 
 def get_counts(sequencing_files, blacklist_filename, output_region_filenames, truQuant_regions_dict, max_threads):
-    pool = multiprocessing.Pool(processes=max_threads)
+    with multiprocessing.Pool(processes=max_threads) as pool:
 
-    count_information_list = pool.starmap(gather_data,
-                                          [(sequencing_file, blacklist_filename, i == 0, output_region_filenames,
-                                            truQuant_regions_dict) for i, sequencing_file in
-                                           enumerate(sequencing_files)])
-
-    pool.close()
+        count_information_list = pool.starmap(gather_data,
+                                              [(sequencing_file, blacklist_filename, i == 0, output_region_filenames,
+                                                truQuant_regions_dict) for i, sequencing_file in
+                                               enumerate(sequencing_files)])
 
     region_data_dict, gene_counts_dict = combine_indv_gene_counts_dict(count_information_list, sequencing_files)
 

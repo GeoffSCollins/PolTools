@@ -173,7 +173,6 @@ def get_quant_list(truQuant_output_file, distances, sequencing_filename, norm_fa
 
 def get_both_quant_lists(truQuant_output_file, distances, seq_files, blacklist_regions_file, bp_width):
     # Get the quant lists and add them together
-    pool = multiprocessing.Pool(2)
 
     # Get the arguments
     args = []
@@ -183,9 +182,8 @@ def get_both_quant_lists(truQuant_output_file, distances, seq_files, blacklist_r
             (truQuant_output_file, distances, seq_file, norm_factor, blacklist_regions_file, bp_width)
         )
 
-    quant_lists = pool.starmap(get_quant_list, args)
-
-    pool.close()
+    with multiprocessing.Pool(2) as pool:
+        quant_lists = pool.starmap(get_quant_list, args)
 
     # Add the quant lists together
     summed_quant_list = [x + y for x, y in zip(*quant_lists)]
@@ -214,16 +212,13 @@ def main(args):
     blacklist_regions_file = blacklist_extended_gene_bodies(tsr_file, downstream_distance)
 
     # Get the list for the numerators and denominators
-    pool = NestedPool(2)
-
     args = [
         (truQuant_output_file, distances, numerator_seq_file_data, blacklist_regions_file , bp_width),
         (truQuant_output_file, distances, denominator_seq_file_data, blacklist_regions_file, bp_width)
     ]
 
-    numerator_list, denominator_list = pool.starmap(get_both_quant_lists, args)
-
-    pool.close()
+    with NestedPool(2) as pool:
+        numerator_list, denominator_list = pool.starmap(get_both_quant_lists, args)
 
     # Make the log2 fold change and then output it!
     log_two_fold_change = []

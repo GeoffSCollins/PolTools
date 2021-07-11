@@ -8,10 +8,6 @@ from PolTools.utils.print_tab_delimited import print_tab_delimited
 from PolTools.utils.verify_region_length_is_even import verify_region_length_is_even
 
 
-def most_common(lst):
-    return max(set(lst), key=lst.count)
-
-
 def get_pausing_distances_helper(region_filename, transcripts_dict, region_length):
     # Go through each gene and get the distances from each one
     ret_dict = {}
@@ -24,7 +20,7 @@ def get_pausing_distances_helper(region_filename, transcripts_dict, region_lengt
             # Get all of the transcript lengths at this position
             if five_prime_position in transcripts_dict[chromosome][strand]:
                 curr_dict = transcripts_dict[chromosome][strand][five_prime_position]
-                most_common_pausing_distance = max(curr_dict, key=curr_dict.get)
+                most_common_pausing_distance = abs(max(curr_dict, key=curr_dict.get) - five_prime_position)
 
                 # If the strand is positive, we add 1 because the transcripts dict is inclusive
                 if strand == "+":
@@ -106,9 +102,9 @@ def output_data(pausing_distances):
 
 
 def run_tps_distance_per_gene(regions_filename, sequencing_files_list, region_length, max_threads):
-    pool = multiprocessing.Pool(processes=max_threads)
-    pausing_distances = pool.starmap(get_pausing_distances, [(sequencing_filename, regions_filename, region_length) for sequencing_filename in sequencing_files_list])
-    pool.close()
+    with multiprocessing.Pool(processes=max_threads) as pool:
+        pausing_distances = pool.starmap(get_pausing_distances, [(sequencing_filename, regions_filename, region_length) for sequencing_filename in sequencing_files_list])
+
     output_data(pausing_distances)
 
 

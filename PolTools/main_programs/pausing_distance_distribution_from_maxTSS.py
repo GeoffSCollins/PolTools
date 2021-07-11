@@ -26,12 +26,12 @@ def get_pausing_distances_helper(transcripts_dict, regions_filename, max_transcr
             # Get all of the transcript lengths at this position
             if five_prime_position in transcripts_dict[chromosome][strand]:
                 # Go through all the transcripts that have this 5' end
-                for three_prime_end in transcripts_dict[chromosome][strand][five_prime_position]:
+                for three_prime_end, amount in transcripts_dict[chromosome][strand][five_prime_position].items():
                     # The three prime ends are inclusive, so we need to add 1 to the transcript length
                     transcript_length = abs(five_prime_position - three_prime_end) + 1
 
                     if transcript_length <= max_transcript_length:
-                        all_pause_distances[transcript_length] += transcripts_dict[chromosome][strand][five_prime_position][three_prime_end]
+                        all_pause_distances[transcript_length] += amount
 
     return all_pause_distances
 
@@ -96,9 +96,12 @@ def output_pausing_distances(pausing_distances, sequencing_files):
 
 
 def pausing_distance_distribution_from_maxTSS(regions_filename, sequencing_files, max_transcript_length, max_threads):
-    pool = multiprocessing.Pool(processes=max_threads)
-    pausing_distances = pool.starmap(get_pausing_distances, [(regions_filename, seq_filename, max_transcript_length) for seq_filename in sequencing_files])
-    pool.close()
+    with multiprocessing.Pool(processes=max_threads) as pool:
+        pausing_distances = pool.starmap(
+            get_pausing_distances,
+            [(regions_filename, seq_filename, max_transcript_length) for seq_filename in sequencing_files]
+        )
+
     output_pausing_distances(pausing_distances, sequencing_files)
 
 

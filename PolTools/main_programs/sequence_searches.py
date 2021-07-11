@@ -2,7 +2,7 @@ import sys
 import argparse
 
 from itertools import product
-from Bio import Seq
+import Bio.Data.IUPACData as iupac
 
 from PolTools.utils.get_region_length import determine_region_length
 from PolTools.utils.print_tab_delimited import print_tab_delimited
@@ -22,7 +22,7 @@ class InvalidSearchException(Exception):
 
 def extend_ambiguous_dna(seq):
     """return list of all possible sequences given an ambiguous DNA input"""
-    d = Seq.IUPAC.IUPACData.ambiguous_dna_values
+    d = iupac.ambiguous_dna_values
     return list(map("".join, product(*map(d.get, seq))))
 
 
