@@ -33,7 +33,8 @@ def verify_program_exists(program):
                      "tps_distance_per_gene", "truQuant", "multicoverage", "tsrFinder", "gene_body_fold_change_heatmap",
                      "gene_body_heatmap", "quantify_gene_body_fold_change_heatmap", "TES_heatmap",
                      "TES_fold_change_heatmap", "nucleotide_heatmap", "track_links_from_bw",
-                     "sequence_from_region_around_max_tss", "region_heatmap", "region_fold_change_heatmap", "metaplot"]
+                     "sequence_from_region_around_max_tss", "region_heatmap", "region_fold_change_heatmap", "metaplot",
+                     "align"]
 
     if program not in programs_list:
         sys.stderr.write(program + " is not in the program list. Exiting ...\n")

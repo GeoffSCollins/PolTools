@@ -11,7 +11,7 @@ _poltools() {
  	tps_distance_per_gene truQuant polyAToPolyN tsrFinder gene_body_fold_change_heatmap \
  	gene_body_heatmap quantify_gene_body_fold_change_heatmap TES_heatmap TES_fold_change_heatmap \
  	multicoverage nucleotide_heatmap track_links_from_bw sequence_from_region_around_max_tss region_heatmap \
- 	region_fold_change_heatmap"
+ 	region_fold_change_heatmap align"
 
  	if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
  	  COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
