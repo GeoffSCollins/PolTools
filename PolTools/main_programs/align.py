@@ -15,6 +15,7 @@ from shutil import rmtree
 
 global MAIN_DIRECTORY
 
+
 # Get input
 def parse_args(args):
     def positive_int(num):
@@ -53,15 +54,18 @@ def read_sample_name_conversion_table(filename):
     if not filename or not os.path.isfile(filename):
         return None, ['.fastq.gz']
 
+    downloading_prefixes = []
+
     sample_name_conversion = {}
     with open(filename) as file:
         for i, line in enumerate(file):
             if i != 0:
-                old_name, new_name = line.split()
+                download_prefix, prefix, new_name, group_name = line.split()
+                downloading_prefixes.append(download_prefix)
 
-                sample_name_conversion[old_name] = new_name
+                sample_name_conversion[prefix] = [new_name, group_name]
 
-    return sample_name_conversion, list(sample_name_conversion.keys())
+    return sample_name_conversion, downloading_prefixes
 
 
 def build_directory_structure():
@@ -118,7 +122,6 @@ def _align_and_dedup(read_one_file, read_two_file, sample_name, align_params, th
     maxins = align_params['maxins']
     index = align_params['index']
 
-    trimmed_directory = MAIN_DIRECTORY + "trimmed"
     sam_directory = MAIN_DIRECTORY + "sam"
     bed_directory = MAIN_DIRECTORY + "bed"
 
@@ -167,7 +170,12 @@ def align(align_params, sample_name_conversion, threads):
     prefixes = defaultdict(list)
     for filename in os.listdir(trimmed_directory):
         if 'trimming_report' not in filename:
-            prefix = filename.split("_lane")[0]
+            prefix = '_'.join(filename.split('_')[:-6])
+            # Remove the lane string if there is one
+            if 'lane' in prefix:
+                location = prefix.find('lane')
+                prefix = prefix[:location] + prefix[location + 6:]
+
             prefixes[prefix].append(filename)
 
     # If there is more than one lane with the prefix, then we align and dedup separately but combine the bed files at the end
@@ -179,16 +187,15 @@ def align(align_params, sample_name_conversion, threads):
             lane_strings = defaultdict(list)
 
             for filename in filenames:
-                # The lane string has lane and then a number
-                lane_string = filename[filename.find('lane'):filename.find('lane')+5]
+                lane_string = filename.split('_')[-3]
                 lane_strings[lane_string].append(filename)
 
             new_list = []
 
             # Verify that there are two files for each lane string and make sure we add them to the prefixes dict
-            for string, lane_filenames in lane_strings.items():
+            for lane_filenames in lane_strings.values():
                 if len(lane_filenames) != 2:
-                    print("Something odd happened with the lane strings. Specifically this one: " + string)
+                    print("Something odd happened with lanes. Here are the samples grouped: " + str(lane_filenames))
                 else:
                     new_list.append(lane_filenames)
 
@@ -199,7 +206,7 @@ def align(align_params, sample_name_conversion, threads):
 
         # If the sample name is being converted, do it
         if sample_name_conversion and prefix in sample_name_conversion:
-            sample_name = sample_name_conversion[prefix]
+            sample_name = sample_name_conversion[prefix][0]
         else:
             sample_name = prefix
 
@@ -229,114 +236,139 @@ def align(align_params, sample_name_conversion, threads):
             remove_files(lane_specific_bed_files)
 
 
-def _calculate_spike_in_normalization_table(spike_in_genome, genomes):
-    filedata = {}
+def _calculate_spike_in_normalization_table(sample_name_conversion, spike_in_genome, genomes):
+    def get_group_name(filename):
+        sample_name = filename.replace('-dedup.bed', '')
+
+        for prefix in sample_name_conversion:
+            if sample_name_conversion[prefix][0] == sample_name:
+                return sample_name_conversion[prefix][1]
+
+        return "unknown"
+
 
     bed_directory = MAIN_DIRECTORY + "bed"
+
+    normalization_group_data = defaultdict(dict)
 
     # Loop through each bed file
     for filename in os.listdir(bed_directory):
         # Get the total number of reads and split it for each genome
-        filedata[filename] = {
+        group_name = get_group_name(filename)
+
+        normalization_group_data[group_name][filename] = {
             'total reads': 0,
             'library size normalization factor': 0.0,
             'spike in normalization factor': 0.0
         }
 
         for genome in genomes:
-            filedata[filename][genome] = 0
+            normalization_group_data[group_name][filename][genome] = 0
 
         with open(bed_directory + "/" + filename) as file:
             for line in file:
                 chrom, left, right, name, score, strand = line.split()
 
                 # Add the read to total counts and the specific genome
-                filedata[filename]['total reads'] += 1
+                normalization_group_data[group_name][filename]['total reads'] += 1
 
                 if 'chr' in chrom:
-                    filedata[filename]['hg38'] += 1
+                    normalization_group_data[group_name][filename]['hg38'] += 1
 
                 else:
-                    filedata[filename][chrom] += 1
+                    normalization_group_data[group_name][filename][chrom] += 1
 
-    # Now calculate the normalization factors
-    average_counts = mean([indv_filedata['total reads'] for indv_filedata in filedata.values()])
 
-    for filename in filedata:
-        filedata[filename]['library size normalization factor'] = average_counts / filedata[filename]['total reads']
-
-    average_normalized_spike_in_reads = mean(
-        [indv_filedata['library size normalization factor'] * indv_filedata[spike_in_genome]
-         for indv_filedata in filedata.values()]
-    )
-
-    for filename in filedata:
-        filedata[filename]['spike in normalization factor'] = \
-            average_normalized_spike_in_reads / filedata[filename][spike_in_genome]
-
-    # Write the data to a table
+    # For each group, calculate the normalization factors and write it to the file
     with open(MAIN_DIRECTORY + "normalization_table.tsv", 'w') as file:
-        # Write the headers first
-        file.write(
-            "\t".join(
-                ["Sample", "Total Reads"] + genomes + ["Library Size Correction Factor", "Spike-in Correction Factor",
-                                                       "Final Correction Factor"]
-            ) + "\n"
-        )
+        file.write("\t".join(
+            ["Sample", "Total Reads"] + genomes + ["Library Size Correction Factor", "Spike-in Correction Factor",
+                                                   "Final Correction Factor", "Group"]
+        ) + "\n")
 
-        # Now write the data
-        for filename, data_dict in filedata.items():
-            final_correction_factor = data_dict['library size normalization factor'] * \
-                                      data_dict['spike in normalization factor']
-            file.write(
-                "\t".join(
-                    [filename.replace("-dedup.bed", ""), str(data_dict['total reads'])] +
-                    [str(data_dict[genome]) for genome in genomes] +
-                    [str(data_dict['library size normalization factor'])] +
-                    [str(data_dict['spike in normalization factor'])] +
-                    [str(final_correction_factor)]
-                ) + "\n"
+        for group_name, group_data in normalization_group_data.items():
+
+            # Now calculate the normalization factors
+            average_counts = mean([sample_data['total reads'] for sample_data in group_data.values()])
+
+            for sample_data in group_data.values():
+                sample_data['library size normalization factor'] = average_counts / sample_data['total reads']
+
+            average_normalized_spike_in_reads = mean(
+                [sample_data['library size normalization factor'] * sample_data[spike_in_genome]
+                 for sample_data in group_data.values()]
             )
 
+            for sample_data in group_data.values():
+                sample_data['spike in normalization factor'] = average_normalized_spike_in_reads / sample_data[spike_in_genome]
 
-def _calculate_library_size_normalization_table():
+            # Write the data for each sample
+            for sample_filename, sample_data in group_data.items():
+                final_correction_factor = sample_data['library size normalization factor'] * \
+                                          sample_data['spike in normalization factor']
+                file.write(
+                    "\t".join(
+                        [sample_filename.replace("-dedup.bed", ""), str(sample_data['total reads'])] +
+                        [str(sample_data[genome]) for genome in genomes] +
+                        [str(sample_data['library size normalization factor'])] +
+                        [str(sample_data['spike in normalization factor'])] +
+                        [str(final_correction_factor), group_name]
+                    ) + "\n"
+                )
+
+
+def _calculate_library_size_normalization_table(sample_name_conversion):
+    def get_group_name(filename):
+        sample_name = filename.replace('-dedup.bed', '')
+
+        for prefix in sample_name_conversion:
+            if sample_name_conversion[prefix][0] == sample_name:
+                return sample_name_conversion[prefix][1]
+
+        return "unknown"
+
+
     bed_directory = MAIN_DIRECTORY + "bed"
 
-    line_count = {}
+    normalization_group_data = defaultdict(dict)
 
     for filename in os.listdir(bed_directory):
+        group_name = get_group_name(filename)
+
         with open(bed_directory + "/" + filename) as file:
             for i, _ in enumerate(file):
                 pass
 
-        line_count[filename] = i + 1
-
-    average_library_size = mean(count for _, count in line_count.values())
+        normalization_group_data[group_name][filename] = i + 1
 
     # Write the data to a file
     with open(MAIN_DIRECTORY + "normalization_table.tsv", 'w') as file:
-        # Write the headers
-        file.write(
-            "\t".join(
-                ["Sample", "Total Reads", "Correction Factor"]
-            ) + "\n"
-        )
+        for group_name, group_data in normalization_group_data.items():
 
-        for filename, counts in line_count.items():
+            average_library_size = mean([count for count in group_data.values()])
+
+            # Write the headers
             file.write(
                 "\t".join(
-                    [filename.replace("-dedup.bed", ""), str(counts), str(average_library_size / counts)]
+                    ["Sample", "Total Reads", "Correction Factor"]
                 ) + "\n"
             )
 
+            for filename, counts in group_data.items():
+                file.write(
+                    "\t".join(
+                        [filename.replace("-dedup.bed", ""), str(counts), str(average_library_size / counts), group_name]
+                    ) + "\n"
+                )
 
-def calculate_normalization_table(spike_in_genome=None, genomes=None):
-    # If they provide arguments, then it must be spike_in normalizatio
+
+def calculate_normalization_table(sample_name_conversion, spike_in_genome=None, genomes=None):
+    # If they provide arguments, then it must be spike_in normalization
     if spike_in_genome and genomes:
-        _calculate_spike_in_normalization_table(spike_in_genome, genomes)
+        _calculate_spike_in_normalization_table(sample_name_conversion, spike_in_genome, genomes)
     else:
         # Calculate based on total library size
-        _calculate_library_size_normalization_table()
+        _calculate_library_size_normalization_table(sample_name_conversion)
 
 
 def _generate_bigwig(filename, normalization_factor, chrom_sizes_file, hosting_location):
@@ -427,7 +459,7 @@ def generate_bigwigs(chrom_sizes_filename, threads, hosting_location):
     with open(MAIN_DIRECTORY + "normalization_table.tsv") as file:
         for i, line in enumerate(file):
             if i != 0:
-                sample_name, *_, normalization_factor = line.split()
+                sample_name, *_, normalization_factor, _ = line.split()
                 normalization_factors[sample_name] = normalization_factor
 
     bed_directory = MAIN_DIRECTORY + "bed"
@@ -463,17 +495,6 @@ def clean_directories():
 
 
 def main(args):
-    # Example command
-    """
-    python3 align.py \
-      -u http://dnacore454.healthcare.uiowa.edu/20201217-0119_Price_20131PoyCTDqnZdykcTwIIKqPTtGwcSDSdPqaDyzxNijt/ \
-      -f delete_me -i /media/genomes/combinedgenome/combinedhg38_moth \
-      -c /media/genomes/combinedgenome/combinedhg38_moth.chrom.sizes \
-      -s http://pricenas.biochem.uiowa.edu/ \
-      --spike-in-genome JQCY02.1 \
-      -g hg38 \
-      --conversion-file conversion.tsv
-    """
     args = parse_args(args)
     url = args.url
     folder_name = args.folder_name
@@ -505,7 +526,7 @@ def main(args):
     download_data(url, prefixes)
     trim_adapters(threads)
     align(align_params, sample_name_conversion, threads)
-    calculate_normalization_table(spike_in_genome, genomes)
+    calculate_normalization_table(sample_name_conversion, spike_in_genome, genomes)
     generate_bigwigs(chrom_sizes_file, threads, hosting_location)
     clean_directories()
 
