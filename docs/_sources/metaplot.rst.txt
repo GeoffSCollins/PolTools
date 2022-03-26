@@ -1,7 +1,7 @@
 ##############################
 *Metaplot*
 ##############################
-The ``metaplot`` tool computes the average coverage of 3' ends of sequencing data around the center of features provided.
+The ``metaplot`` tool computes the average coverage of [5'/3'/pileup] reads of sequencing data around the center of features provided.
 
 .. note::
 

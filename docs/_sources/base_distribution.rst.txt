@@ -6,8 +6,7 @@ The ``base_distribution`` tool computes the average base composition at each pos
 
 .. note::
 
-    This tool requires `bedtools <https://github.com/arq5x/bedtools2>`_ to be installed and hg38.fa to be downloaded to
-    ~/PolTools/static. This can be done by running the commands at the bottom of this page.
+    This tool requires `bedtools <https://github.com/arq5x/bedtools2>`_ to be installed.
 
 
 ===============================
@@ -61,16 +60,3 @@ For example:
   3.0     0.2156319290465632      0.2953621581670362      0.2557280118255728      0.2332779009608278
   4.0     0.13848854397634885     0.27023281596452325     0.33379526977087953     0.25748337028824836
   5.0     0.12601626016260162     0.23706577974870657     0.2983185513673319      0.33859940872135996
-
-
-===============================
-Download hg38.fa
-===============================
-**Download hg38.fa**:
-To download the hg38.fa (fasta file for the whole genome), run the following commands in the static directory:
-
-.. code-block:: bash
-
-  wget http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
-  gunzip hg38.fa.gz
-

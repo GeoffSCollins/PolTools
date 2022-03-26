@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sequence Searches &mdash; PolTools 1.0.0 documentation</title>
+  <title>tsrPicker &mdash; PolTools 1.0.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -18,8 +18,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="TPS Distance Per Gene" href="tps_distance_per_gene.html" />
-    <link rel="prev" title="Sequence from Around Max TSS" href="sequence_from_region_around_max_tss.html" /> 
+    <link rel="prev" title="tsrFinder" href="tsrFinder.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -53,16 +52,16 @@
 <li class="toctree-l1"><a class="reference internal" href="region_fold_change_heatmap.html"><em>Region Fold Change Heatmap</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="region_heatmap.html"><em>Region Heatmap</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="sequence_from_region_around_max_tss.html"><em>Sequence from Around Max TSS</em></a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#"><em>Sequence Searches</em></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#usage-and-option-summary">Usage and option summary</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#behavior">Behavior</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="sequence_searches.html"><em>Sequence Searches</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="tps_distance_per_gene.html"><em>TPS Distance Per Gene</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="track_links_from_bw.html"><em>Track Links From Bigwigs</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="truQuant.html"><em>truQuant</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="tsrFinder.html"><em>tsrFinder</em></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tsrPicker.html"><em>tsrPicker</em></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><em>tsrPicker</em></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#behavior">Behavior</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -79,7 +78,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li><em>Sequence Searches</em></li>
+      <li><em>tsrPicker</em></li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -88,23 +87,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="sequence-searches">
-<h1><em>Sequence Searches</em><a class="headerlink" href="#sequence-searches" title="Permalink to this headline"></a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">sequence_searches</span></code> tool is used determine if a sequence is present in a certain location around regions.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This tool requires <a class="reference external" href="https://github.com/arq5x/bedtools2">bedtools</a> to be installed.</p>
-</div>
-<section id="usage-and-option-summary">
-<h2>Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline"></a></h2>
+  <section id="tsrpicker">
+<h1><em>tsrPicker</em><a class="headerlink" href="#tsrpicker" title="Permalink to this headline"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">tsrPicker</span></code> tool identifies transcription start regions from PRO-Cap, PRO-Seq, and related sequencing experiments.</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PolTools</span> <span class="n">PolTools</span> <span class="n">sequence_searches</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">regions_filename</span> <span class="n">search</span> <span class="p">[</span><span class="n">search</span> <span class="o">...</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PolTools</span> <span class="n">tsrPicker</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="p">[</span><span class="n">radius</span><span class="p">]]</span> <span class="n">seq_file</span> <span class="n">min_seq_depth</span>
 </pre></div>
 </div>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 15%" />
-<col style="width: 85%" />
+<col style="width: 17%" />
+<col style="width: 83%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Required Arguments</p></th>
@@ -112,12 +107,11 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><strong>Regions filename</strong></p></td>
-<td><p>Bed formatted file containing all the regions you want to quantify (must be centered on +1 nt). This file can be generated from the
-<a class="reference external" href="https://geoffscollins.github.io/PolTools/make_regions_file_centered_on_max_tss.html">make_regions_file_centered_on_max_tss program</a></p></td>
+<tr class="row-even"><td><p><strong>Sequencing File</strong></p></td>
+<td><p>Bed formatted file from a sequencing experiment.</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Search</strong></p></td>
-<td><p>Search region and sequence formatted as follows: (Sequence),(-/+)left:(-/+)right. Ex: TATA,-30:-20</p></td>
+<tr class="row-odd"><td><p><strong>Min Seq Depth</strong></p></td>
+<td><p>The minimum number of 5’ reads to be considered as a TSR.</p></td>
 </tr>
 </tbody>
 </table>
@@ -132,22 +126,43 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><strong>Search</strong></p></td>
-<td><p>Additional searches can be provided.</p></td>
+<tr class="row-even"><td><p><strong>-r, –radius</strong></p></td>
+<td><p>Number of base pairs to expand the TSR from. Default is 5. For example, a value of 5 generates 11 bp TSRs as 5 base pairs are added on each side.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="behavior">
 <h2>Behavior<a class="headerlink" href="#behavior" title="Permalink to this headline"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">sequence_searches</span></code> will output the regions file provided with new columns for the searches containing True or False values.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tsrPicker</span></code> generates a file named the sequencing file plus the minimum sequencing depth and -TSR.bed.
+This bed formatted file contains TSRs with the number of 5’ ends at the max TSS. <code class="docutils literal notranslate"><span class="pre">tsrPicker</span></code> selects the
+base with the largest number of 5’ ends and generates a TSR of size 1 + (2 * radius) centered on that base. This process
+is repeated with all bases that are not within a TSR that meet the minimum sequencing depth.</p>
 <p>For example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ head POLR2A_inr.bed
-chr17   <span class="m">7484355</span> <span class="m">7484375</span> POLR2A  <span class="m">0</span>       +
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ head seq_file.bed
+chr1    <span class="m">11981</span>   <span class="m">12023</span>   A00876:119:HW5F5DRXX:1:2168:2248:1407   <span class="m">255</span>     -
+chr1    <span class="m">13099</span>   <span class="m">13117</span>   A00876:119:HW5F5DRXX:1:2203:31403:26757 <span class="m">255</span>     -
+chr1    <span class="m">13356</span>   <span class="m">13423</span>   A00876:119:HW5F5DRXX:1:2151:15808:7827  <span class="m">255</span>     -
+chr1    <span class="m">13435</span>   <span class="m">13477</span>   A00876:119:HW5F5DRXX:1:2273:15781:19241 <span class="m">255</span>     -
+chr1    <span class="m">13739</span>   <span class="m">13772</span>   A00876:119:HW5F5DRXX:1:2256:29966:10520 <span class="m">255</span>     -
+chr1    <span class="m">13741</span>   <span class="m">13773</span>   A00876:119:HW5F5DRXX:1:2235:4101:11882  <span class="m">255</span>     -
+chr1    <span class="m">14178</span>   <span class="m">14203</span>   A00876:119:HW5F5DRXX:1:2115:8241:31422  <span class="m">255</span>     -
+chr1    <span class="m">14734</span>   <span class="m">14768</span>   A00876:119:HW5F5DRXX:1:2165:23764:2440  <span class="m">255</span>     -
+chr1    <span class="m">14988</span>   <span class="m">15012</span>   A00876:119:HW5F5DRXX:1:2219:16134:32784 <span class="m">255</span>     -
+chr1    <span class="m">18337</span>   <span class="m">18362</span>   A00876:119:HW5F5DRXX:1:2149:32054:31328 <span class="m">255</span>     -
 
-$ PolTools sequence_searches POLR2A_inr.bed GCTGC,-3:3
-Chromosome      Left    Right   Gene    Score   Strand  GCTGC
-chr17   <span class="m">7484355</span> <span class="m">7484375</span> POLR2A  <span class="m">0</span>       +       True
+$ PolTools tsrPicker seq_file.bed <span class="m">200</span>
+$ head seq_file_20_20_30_600-TSR.tab
+chr1    <span class="m">156216434</span>       <span class="m">156216445</span>       TSR740  <span class="m">88595</span>   +
+chr1    <span class="m">149832651</span>       <span class="m">149832662</span>       TSR741  <span class="m">24039</span>   +
+chr1    <span class="m">203305513</span>       <span class="m">203305524</span>       TSR742  <span class="m">18139</span>   +
+chr1    <span class="m">146376801</span>       <span class="m">146376812</span>       TSR743  <span class="m">16896</span>   +
+chr1    <span class="m">16740510</span>        <span class="m">16740521</span>        TSR744  <span class="m">16140</span>   +
+chr1    <span class="m">149851056</span>       <span class="m">149851067</span>       TSR745  <span class="m">15735</span>   +
+chr1    <span class="m">16895974</span>        <span class="m">16895985</span>        TSR746  <span class="m">15223</span>   +
+chr1    <span class="m">28648594</span>        <span class="m">28648605</span>        TSR747  <span class="m">15157</span>   +
+chr1    <span class="m">85580755</span>        <span class="m">85580766</span>        TSR748  <span class="m">14528</span>   +
+chr1    <span class="m">148522595</span>       <span class="m">148522606</span>       TSR749  <span class="m">13905</span>   +
 </pre></div>
 </div>
 </section>
@@ -157,8 +172,7 @@ chr17   <span class="m">7484355</span> <span class="m">7484375</span> POLR2A  <s
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="sequence_from_region_around_max_tss.html" class="btn btn-neutral float-left" title="Sequence from Around Max TSS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="tps_distance_per_gene.html" class="btn btn-neutral float-right" title="TPS Distance Per Gene" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tsrFinder.html" class="btn btn-neutral float-left" title="tsrFinder" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
