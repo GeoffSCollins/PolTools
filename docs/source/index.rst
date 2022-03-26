@@ -14,8 +14,7 @@ Two options are provided for installation. Both assume you already have R and be
 install it as described `here <https://cran.r-project.org/doc/manuals/r-release/R-admin.html>`_. If you do not have
 bedtools installed, please install it as described `in the documentation <https://bedtools.readthedocs.io/en/latest/content/installation.html>`_
 
-1) Install using pip and pypi
-Inside a terminal, run the following commands to install the necessary files
+1) Install using pip and PyPI
 
 .. code-block:: bash
 

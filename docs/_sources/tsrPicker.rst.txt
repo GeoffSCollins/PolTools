@@ -52,7 +52,7 @@ For example:
   chr1    18337   18362   A00876:119:HW5F5DRXX:1:2149:32054:31328 255     -
 
   $ PolTools tsrPicker seq_file.bed 200
-  $ head seq_file_20_20_30_600-TSR.tab
+  $ head seq_file_min_200-TSR.tab
   chr1    156216434       156216445       TSR740  88595   +
   chr1    149832651       149832662       TSR741  24039   +
   chr1    203305513       203305524       TSR742  18139   +
