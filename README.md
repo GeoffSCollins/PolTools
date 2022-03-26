@@ -11,7 +11,7 @@ It is primary written in python3, but utilizes R for plotting and C++ for comput
 
 Please see the [documentation](https://geoffscollins.github.io/PolTools/index.html) for more information. 
 
-PolTools contains 19 main programs, listed below. However, PolTools is much more than a collection of bioinformatic programs. It contains an extensive library of utility functions which can easily be used to create new, exciting bioinformatic tools.
+PolTools contains 20 main programs, listed below. However, PolTools is much more than a collection of bioinformatic programs. It contains an extensive library of utility functions which can easily be used to create new, exciting bioinformatic tools.
 
 - TES Fold Change Heatmap
 - TES Heatmap
@@ -32,3 +32,4 @@ PolTools contains 19 main programs, listed below. However, PolTools is much more
 - Track Links From Bigwigs
 - truQuant
 - tsrFinder
+- tsrPicker
